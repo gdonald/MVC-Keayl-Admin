@@ -8,28 +8,26 @@
       
       
       
-        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/assets/">
+        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/authentication/">
       
       
-        <link rel="prev" href="../layout/">
+        <link rel="prev" href="../assets/">
       
-      
-        <link rel="next" href="../authentication/">
       
       
         
       
       
-      <link rel="icon" href="images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Assets - MVC::Keayl::Admin</title>
+        <title>Authentication - MVC::Keayl::Admin</title>
       
     
     
-      <link rel="stylesheet" href="stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -66,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#assets" class="md-skip">
+        <a href="#authentication" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Assets
+              Authentication
             
           </span>
         </div>
@@ -300,6 +298,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../assets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Assets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -319,7 +344,7 @@
   <span class="md-ellipsis">
     
   
-    Assets
+    Authentication
   
 
     
@@ -337,7 +362,7 @@
   <span class="md-ellipsis">
     
   
-    Assets
+    Authentication
   
 
     
@@ -363,43 +388,49 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-bundle" class="md-nav__link">
+  <a href="#strategies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The bundle
+        Strategies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#http-basic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP basic
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#serving-and-fingerprinting" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Serving and fingerprinting
+        Session
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#overriding-styles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overriding styles
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#licensing" class="md-nav__link">
+  <a href="#the-current-admin" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Licensing
+        The current admin
       
     </span>
   </a>
@@ -410,33 +441,6 @@
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -468,43 +472,49 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-bundle" class="md-nav__link">
+  <a href="#strategies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The bundle
+        Strategies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#http-basic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP basic
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#serving-and-fingerprinting" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Serving and fingerprinting
+        Session
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#overriding-styles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overriding styles
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#licensing" class="md-nav__link">
+  <a href="#the-current-admin" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Licensing
+        The current admin
       
     </span>
   </a>
@@ -531,58 +541,70 @@
   
 
 
-<h1 id="assets">Assets<a class="headerlink" href="#assets" title="Permanent link">&para;</a></h1>
-<p>The admin ships a vendored frontend bundle and serves it through the engine, so
-it works with no external requests and no CDN dependency.</p>
-<h2 id="the-bundle">The bundle<a class="headerlink" href="#the-bundle" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Version</th>
-<th>Logical paths</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Bootstrap</td>
-<td>5.3.3</td>
-<td><code>bootstrap/bootstrap.min.css</code>, <code>bootstrap/bootstrap.bundle.min.js</code></td>
-</tr>
-<tr>
-<td>Bootstrap Icons</td>
-<td>1.11.3</td>
-<td><code>bootstrap-icons/bootstrap-icons.min.css</code></td>
-</tr>
-<tr>
-<td>htmx</td>
-<td>2.0.4</td>
-<td><code>htmx/htmx.min.js</code></td>
-</tr>
-</tbody>
-</table>
-<p>The files live under <code>assets/</code> and ship with the distribution. They are pinned
-in <code>tools/vendored-assets.json</code> (versions, source URLs, and checksums); run
-<code>raku tools/vendor-assets.raku</code> to refetch or upgrade them.</p>
-<h2 id="serving-and-fingerprinting">Serving and fingerprinting<a class="headerlink" href="#serving-and-fingerprinting" title="Permanent link">&para;</a></h2>
-<p>The engine serves the bundle under <code>&lt;mount&gt;/admin-assets/&lt;path&gt;</code>. Each URL
-carries a content digest as a query string, and responses are sent with
-<code>Cache-Control: public, max-age=31536000, immutable</code>. When a file's content
-changes its digest changes, so the URL changes and caches refresh on their own.</p>
-<p><code>MVC::Keayl::Admin::Assets.asset-url('bootstrap/bootstrap.min.css')</code> returns the
-fingerprinted URL. The layout renders the stylesheet, script, and import-map
-tags for the bundle. htmx and Bootstrap are also pinned in an import map.</p>
-<h2 id="overriding-styles">Overriding styles<a class="headerlink" href="#overriding-styles" title="Permanent link">&para;</a></h2>
-<p>A host application can layer its own stylesheet after the bundle:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">use-stylesheet</span>(<span class="s">&#39;/assets/admin-overrides.css&#39;</span>);
+<h1 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h1>
+<p>Every admin request runs through a pluggable authentication gate. Configure a
+strategy and the gate challenges or redirects unauthenticated visitors before
+any action runs. With no strategy configured the admin is open, which is
+convenient in development but should not be shipped to production.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin</span>;
+<span class="k">use</span> <span class="n">MVC::Keayl::Admin::Authentication::Basic</span>;
+
+<span class="n">MVC::Keayl::Admin</span>.<span class="n">authenticate-with</span>(
+  <span class="n">MVC::Keayl::Admin::Authentication::Basic</span>.<span class="nb">new</span>(
+    <span class="nb">name</span>     =&gt; <span class="s">&#39;admin&#39;</span>,
+    <span class="n">password</span> =&gt; <span class="s">&#39;secret&#39;</span>,
+    <span class="n">realm</span>    =&gt; <span class="s">&#39;Admin&#39;</span>,
+  )
+);
 </code></pre></div></td></tr></table></div>
-<p>The override is emitted after the vendored stylesheets, so its rules win.</p>
-<h2 id="licensing">Licensing<a class="headerlink" href="#licensing" title="Permanent link">&para;</a></h2>
-<p>The vendored assets are separate works under their own licenses (Bootstrap and
-Bootstrap Icons are MIT, htmx is Zero-Clause BSD), distinct from this
-distribution's Artistic-2.0 license. Each component's <code>LICENSE</code> is bundled next
-to its files, and <a href="https://github.com/gdonald/MVC-Keayl-Admin/blob/main/NOTICES.md">NOTICES.md</a>
-records the versions, licenses, and sources.</p>
+<h2 id="strategies">Strategies<a class="headerlink" href="#strategies" title="Permanent link">&para;</a></h2>
+<p>A strategy does the <code>MVC::Keayl::Admin::Authentication::Strategy</code> role, which has
+two methods: <code>authenticate($controller)</code> returns the current admin or an
+undefined value, and <code>challenge($controller)</code> issues the response for an
+unauthenticated visitor.</p>
+<h3 id="http-basic">HTTP basic<a class="headerlink" href="#http-basic" title="Permanent link">&para;</a></h3>
+<p><code>MVC::Keayl::Admin::Authentication::Basic</code> compares the request's basic
+credentials against a configured <code>name</code> and <code>password</code> using a constant-time
+comparison, and challenges with a <code>401</code> and a <code>WWW-Authenticate</code> header.</p>
+<h3 id="session">Session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h3>
+<p><code>MVC::Keayl::Admin::Authentication::Session</code> reads an id from the session (<code>key</code>,
+default <code>admin_id</code>) and redirects an unauthenticated visitor to <code>login-path</code>
+(default <code>/login</code>). An optional <code>resolve</code> block maps the stored id to an admin
+object:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin::Authentication::Session</span>;
+
+<span class="n">MVC::Keayl::Admin</span>.<span class="n">authenticate-with</span>(
+  <span class="n">MVC::Keayl::Admin::Authentication::Session</span>.<span class="nb">new</span>(
+    <span class="nb">key</span>        =&gt; <span class="s">&#39;admin_id&#39;</span>,
+    <span class="n">login-path</span> =&gt; <span class="s">&#39;/admin/login&#39;</span>,
+    <span class="nb">resolve</span>    =&gt; -&gt; <span class="nv">$id</span> { <span class="n">Admin</span>.<span class="n">find</span>(<span class="nv">$id</span>) },
+  )
+);
+</code></pre></div></td></tr></table></div>
+<h2 id="the-current-admin">The current admin<a class="headerlink" href="#the-current-admin" title="Permanent link">&para;</a></h2>
+<p>When authentication succeeds the result is the current admin. It is available to
+controllers as <code>self.current-admin</code>, exposed to views as <code>$current_admin</code> (the
+layout shows a "Signed in as" indicator when present), and is the value the
+authorization layer will check.</p>
+<p>Assets are served by a controller outside the gate, so the stylesheet, script,
+and font bundle load without authentication.</p>
 
 
 
@@ -632,10 +654,10 @@ records the versions, licenses, and sources.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

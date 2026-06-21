@@ -8,28 +8,28 @@
       
       
       
-        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/assets/">
+        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/layout/">
       
       
-        <link rel="prev" href="../layout/">
+        <link rel="prev" href="../mounting/">
       
       
-        <link rel="next" href="../authentication/">
+        <link rel="next" href="../assets/">
       
       
         
       
       
-      <link rel="icon" href="images/favicon.png">
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Assets - MVC::Keayl::Admin</title>
+        <title>Layout and chrome - MVC::Keayl::Admin</title>
       
     
     
-      <link rel="stylesheet" href="stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#assets" class="md-skip">
+        <a href="#layout-and-chrome" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Assets
+              Layout and chrome
             
           </span>
         </div>
@@ -273,33 +273,6 @@
       
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../layout/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Layout and chrome
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
     
   
   
@@ -319,7 +292,7 @@
   <span class="md-ellipsis">
     
   
-    Assets
+    Layout and chrome
   
 
     
@@ -337,7 +310,7 @@
   <span class="md-ellipsis">
     
   
-    Assets
+    Layout and chrome
   
 
     
@@ -363,10 +336,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-bundle" class="md-nav__link">
+  <a href="#rendering-a-page" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The bundle
+        Rendering a page
       
     </span>
   </a>
@@ -374,32 +347,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#serving-and-fingerprinting" class="md-nav__link">
+  <a href="#the-admin-context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Serving and fingerprinting
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#overriding-styles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overriding styles
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#licensing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Licensing
+        The admin context
       
     </span>
   </a>
@@ -410,6 +361,33 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../assets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Assets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -468,10 +446,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-bundle" class="md-nav__link">
+  <a href="#rendering-a-page" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The bundle
+        Rendering a page
       
     </span>
   </a>
@@ -479,32 +457,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#serving-and-fingerprinting" class="md-nav__link">
+  <a href="#the-admin-context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Serving and fingerprinting
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#overriding-styles" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overriding styles
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#licensing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Licensing
+        The admin context
       
     </span>
   </a>
@@ -531,58 +487,50 @@
   
 
 
-<h1 id="assets">Assets<a class="headerlink" href="#assets" title="Permanent link">&para;</a></h1>
-<p>The admin ships a vendored frontend bundle and serves it through the engine, so
-it works with no external requests and no CDN dependency.</p>
-<h2 id="the-bundle">The bundle<a class="headerlink" href="#the-bundle" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Version</th>
-<th>Logical paths</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Bootstrap</td>
-<td>5.3.3</td>
-<td><code>bootstrap/bootstrap.min.css</code>, <code>bootstrap/bootstrap.bundle.min.js</code></td>
-</tr>
-<tr>
-<td>Bootstrap Icons</td>
-<td>1.11.3</td>
-<td><code>bootstrap-icons/bootstrap-icons.min.css</code></td>
-</tr>
-<tr>
-<td>htmx</td>
-<td>2.0.4</td>
-<td><code>htmx/htmx.min.js</code></td>
-</tr>
-</tbody>
-</table>
-<p>The files live under <code>assets/</code> and ship with the distribution. They are pinned
-in <code>tools/vendored-assets.json</code> (versions, source URLs, and checksums); run
-<code>raku tools/vendor-assets.raku</code> to refetch or upgrade them.</p>
-<h2 id="serving-and-fingerprinting">Serving and fingerprinting<a class="headerlink" href="#serving-and-fingerprinting" title="Permanent link">&para;</a></h2>
-<p>The engine serves the bundle under <code>&lt;mount&gt;/admin-assets/&lt;path&gt;</code>. Each URL
-carries a content digest as a query string, and responses are sent with
-<code>Cache-Control: public, max-age=31536000, immutable</code>. When a file's content
-changes its digest changes, so the URL changes and caches refresh on their own.</p>
-<p><code>MVC::Keayl::Admin::Assets.asset-url('bootstrap/bootstrap.min.css')</code> returns the
-fingerprinted URL. The layout renders the stylesheet, script, and import-map
-tags for the bundle. htmx and Bootstrap are also pinned in an import map.</p>
-<h2 id="overriding-styles">Overriding styles<a class="headerlink" href="#overriding-styles" title="Permanent link">&para;</a></h2>
-<p>A host application can layer its own stylesheet after the bundle:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">use-stylesheet</span>(<span class="s">&#39;/assets/admin-overrides.css&#39;</span>);
+<h1 id="layout-and-chrome">Layout and chrome<a class="headerlink" href="#layout-and-chrome" title="Permanent link">&para;</a></h1>
+<p>Admin pages render inside a Bootstrap 5 layout: a top bar with the site brand, a
+collapsible left sidebar, a main content region, a flash area, and breadcrumbs.
+On small screens the sidebar becomes an offcanvas panel toggled from the top
+bar.</p>
+<h2 id="rendering-a-page">Rendering a page<a class="headerlink" href="#rendering-a-page" title="Permanent link">&para;</a></h2>
+<p>Controllers derive from <code>MVC::Keayl::Admin::Controller</code> and render through
+<code>render-admin</code>, which wires the chrome (asset tags, brand, menu, breadcrumbs,
+flash) into the layout and renders the named template into the main region.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin::Controller</span>;
+
+<span class="k">unit</span> <span class="k">class</span> <span class="n">MyAdmin::PostsController</span> <span class="k">is</span> <span class="n">MVC::Keayl::Admin::Controller</span>;
+
+<span class="k">method</span> <span class="nb">index</span> {
+  <span class="nb">self</span>.<span class="n">render-admin</span>(
+    <span class="s">&#39;posts/index&#39;</span>,
+    <span class="n">page-title</span>  =&gt; <span class="s">&#39;Posts&#39;</span>,
+    <span class="n">breadcrumbs</span> =&gt; [ <span class="s">&#39;Posts&#39;</span> =&gt; <span class="nb">Nil</span> ],
+  )
+}
 </code></pre></div></td></tr></table></div>
-<p>The override is emitted after the vendored stylesheets, so its rules win.</p>
-<h2 id="licensing">Licensing<a class="headerlink" href="#licensing" title="Permanent link">&para;</a></h2>
-<p>The vendored assets are separate works under their own licenses (Bootstrap and
-Bootstrap Icons are MIT, htmx is Zero-Clause BSD), distinct from this
-distribution's Artistic-2.0 license. Each component's <code>LICENSE</code> is bundled next
-to its files, and <a href="https://github.com/gdonald/MVC-Keayl-Admin/blob/main/NOTICES.md">NOTICES.md</a>
-records the versions, licenses, and sources.</p>
+<ul>
+<li><code>page-title</code> sets the document title and the page heading. It defaults to the
+  configured site title.</li>
+<li><code>breadcrumbs</code> is a list of <code>label =&gt; url</code> pairs. A pair whose url is <code>Nil</code>
+  (or empty) renders as the current, unlinked page. Typically the last crumb.</li>
+</ul>
+<p>The template named in the first argument renders into the main content region.
+The vendored asset bundle, import map, brand, sidebar menu, and breadcrumbs are
+supplied by the layout, so a page template only renders its own content.</p>
+<h2 id="the-admin-context">The admin context<a class="headerlink" href="#the-admin-context" title="Permanent link">&para;</a></h2>
+<p>The base controller runs a <code>before-action</code> that builds a per-request context
+available as <code>admin-context</code> (site title, mount path, and the current path).
+Later phases extend it with the current resource and action.</p>
 
 
 
@@ -632,10 +580,10 @@ records the versions, licenses, and sources.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
