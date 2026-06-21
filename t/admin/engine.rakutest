@@ -1,0 +1,47 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Engine;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+
+sub request($method, $path) {
+  MVC::Keayl::Request.new(:$method, :$path)
+}
+
+sub mounted-host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+MVC::Keayl::Admin.reset;
+
+my $engine = MVC::Keayl::Admin.engine;
+
+isa-ok $engine, MVC::Keayl::Admin::Engine, 'the entry point builds an admin engine';
+
+is $engine.namespace, 'MVC::Keayl::Admin', 'the engine isolates the admin namespace';
+
+ok $engine.view-paths.elems > 0, 'the engine declares a view path';
+
+ok $engine.asset-paths.elems > 0, 'the engine declares an asset path';
+
+ok $engine.helper-paths.elems > 0, 'the engine declares a helper path';
+
+is mounted-host.call(request('GET', '/admin')).body, 'Admin', 'the mounted admin serves its dashboard';
+
+is MVC::Keayl::Admin.config.mount-path, '/admin', 'the mount path defaults to /admin';
+
+MVC::Keayl::Admin.configure(mount-path => '/manage');
+
+is MVC::Keayl::Admin.config.mount-path, '/manage', 'the mount path is configurable';
+
+MVC::Keayl::Admin.configure(site-title => 'Control Panel');
+
+is mounted-host.call(request('GET', '/admin')).body, 'Control Panel', 'the site title is configurable';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

@@ -15,15 +15,21 @@
   "test-depends": [
     "Test",
     "Test::META",
+    "JSON::Fast",
     "BDD::Behave:auth<zef:gdonald>",
     "ORM::Factory:auth<zef:gdonald>"
   ],
   "provides": {
     "MVC::Keayl::Admin": "lib/MVC/Keayl/Admin.rakumod",
+    "MVC::Keayl::Admin::Assets": "lib/MVC/Keayl/Admin/Assets.rakumod",
+    "MVC::Keayl::Admin::AssetsController": "lib/MVC/Keayl/Admin/AssetsController.rakumod",
+    "MVC::Keayl::Admin::Config": "lib/MVC/Keayl/Admin/Config.rakumod",
     "MVC::Keayl::Admin::Controller": "lib/MVC/Keayl/Admin/Controller.rakumod",
+    "MVC::Keayl::Admin::DashboardController": "lib/MVC/Keayl/Admin/DashboardController.rakumod",
     "MVC::Keayl::Admin::DSL": "lib/MVC/Keayl/Admin/DSL.rakumod",
     "MVC::Keayl::Admin::Engine": "lib/MVC/Keayl/Admin/Engine.rakumod",
     "MVC::Keayl::Admin::Filter": "lib/MVC/Keayl/Admin/Filter.rakumod",
+    "MVC::Keayl::Admin::Paths": "lib/MVC/Keayl/Admin/Paths.rakumod",
     "MVC::Keayl::Admin::Registry": "lib/MVC/Keayl/Admin/Registry.rakumod",
     "MVC::Keayl::Admin::Resource": "lib/MVC/Keayl/Admin/Resource.rakumod",
     "MVC::Keayl::Admin::View": "lib/MVC/Keayl/Admin/View.rakumod"

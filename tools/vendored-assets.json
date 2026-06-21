@@ -1,0 +1,78 @@
+{
+  "components": [
+    {
+      "files": [
+        {
+          "path": "bootstrap/bootstrap.min.css",
+          "sha1": "c5ac1dee961cb59a045256ec203f69e317872f7c",
+          "url": "https://cdn.jsdelivr.net/npm/bootstrap@{version}/dist/css/bootstrap.min.css"
+        },
+        {
+          "path": "bootstrap/bootstrap.bundle.min.js",
+          "sha1": "ddc6e9ead6d16ae9237399ce41e8c1620cc59c36",
+          "url": "https://cdn.jsdelivr.net/npm/bootstrap@{version}/dist/js/bootstrap.bundle.min.js"
+        },
+        {
+          "path": "bootstrap/LICENSE",
+          "sha1": "e5341458eab02cb75a41a0f73525bb47065734e8",
+          "url": "https://raw.githubusercontent.com/twbs/bootstrap/v{version}/LICENSE"
+        }
+      ],
+      "license": "MIT",
+      "name": "bootstrap",
+      "source": "https://github.com/twbs/bootstrap",
+      "title": "Bootstrap",
+      "version": "5.3.3"
+    },
+    {
+      "files": [
+        {
+          "path": "bootstrap-icons/bootstrap-icons.min.css",
+          "sha1": "043a332e4f555cc0bfd35e451be955b4b93966a0",
+          "url": "https://cdn.jsdelivr.net/npm/bootstrap-icons@{version}/font/bootstrap-icons.min.css"
+        },
+        {
+          "path": "bootstrap-icons/fonts/bootstrap-icons.woff2",
+          "sha1": "020c3c6f9280a315e8425d7f92e15bcd0cdda1b2",
+          "url": "https://cdn.jsdelivr.net/npm/bootstrap-icons@{version}/font/fonts/bootstrap-icons.woff2"
+        },
+        {
+          "path": "bootstrap-icons/fonts/bootstrap-icons.woff",
+          "sha1": "d5831fd39baf13aff7626e483b9a089730f18604",
+          "url": "https://cdn.jsdelivr.net/npm/bootstrap-icons@{version}/font/fonts/bootstrap-icons.woff"
+        },
+        {
+          "path": "bootstrap-icons/LICENSE",
+          "sha1": "acac50435cf9dc993396653dcc5335fc4b52efb5",
+          "url": "https://raw.githubusercontent.com/twbs/icons/v{version}/LICENSE"
+        }
+      ],
+      "license": "MIT",
+      "name": "bootstrap-icons",
+      "source": "https://github.com/twbs/icons",
+      "title": "Bootstrap Icons",
+      "version": "1.11.3"
+    },
+    {
+      "files": [
+        {
+          "path": "htmx/htmx.min.js",
+          "sha1": "03a1ffdf83a11fab58acf6bcdf51233fdf14abd5",
+          "url": "https://cdn.jsdelivr.net/npm/htmx.org@{version}/dist/htmx.min.js"
+        },
+        {
+          "path": "htmx/LICENSE",
+          "sha1": "30c284d61a1e4ea8cdf633e6e02af57f7031da82",
+          "url": "https://raw.githubusercontent.com/bigskysoftware/htmx/v{version}/LICENSE"
+        }
+      ],
+      "license": "Zero-Clause BSD",
+      "name": "htmx",
+      "source": "https://github.com/bigskysoftware/htmx",
+      "title": "htmx",
+      "version": "2.0.4"
+    }
+  ],
+  "description": "Pinned manifest of the vendored frontend bundle. To upgrade a component, change its version, run tools/vendor-assets.raku to refetch and refresh the sha1 checksums, review the diff, and run the test suite.",
+  "destination": "assets"
+}

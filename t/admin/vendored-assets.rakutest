@@ -1,0 +1,44 @@
+use v6.d;
+use Test;
+use JSON::Fast;
+use MVC::Keayl::Assets;
+
+my $root     = $*PROGRAM.IO.parent(3);
+my %manifest = from-json($root.add('tools/vendored-assets.json').slurp);
+my $dest     = $root.add(%manifest<destination>);
+
+my @manifest-paths = %manifest<components>.list.map({ .<files>.list.map(*.<path>) }).flat;
+
+my @served = <
+  bootstrap/bootstrap.min.css
+  bootstrap/bootstrap.bundle.min.js
+  bootstrap-icons/bootstrap-icons.min.css
+  htmx/htmx.min.js
+>;
+
+for %manifest<components>.list -> %component {
+  for %component<files>.list -> %file {
+    my $path = $dest.add(%file<path>);
+
+    ok $path.e, "vendored file present: {%file<path>}";
+
+    is digest-for($path.slurp(:bin)), %file<sha1>,
+      "vendored file matches its pinned sha1: {%file<path>}";
+  }
+}
+
+for @served -> $logical {
+  ok @manifest-paths.grep($logical).elems > 0,
+    "served asset is pinned in the manifest: $logical";
+}
+
+my @notices-lines = $root.add('NOTICES.md').lines;
+
+for %manifest<components>.list -> %component {
+  ok @notices-lines.first({
+       .contains(%component<title>) && .contains(%component<version>) && .contains(%component<license>)
+     }).defined,
+    "NOTICES.md records {%component<title>} {%component<version>} ({%component<license>})";
+}
+
+done-testing;

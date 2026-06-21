@@ -1,0 +1,70 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Assets;
+use MVC::Keayl::Admin::AssetsController;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Parameters;
+
+sub request($method, $path) {
+  MVC::Keayl::Request.new(:$method, :$path)
+}
+
+sub mounted-host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+MVC::Keayl::Admin.reset;
+
+# fingerprinted urls
+my $url = MVC::Keayl::Admin::Assets.asset-url('bootstrap/bootstrap.min.css');
+
+ok $url.starts-with('/admin/admin-assets/bootstrap/bootstrap.min.css?'),
+  'an asset url is mount-prefixed, namespaced, and fingerprinted';
+
+isnt MVC::Keayl::Admin::Assets.digest-of('htmx/htmx.min.js'), Str,
+  'a vendored asset has a content digest';
+
+# serving with cache headers and content type
+my $response = mounted-host.call(request('GET', '/admin/admin-assets/bootstrap/bootstrap.min.css'));
+
+is $response.status, 200, 'a vendored asset is served';
+
+ok $response.body.elems > 0 || $response.body.chars > 0, 'the served asset has a body';
+
+is $response.header('Cache-Control'), 'public, max-age=31536000, immutable',
+  'a served asset carries an immutable long-lived cache header';
+
+is $response.header('Content-Type'), 'text/css', 'a css asset is served with the css content type';
+
+# path traversal is refused
+my $traversal = MVC::Keayl::Admin::AssetsController.new(
+  params => MVC::Keayl::Parameters.new({ path => '../../META6.json' })
+).dispatch('show');
+
+is $traversal.status, 404, 'a path traversal attempt is refused';
+
+# import map pins htmx and bootstrap, with no external host
+my %imports = MVC::Keayl::Admin::Assets.import-map.imports;
+
+ok %imports<htmx.org>.contains('/admin/admin-assets/htmx/htmx.min.js'),
+  'the import map pins htmx to the vendored bundle';
+
+ok %imports<bootstrap>.contains('/admin/admin-assets/bootstrap/bootstrap.bundle.min.js'),
+  'the import map pins bootstrap to the vendored bundle';
+
+# host override stylesheet is layered after the bundle
+MVC::Keayl::Admin.use-stylesheet('/css/custom-admin.css');
+
+my $tags = MVC::Keayl::Admin::Assets.stylesheet-tags;
+
+ok $tags.index('bootstrap/bootstrap.min.css') < $tags.index('/css/custom-admin.css'),
+  'the override stylesheet is layered after the vendored bundle';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

@@ -1,4 +1,5 @@
 test.raku
+tools/vendor-assets.raku
 CLAUDE.md
 ROADMAP.md
 .behave-failures

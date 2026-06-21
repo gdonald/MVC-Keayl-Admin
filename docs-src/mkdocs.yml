@@ -3,6 +3,8 @@ site_url: https://gdonald.github.io/MVC-Keayl-Admin/
 repo_url: https://github.com/gdonald/MVC-Keayl-Admin
 nav:
   - Home: index.md
+  - Mounting: mounting.md
+  - Assets: assets.md
 theme:
   name: 'material'
 markdown_extensions:

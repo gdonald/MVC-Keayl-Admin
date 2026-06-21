@@ -16,6 +16,13 @@ depends on MVC::Keayl, never the reverse.
 
 Early development. See [ROADMAP.md](ROADMAP.md) for the planned surface.
 
+## Vendored assets
+
+The admin vendors Bootstrap 5, Bootstrap Icons, and htmx so it works with no
+external requests. These are third-party works under their own licenses,
+separate from this distribution's Artistic-2.0 license. See
+[NOTICES.md](NOTICES.md).
+
 ## Testing
 
 Run the prove6 and behave suites:

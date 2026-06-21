@@ -1,13 +1,18 @@
 use v6.d;
 use Test;
 
-plan 8;
+plan 13;
 
 use-ok 'MVC::Keayl::Admin';
+use-ok 'MVC::Keayl::Admin::Assets';
+use-ok 'MVC::Keayl::Admin::AssetsController';
+use-ok 'MVC::Keayl::Admin::Config';
 use-ok 'MVC::Keayl::Admin::Controller';
+use-ok 'MVC::Keayl::Admin::DashboardController';
 use-ok 'MVC::Keayl::Admin::DSL';
 use-ok 'MVC::Keayl::Admin::Engine';
 use-ok 'MVC::Keayl::Admin::Filter';
+use-ok 'MVC::Keayl::Admin::Paths';
 use-ok 'MVC::Keayl::Admin::Registry';
 use-ok 'MVC::Keayl::Admin::Resource';
 use-ok 'MVC::Keayl::Admin::View';
