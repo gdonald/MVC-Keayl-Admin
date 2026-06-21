@@ -1,0 +1,31 @@
+{
+  "name": "MVC::Keayl::Admin",
+  "description": "Generated administration interface for MVC::Keayl applications",
+  "version": "0.0.1",
+  "api": "1",
+  "perl": "6.d",
+  "authors": ["Greg Donald"],
+  "auth": "zef:gdonald",
+  "depends": [
+    "MVC::Keayl:auth<zef:gdonald>",
+    "ORM::ActiveRecord:auth<zef:gdonald>",
+    "Template::HAML:auth<zef:gdonald>"
+  ],
+  "build-depends": [],
+  "test-depends": [
+    "Test",
+    "Test::META",
+    "BDD::Behave:auth<zef:gdonald>",
+    "ORM::Factory:auth<zef:gdonald>"
+  ],
+  "provides": {
+  },
+  "resources": [],
+  "support": {
+    "source": "https://github.com/gdonald/MVC-Keayl-Admin.git",
+    "bugtracker": "https://github.com/gdonald/MVC-Keayl-Admin/issues"
+  },
+  "license": "Artistic-2.0",
+  "tags": ["MVC", "Web", "Admin", "Administration", "MVC::Keayl"],
+  "source-url": "git://github.com/gdonald/MVC-Keayl-Admin.git"
+}
