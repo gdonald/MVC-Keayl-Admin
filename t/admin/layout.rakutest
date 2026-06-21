@@ -1,0 +1,65 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Chrome;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+
+sub request($method, $path) {
+  MVC::Keayl::Request.new(:$method, :$path)
+}
+
+sub dashboard-body {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host   = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+  $host.call(request('GET', '/admin')).body
+}
+
+MVC::Keayl::Admin.reset;
+
+my $body = dashboard-body;
+
+ok $body.contains('<!DOCTYPE html>') || $body.contains('<html'), 'the layout renders a full HTML document';
+
+ok $body.contains('<title>Dashboard</title>'), 'the page title fills the document title';
+
+ok $body.contains('rel="stylesheet"') && $body.contains('bootstrap/bootstrap.min.css'),
+  'the vendored stylesheet bundle is linked';
+
+ok $body.contains('htmx/htmx.min.js'), 'the htmx script is included';
+
+ok $body.contains('type="importmap"'), 'the import map is emitted';
+
+ok $body.contains('navbar'), 'the top bar is present';
+
+ok $body.contains('navbar-brand') && $body.contains('Admin'), 'the brand shows the site title';
+
+ok $body.contains('offcanvas') && $body.contains('data-bs-target') && $body.contains('#admin-sidebar'),
+  'the sidebar is a responsive offcanvas with a toggle target';
+
+ok $body.contains('breadcrumb'), 'breadcrumbs are rendered';
+
+ok $body.contains('<main'), 'a main content region is present';
+
+ok $body.contains('Welcome to Admin'), 'the dashboard content renders inside the layout';
+
+# chrome units
+ok MVC::Keayl::Admin::Chrome.brand-html.contains('navbar-brand') && MVC::Keayl::Admin::Chrome.brand-html.contains('/admin'),
+  'the brand links to the mount path';
+
+ok MVC::Keayl::Admin::Chrome.menu-html(path => '/').contains('active'),
+  'the dashboard menu entry is active at the mount root';
+
+is MVC::Keayl::Admin::Chrome.breadcrumbs-html([]), '', 'breadcrumbs are empty without crumbs';
+
+ok MVC::Keayl::Admin::Chrome.breadcrumbs-html([ 'Posts' => '/admin/posts' ]).contains('href="/admin/posts"'),
+  'a breadcrumb with a url renders a link';
+
+ok MVC::Keayl::Admin::Chrome.breadcrumbs-html([ 'Posts' => Nil ]).contains('aria-current="page"'),
+  'a breadcrumb without a url renders as the active page';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

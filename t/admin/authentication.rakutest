@@ -1,0 +1,78 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Controller;
+use MVC::Keayl::Admin::Authentication::Basic;
+use MVC::Keayl::Admin::Authentication::Session;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::HttpAuthentication;
+
+sub fetch($path, :$authorization) {
+  my %headers = $authorization.defined ?? (Authorization => $authorization) !! ();
+  my $router  = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host    = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+  $host.call(MVC::Keayl::Request.new(method => 'GET', path => $path, :%headers))
+}
+
+# no strategy configured: the admin is open
+MVC::Keayl::Admin.reset;
+
+is fetch('/admin').status, 200, 'with no strategy configured the admin is open';
+
+# http basic gate
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.authenticate-with(
+  MVC::Keayl::Admin::Authentication::Basic.new(name => 'admin', password => 'secret', realm => 'Admin')
+);
+
+is fetch('/admin').status, 401, 'a basic-auth gate challenges an unauthenticated visitor';
+
+ok fetch('/admin').header('WWW-Authenticate').contains('Basic'),
+  'the challenge asks for basic credentials';
+
+is fetch('/admin', authorization => encode-basic-credentials('admin', 'wrong')).status, 401,
+  'invalid credentials are rejected';
+
+my $ok = fetch('/admin', authorization => encode-basic-credentials('admin', 'secret'));
+
+is $ok.status, 200, 'valid credentials reach the admin';
+
+ok $ok.body.contains('Signed in as admin'), 'the current admin is exposed to the view';
+
+# assets stay reachable without authentication
+ok fetch('/admin/admin-assets/htmx/htmx.min.js').status == 200,
+  'assets are served without authentication';
+
+# session strategy unit behavior
+MVC::Keayl::Admin.reset;
+
+my $session-strategy = MVC::Keayl::Admin::Authentication::Session.new(key => 'admin_id', login-path => '/admin/login');
+
+my $signed-in = MVC::Keayl::Admin::Controller.new;
+$signed-in.session<admin_id> = 7;
+
+is $session-strategy.authenticate($signed-in), 7, 'the session strategy returns the stored admin id';
+
+my $anonymous = MVC::Keayl::Admin::Controller.new;
+
+nok $session-strategy.authenticate($anonymous).defined, 'the session strategy returns nothing for an anonymous visitor';
+
+my $redirect = $session-strategy.challenge($anonymous);
+
+is $redirect.status, 302, 'the session strategy redirects an unauthenticated visitor';
+
+is $redirect.header('Location'), '/admin/login', 'the redirect targets the configured login path';
+
+# session strategy with a resolver
+my $resolving = MVC::Keayl::Admin::Authentication::Session.new(resolve => -> $id { "admin-$id" });
+my $controller = MVC::Keayl::Admin::Controller.new;
+$controller.session<admin_id> = 5;
+
+is $resolving.authenticate($controller), 'admin-5', 'a resolver maps the stored id to an admin';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

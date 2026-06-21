@@ -1,11 +1,15 @@
 use v6.d;
 use Test;
 
-plan 13;
+plan 17;
 
 use-ok 'MVC::Keayl::Admin';
 use-ok 'MVC::Keayl::Admin::Assets';
 use-ok 'MVC::Keayl::Admin::AssetsController';
+use-ok 'MVC::Keayl::Admin::Authentication';
+use-ok 'MVC::Keayl::Admin::Authentication::Basic';
+use-ok 'MVC::Keayl::Admin::Authentication::Session';
+use-ok 'MVC::Keayl::Admin::Chrome';
 use-ok 'MVC::Keayl::Admin::Config';
 use-ok 'MVC::Keayl::Admin::Controller';
 use-ok 'MVC::Keayl::Admin::DashboardController';

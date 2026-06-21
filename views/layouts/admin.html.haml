@@ -1,0 +1,31 @@
+!!! 5
+%html{lang: 'en'}
+  %head
+    %meta{charset: 'utf-8'}
+    %meta(name='viewport' content='width=device-width, initial-scale=1')
+    %title= $page_title
+    != $admin_styles
+  %body
+    %nav.navbar.navbar-expand-lg.bg-dark.border-bottom.sticky-top.px-3
+      .container-fluid
+        %button.navbar-toggler.d-lg-none(type='button' data-bs-toggle='offcanvas' data-bs-target='#admin-sidebar' aria-controls='admin-sidebar' aria-label='Toggle navigation')
+          %span.navbar-toggler-icon
+        != $admin_brand
+        - if $current_admin
+          %span.navbar-text.text-light.ms-auto Signed in as #{$current_admin}
+    .container-fluid
+      .row
+        %nav#admin-sidebar.offcanvas-lg.offcanvas-start.col-lg-2.bg-body-tertiary.border-end.p-0(tabindex='-1' aria-labelledby='admin-sidebar-label')
+          .offcanvas-header
+            %h5#admin-sidebar-label.offcanvas-title= $site_title
+            %button.btn-close(type='button' data-bs-dismiss='offcanvas' data-bs-target='#admin-sidebar' aria-label='Close')
+          .offcanvas-body.flex-column.align-items-stretch.p-3
+            != $admin_menu
+        %main.col-lg-10.ms-sm-auto.px-md-4.py-3
+          != $admin_breadcrumbs
+          - if $flash_notice
+            .alert.alert-success(role='alert')= $flash_notice
+          %h1.h3.mb-3= $page_title
+          != $content
+    != $admin_importmap
+    != $admin_scripts

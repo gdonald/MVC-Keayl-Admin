@@ -30,7 +30,8 @@ ok $engine.asset-paths.elems > 0, 'the engine declares an asset path';
 
 ok $engine.helper-paths.elems > 0, 'the engine declares a helper path';
 
-is mounted-host.call(request('GET', '/admin')).body, 'Admin', 'the mounted admin serves its dashboard';
+ok mounted-host.call(request('GET', '/admin')).body.contains('Admin'),
+  'the mounted admin serves its dashboard';
 
 is MVC::Keayl::Admin.config.mount-path, '/admin', 'the mount path defaults to /admin';
 
@@ -40,7 +41,8 @@ is MVC::Keayl::Admin.config.mount-path, '/manage', 'the mount path is configurab
 
 MVC::Keayl::Admin.configure(site-title => 'Control Panel');
 
-is mounted-host.call(request('GET', '/admin')).body, 'Control Panel', 'the site title is configurable';
+ok mounted-host.call(request('GET', '/admin')).body.contains('Control Panel'),
+  'the site title is configurable';
 
 MVC::Keayl::Admin.reset;
 

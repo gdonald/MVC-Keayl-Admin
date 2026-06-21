@@ -5,6 +5,7 @@ use MVC::Keayl::Admin::Resource;
 use MVC::Keayl::Admin::Config;
 use MVC::Keayl::Admin::Engine;
 use MVC::Keayl::Admin::Assets;
+use MVC::Keayl::Admin::Authentication;
 use MVC::Keayl::Admin::DashboardController;
 use MVC::Keayl::Admin::AssetsController;
 
@@ -41,6 +42,10 @@ method use-stylesheet(::?CLASS:U: Str:D $url --> Nil) {
   MVC::Keayl::Admin::Assets.use-stylesheet($url);
 }
 
+method authenticate-with(::?CLASS:U: $strategy --> Nil) {
+  MVC::Keayl::Admin::Authentication.use-strategy($strategy);
+}
+
 sub admin-routes {
   my $dashboard = MVC::Keayl::Admin::DashboardController.controller-path ~ '#index';
   my $assets    = MVC::Keayl::Admin::AssetsController.controller-path ~ '#show';
@@ -71,4 +76,5 @@ method reset(::?CLASS:U: --> Nil) {
   $registry .= new;
   MVC::Keayl::Admin::Config.reset;
   MVC::Keayl::Admin::Assets.reset;
+  MVC::Keayl::Admin::Authentication.reset;
 }

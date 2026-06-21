@@ -2,6 +2,10 @@ use BDD::Behave;
 use MVC::Keayl::Admin;
 use MVC::Keayl::Admin::Assets;
 use MVC::Keayl::Admin::AssetsController;
+use MVC::Keayl::Admin::Authentication;
+use MVC::Keayl::Admin::Authentication::Basic;
+use MVC::Keayl::Admin::Authentication::Session;
+use MVC::Keayl::Admin::Chrome;
 use MVC::Keayl::Admin::Config;
 use MVC::Keayl::Admin::Controller;
 use MVC::Keayl::Admin::DashboardController;
@@ -44,6 +48,22 @@ describe 'MVC::Keayl::Admin distribution', {
 
   it 'loads the assets controller', {
     expect(MVC::Keayl::Admin::AssetsController.^name).to.be('MVC::Keayl::Admin::AssetsController');
+  }
+
+  it 'loads the chrome helper', {
+    expect(MVC::Keayl::Admin::Chrome.^name).to.be('MVC::Keayl::Admin::Chrome');
+  }
+
+  it 'loads the authentication manager', {
+    expect(MVC::Keayl::Admin::Authentication.^name).to.be('MVC::Keayl::Admin::Authentication');
+  }
+
+  it 'loads the basic authentication strategy', {
+    expect(MVC::Keayl::Admin::Authentication::Basic.^name).to.be('MVC::Keayl::Admin::Authentication::Basic');
+  }
+
+  it 'loads the session authentication strategy', {
+    expect(MVC::Keayl::Admin::Authentication::Session.^name).to.be('MVC::Keayl::Admin::Authentication::Session');
   }
 
   it 'loads the base controller', {

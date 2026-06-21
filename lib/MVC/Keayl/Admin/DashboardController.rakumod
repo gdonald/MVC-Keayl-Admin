@@ -4,5 +4,9 @@ use MVC::Keayl::Admin::Controller;
 unit class MVC::Keayl::Admin::DashboardController is MVC::Keayl::Admin::Controller;
 
 method index {
-  self.render(plain => self.admin-context<site-title>)
+  self.render-admin(
+    'dashboard/index',
+    page-title  => 'Dashboard',
+    breadcrumbs => [ 'Dashboard' => Nil ],
+  )
 }

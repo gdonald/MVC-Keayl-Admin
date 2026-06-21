@@ -48,7 +48,7 @@ describe 'MVC::Keayl::Admin mounting', {
   }
 
   it 'serves the dashboard below the mount point', {
-    expect(mounted-host.call(request('GET', '/admin')).body).to.be('Admin');
+    expect(mounted-host.call(request('GET', '/admin')).body.contains('Admin')).to.be-truthy;
   }
 
   context 'with a configured site title', {
@@ -57,7 +57,7 @@ describe 'MVC::Keayl::Admin mounting', {
     }
 
     it 'renders the configured site title', {
-      expect(mounted-host.call(request('GET', '/admin')).body).to.be('Control Panel');
+      expect(mounted-host.call(request('GET', '/admin')).body.contains('Control Panel')).to.be-truthy;
     }
   }
 }
