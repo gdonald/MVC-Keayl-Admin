@@ -1,0 +1,34 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Resource;
+
+class TestModel { }
+
+MVC::Keayl::Admin.reset;
+
+my $resource = MVC::Keayl::Admin.register(TestModel, { ; });
+
+isa-ok $resource, MVC::Keayl::Admin::Resource, 'register returns a resource';
+
+is $resource.model-name, 'TestModel', 'resource reports its model name';
+
+is MVC::Keayl::Admin.registry.all.elems, 1, 'register adds the resource to the registry';
+
+is MVC::Keayl::Admin.registry.all[0], $resource, 'the registered resource is the one returned';
+
+MVC::Keayl::Admin.reset;
+
+is MVC::Keayl::Admin.registry.all.elems, 0, 'reset clears the registry';
+
+$resource.declare('column', 'title', :sortable);
+$resource.declare('field', 'title');
+
+is $resource.declarations-of('column').elems, 1, 'declarations-of returns declarations of one kind';
+
+is $resource.declarations-of('column')[0]<args>[0], 'title', 'a declaration records its positional arguments';
+
+is $resource.declarations-of('column')[0]<opts><sortable>, True, 'a declaration records its named options';
+
+done-testing;

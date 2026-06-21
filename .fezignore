@@ -1,0 +1,9 @@
+test.raku
+CLAUDE.md
+ROADMAP.md
+.behave-failures
+.claude
+.DS_Store
+coverage
+build.sh
+mkdocs.yml

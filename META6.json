@@ -19,6 +19,14 @@
     "ORM::Factory:auth<zef:gdonald>"
   ],
   "provides": {
+    "MVC::Keayl::Admin": "lib/MVC/Keayl/Admin.rakumod",
+    "MVC::Keayl::Admin::Controller": "lib/MVC/Keayl/Admin/Controller.rakumod",
+    "MVC::Keayl::Admin::DSL": "lib/MVC/Keayl/Admin/DSL.rakumod",
+    "MVC::Keayl::Admin::Engine": "lib/MVC/Keayl/Admin/Engine.rakumod",
+    "MVC::Keayl::Admin::Filter": "lib/MVC/Keayl/Admin/Filter.rakumod",
+    "MVC::Keayl::Admin::Registry": "lib/MVC/Keayl/Admin/Registry.rakumod",
+    "MVC::Keayl::Admin::Resource": "lib/MVC/Keayl/Admin/Resource.rakumod",
+    "MVC::Keayl::Admin::View": "lib/MVC/Keayl/Admin/View.rakumod"
   },
   "resources": [],
   "support": {

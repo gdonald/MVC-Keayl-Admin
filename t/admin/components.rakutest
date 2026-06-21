@@ -1,0 +1,26 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Engine;
+use MVC::Keayl::Admin::Controller;
+use MVC::Keayl::Admin::View;
+use MVC::Keayl::Admin::Filter;
+use MVC::Keayl::Engine;
+use MVC::Keayl::Controller;
+use MVC::Keayl::View;
+
+is MVC::Keayl::Admin::Engine.new.namespace, 'MVC::Keayl::Admin', 'the engine isolates the admin namespace';
+
+isa-ok MVC::Keayl::Admin.engine, MVC::Keayl::Admin::Engine, 'the entry point builds an admin engine';
+
+isa-ok MVC::Keayl::Admin::Controller.new, MVC::Keayl::Controller, 'the base controller extends the framework controller';
+
+isa-ok MVC::Keayl::Admin::View.new, MVC::Keayl::View, 'the base view extends the framework view';
+
+is MVC::Keayl::Admin::Filter.new(:name<title>).predicate, 'eq', 'a filter defaults to the equality predicate';
+
+is MVC::Keayl::Admin::Filter.new(:name<title>, :options({ :predicate<cont> })).predicate, 'cont',
+  'a filter reads its predicate from its options';
+
+done-testing;
