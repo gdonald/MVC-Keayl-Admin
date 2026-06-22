@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/mounting/">
+        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/registration/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../mounting/">
       
       
-        <link rel="next" href="../registration/">
+        <link rel="next" href="../layout/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Mounting - MVC::Keayl::Admin</title>
+        <title>Registering resources - MVC::Keayl::Admin</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mounting-the-admin" class="md-skip">
+        <a href="#registering-resources" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Mounting
+              Registering resources
             
           </span>
         </div>
@@ -246,6 +246,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../mounting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mounting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -265,7 +292,7 @@
   <span class="md-ellipsis">
     
   
-    Mounting
+    Registering resources
   
 
     
@@ -283,7 +310,7 @@
   <span class="md-ellipsis">
     
   
-    Mounting
+    Registering resources
   
 
     
@@ -309,10 +336,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        Validation
       
     </span>
   </a>
@@ -320,10 +347,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-admin-context" class="md-nav__link">
+  <a href="#names-and-slug" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The admin context
+        Names and slug
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routes-and-url-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Routes and URL helpers
       
     </span>
   </a>
@@ -334,33 +372,6 @@
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../registration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Registering resources
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -473,10 +484,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        Validation
       
     </span>
   </a>
@@ -484,10 +495,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-admin-context" class="md-nav__link">
+  <a href="#names-and-slug" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The admin context
+        Names and slug
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routes-and-url-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Routes and URL helpers
       
     </span>
   </a>
@@ -514,67 +536,129 @@
   
 
 
-<h1 id="mounting-the-admin">Mounting the admin<a class="headerlink" href="#mounting-the-admin" title="Permanent link">&para;</a></h1>
-<p>The admin ships as a <code>MVC::Keayl</code> engine. A host application mounts it at a
-path, the same way it mounts any other engine.</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span>
-<span class="normal">3</span>
-<span class="normal">4</span>
-<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin</span>;
+<h1 id="registering-resources">Registering resources<a class="headerlink" href="#registering-resources" title="Permanent link">&para;</a></h1>
+<p>A resource is declared by hand with <code>register</code>. Everything the admin shows for a
+model is stated explicitly. Nothing is inferred at request time.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin</span>;
+<span class="k">use</span> <span class="n">MVC::Keayl::Admin::DSL</span>;
 
-<span class="n">routes</span> {
-  <span class="n">mount</span> <span class="n">MVC::Keayl::Admin</span>.<span class="n">endpoint</span>, <span class="nb">at</span> =&gt; <span class="n">MVC::Keayl::Admin</span>.<span class="nb">config</span>.<span class="n">mount-path</span>;
-}
+<span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, {
+  <span class="n">menu</span>(:<span class="n">group</span><span class="s">&lt;Content&gt;</span>, :<span class="n">label</span><span class="s">&lt;Posts&gt;</span>, :<span class="n">priority</span>(<span class="mi">10</span>), :<span class="n">icon</span><span class="s">&lt;file-text&gt;</span>);
+
+  <span class="nb">scope</span>(<span class="s">&#39;All&#39;</span>, :<span class="n">default</span>);
+  <span class="nb">scope</span>(<span class="s">&#39;Published&#39;</span>, { .<span class="n">where</span>(:<span class="n">published</span>(<span class="nb">True</span>)) });
+
+  <span class="nb">column</span>(<span class="s">&#39;title&#39;</span>, :<span class="n">sortable</span>);
+  <span class="nb">column</span>(<span class="s">&#39;author&#39;</span>, :<span class="n">display</span>({ .<span class="n">author</span>.<span class="nb">name</span> }));
+  <span class="nb">column</span>(<span class="s">&#39;published-at&#39;</span>, :<span class="n">format</span><span class="s">&lt;date&gt;</span>);
+
+  <span class="n">filter</span>(<span class="s">&#39;title&#39;</span>,      :<span class="n">as</span><span class="s">&lt;string&gt;</span>,  :<span class="n">predicate</span><span class="s">&lt;cont&gt;</span>);
+  <span class="n">filter</span>(<span class="s">&#39;published&#39;</span>,  :<span class="n">as</span><span class="s">&lt;boolean&gt;</span>);
+  <span class="n">filter</span>(<span class="s">&#39;author-id&#39;</span>,  :<span class="n">as</span><span class="s">&lt;select&gt;</span>, :<span class="n">collection</span>({ <span class="n">Author</span>.<span class="nb">all</span>.<span class="n">map</span>({ .<span class="nb">id</span> =&gt; .<span class="nb">name</span> }) }));
+
+  <span class="n">attribute</span>(<span class="s">&#39;title&#39;</span>);
+  <span class="n">attribute</span>(<span class="s">&#39;body&#39;</span>);
+  <span class="n">attribute</span>(<span class="s">&#39;author&#39;</span>);
+
+  <span class="n">field</span>(<span class="s">&#39;title&#39;</span>,     :<span class="n">as</span><span class="s">&lt;string&gt;</span>);
+  <span class="n">field</span>(<span class="s">&#39;body&#39;</span>,      :<span class="n">as</span><span class="s">&lt;text&gt;</span>);
+  <span class="n">field</span>(<span class="s">&#39;author-id&#39;</span>, :<span class="n">as</span><span class="s">&lt;select&gt;</span>, :<span class="n">collection</span>({ <span class="n">Author</span>.<span class="nb">all</span> }));
+  <span class="n">field</span>(<span class="s">&#39;published&#39;</span>, :<span class="n">as</span><span class="s">&lt;boolean&gt;</span>);
+
+  <span class="n">permit</span>(<span class="s">&lt;title body author-id published&gt;</span>);
+});
 </code></pre></div></td></tr></table></div>
-<p><code>MVC::Keayl::Admin.endpoint</code> returns a dispatcher for the admin engine. The
-engine isolates the <code>MVC::Keayl::Admin</code> namespace and carries its own view,
-helper, and asset paths, so its templates and assets never collide with the
-host application's.</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p><code>MVC::Keayl::Admin.config</code> returns the shared configuration. Two settings are
-available:</p>
+<p>The declaration vocabulary comes from <code>MVC::Keayl::Admin::DSL</code>. Each call records
+a declaration on the resource config:</p>
 <table>
 <thead>
 <tr>
-<th>Setting</th>
-<th>Default</th>
-<th>Purpose</th>
+<th>Declaration</th>
+<th>Records</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>mount-path</code></td>
-<td><code>/admin</code></td>
-<td>The path the host mounts the engine at.</td>
+<td><code>column</code></td>
+<td>an index column (<code>:sortable</code>, <code>:display</code>, <code>:format</code>)</td>
 </tr>
 <tr>
-<td><code>site-title</code></td>
-<td><code>Admin</code></td>
-<td>The title shown in the admin chrome.</td>
+<td><code>attribute</code></td>
+<td>a show-page row (<code>:display</code>, <code>:format</code>)</td>
+</tr>
+<tr>
+<td><code>field</code></td>
+<td>a form input (<code>:as</code>, <code>:collection</code>, <code>:hint</code>, <code>:placeholder</code>)</td>
+</tr>
+<tr>
+<td><code>filter</code></td>
+<td>a search control (<code>:as</code>, <code>:predicate</code>, <code>:collection</code>)</td>
+</tr>
+<tr>
+<td><code>scope</code></td>
+<td>a named scope, one markable <code>:default</code></td>
+</tr>
+<tr>
+<td><code>permit</code></td>
+<td>the strong-params allowlist</td>
+</tr>
+<tr>
+<td><code>menu</code></td>
+<td>the sidebar entry (<code>:group</code>, <code>:label</code>, <code>:priority</code>, <code>:icon</code>)</td>
 </tr>
 </tbody>
 </table>
-<p>Set them with <code>configure</code>:</p>
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
+<p>Declarations are validated when <code>register</code> runs. An unknown option, an unknown
+<code>field</code>/<code>filter</code> type, or a malformed declaration raises at registration time
+rather than failing later on a request.</p>
+<h2 id="names-and-slug">Names and slug<a class="headerlink" href="#names-and-slug" title="Permanent link">&para;</a></h2>
+<p>Each resource derives a URL slug, a singular human name, and a plural human name
+from the model. The slug is the dasherized plural (<code>BlogPost</code> becomes
+<code>blog-posts</code>). The human names resolve through I18n, falling back to a humanized
+form of the model name. Override any of them on <code>register</code>:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... }, <span class="n">slug</span> =&gt; <span class="s">&#39;articles&#39;</span>, <span class="n">singular</span> =&gt; <span class="s">&#39;Article&#39;</span>, <span class="n">plural</span> =&gt; <span class="s">&#39;Articles&#39;</span>);
+</code></pre></div></td></tr></table></div>
+<p>The registry indexes resources by model and by slug, with <code>by-model</code>, <code>by-slug</code>,
+and an <code>all</code> listing in registration order.</p>
+<h2 id="routes-and-url-helpers">Routes and URL helpers<a class="headerlink" href="#routes-and-url-helpers" title="Permanent link">&para;</a></h2>
+<p>Registering a resource generates the seven routes (index, show, new, create,
+edit, update, destroy) under the engine. <code>path-for</code> builds the mount-prefixed URL
+for any resource action, usable from controllers and views:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">configure</span>(
-  <span class="n">mount-path</span> =&gt; <span class="s">&#39;/manage&#39;</span>,
-  <span class="n">site-title</span> =&gt; <span class="s">&#39;Control Panel&#39;</span>,
-);
-</code></pre></div></td></tr></table></div>
-<p><code>mount-path</code> is read by the host when it mounts the engine. <code>site-title</code> is
-read on every request and exposed to controllers and views through the
-per-request admin context.</p>
-<h2 id="the-admin-context">The admin context<a class="headerlink" href="#the-admin-context" title="Permanent link">&para;</a></h2>
-<p>Every admin controller derives from <code>MVC::Keayl::Admin::Controller</code>, which runs
-a <code>before-action</code> that builds a per-request admin context. The context holds the
-site title and the current request path, and later phases extend it with the
-current resource and action.</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">self</span>.<span class="n">admin-context</span><span class="s">&lt;site-title&gt;</span>;
-<span class="nb">self</span>.<span class="n">admin-context</span><span class="s">&lt;path&gt;</span>;
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;posts&#39;</span>);           <span class="c1"># /admin/posts</span>
+<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;post&#39;</span>, <span class="mi">5</span>);         <span class="c1"># /admin/posts/5</span>
+<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;edit-post&#39;</span>, <span class="mi">5</span>);    <span class="c1"># /admin/posts/5/edit</span>
+<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;new-post&#39;</span>);        <span class="c1"># /admin/posts/new</span>
 </code></pre></div></td></tr></table></div>
 
 

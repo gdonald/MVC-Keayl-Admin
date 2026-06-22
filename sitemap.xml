@@ -2,22 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://gdonald.github.io/MVC-Keayl-Admin/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://gdonald.github.io/MVC-Keayl-Admin/assets/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://gdonald.github.io/MVC-Keayl-Admin/authentication/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://gdonald.github.io/MVC-Keayl-Admin/layout/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
     </url>
     <url>
          <loc>https://gdonald.github.io/MVC-Keayl-Admin/mounting/</loc>
-         <lastmod>2026-06-21</lastmod>
+         <lastmod>2026-06-22</lastmod>
+    </url>
+    <url>
+         <loc>https://gdonald.github.io/MVC-Keayl-Admin/registration/</loc>
+         <lastmod>2026-06-22</lastmod>
     </url>
 </urlset>
