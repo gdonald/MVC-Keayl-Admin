@@ -1,5 +1,6 @@
 use v6.d;
 use MVC::Keayl::Routing;
+use MVC::Keayl::Routing::UrlHelpers;
 use MVC::Keayl::Admin::Registry;
 use MVC::Keayl::Admin::Resource;
 use MVC::Keayl::Admin::Config;
@@ -11,10 +12,8 @@ use MVC::Keayl::Admin::AssetsController;
 
 unit class MVC::Keayl::Admin;
 
-my MVC::Keayl::Admin::Registry $registry .= new;
-
 method registry(::?CLASS:U: --> MVC::Keayl::Admin::Registry) {
-  $registry
+  MVC::Keayl::Admin::Registry.current
 }
 
 method config(::?CLASS:U: --> MVC::Keayl::Admin::Config) {
@@ -30,10 +29,17 @@ method configure(::?CLASS:U: Str :$mount-path, Str :$site-title --> MVC::Keayl::
   $config
 }
 
-method register(::?CLASS:U: Mu:U $model, &block --> MVC::Keayl::Admin::Resource) {
-  my $resource = MVC::Keayl::Admin::Resource.new(:$model, :&block);
+method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str :$plural --> MVC::Keayl::Admin::Resource) {
+  my $resource = MVC::Keayl::Admin::Resource.new(
+    :$model,
+    slug-override     => $slug,
+    singular-override => $singular,
+    plural-override   => $plural,
+  );
 
-  $registry.add($resource);
+  $resource.parse(&block);
+
+  MVC::Keayl::Admin::Registry.current.add($resource);
 
   $resource
 }
@@ -49,13 +55,25 @@ method authenticate-with(::?CLASS:U: $strategy --> Nil) {
 sub admin-routes {
   my $dashboard = MVC::Keayl::Admin::DashboardController.controller-path ~ '#index';
   my $assets    = MVC::Keayl::Admin::AssetsController.controller-path ~ '#show';
+  my @slugs     = MVC::Keayl::Admin::Registry.current.all.map(*.slug);
 
   my &block = {
     get '/admin-assets/*path', to => $assets;
+
+    for @slugs -> $slug {
+      resources $slug;
+    }
+
     get '/', to => $dashboard;
   };
 
   &block
+}
+
+method path-for(::?CLASS:U: Str:D $name, |args --> Str) {
+  my $helpers = MVC::Keayl::Routing::UrlHelpers.new(router => self.engine.router);
+
+  MVC::Keayl::Admin::Config.current.mount-path ~ $helpers.path-for($name, |args)
 }
 
 method engine(::?CLASS:U: --> MVC::Keayl::Admin::Engine) {
@@ -73,7 +91,7 @@ method endpoint(::?CLASS:U:) {
 }
 
 method reset(::?CLASS:U: --> Nil) {
-  $registry .= new;
+  MVC::Keayl::Admin::Registry.reset;
   MVC::Keayl::Admin::Config.reset;
   MVC::Keayl::Admin::Assets.reset;
   MVC::Keayl::Admin::Authentication.reset;

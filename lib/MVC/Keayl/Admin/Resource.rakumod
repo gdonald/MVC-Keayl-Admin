@@ -1,11 +1,128 @@
 use v6.d;
-use MVC::Keayl::Admin::DSL;
+use MVC::Keayl::I18n;
+use MVC::Keayl::Routing::Resources;
+use MVC::Keayl::Admin::Inflection;
+use MVC::Keayl::Admin::Column;
+use MVC::Keayl::Admin::Attribute;
+use MVC::Keayl::Admin::Field;
+use MVC::Keayl::Admin::Filter;
+use MVC::Keayl::Admin::Scope;
+use MVC::Keayl::Admin::MenuEntry;
 
-unit class MVC::Keayl::Admin::Resource does MVC::Keayl::Admin::DSL;
+unit class MVC::Keayl::Admin::Resource;
 
 has Mu  $.model is required;
-has     &.block;
+has Str $.slug-override;
+has Str $.singular-override;
+has Str $.plural-override;
+
+has MVC::Keayl::Admin::Column    @.columns;
+has MVC::Keayl::Admin::Attribute @.attributes;
+has MVC::Keayl::Admin::Field     @.fields;
+has MVC::Keayl::Admin::Filter    @.filters;
+has MVC::Keayl::Admin::Scope     @.scopes;
+has Str                          @.permitted;
+has MVC::Keayl::Admin::MenuEntry $.menu-entry is rw;
+
+constant FIELD-TYPES  = set <string text select boolean date time datetime number password hidden file>;
+constant FILTER-TYPES = set <string numeric boolean date date-range select>;
+
+my $default-i18n;
+
+sub default-i18n(--> MVC::Keayl::I18n) {
+  $default-i18n //= MVC::Keayl::I18n.new(default-locale => 'en')
+}
 
 method model-name(--> Str) {
   $!model.^name.split('::')[*-1]
+}
+
+method slug(--> Str) {
+  $!slug-override // dasherize(pluralize(underscore(self.model-name)))
+}
+
+method singular-name(MVC::Keayl::I18n :$i18n = default-i18n() --> Str) {
+  return $!singular-override with $!singular-override;
+
+  my $key = underscore(self.model-name);
+
+  $i18n.translate("activerecord.models.$key", default => humanize($key))
+}
+
+method plural-name(MVC::Keayl::I18n :$i18n = default-i18n() --> Str) {
+  return $!plural-override with $!plural-override;
+
+  pluralize(self.singular-name(:$i18n))
+}
+
+sub reject-unknown(%extra, Str:D $declaration) {
+  die "unknown option '{%extra.keys.sort.join(q{, })}' in $declaration declaration" if %extra;
+}
+
+method column(Str:D $name, Bool :$sortable = False, :&display, Str :$format --> ::?CLASS) {
+  reject-unknown(%_, "column '$name'");
+
+  @!columns.push: MVC::Keayl::Admin::Column.new(:$name, :$sortable, :&display, :$format);
+
+  self
+}
+
+method attribute(Str:D $name, :&display, Str :$format --> ::?CLASS) {
+  reject-unknown(%_, "attribute '$name'");
+
+  @!attributes.push: MVC::Keayl::Admin::Attribute.new(:$name, :&display, :$format);
+
+  self
+}
+
+method field(Str:D $name, Str :$as = 'string', :&collection, Str :$hint, Str :$placeholder --> ::?CLASS) {
+  reject-unknown(%_, "field '$name'");
+
+  die "unknown field type '$as' for field '$name'" unless FIELD-TYPES{$as};
+
+  @!fields.push: MVC::Keayl::Admin::Field.new(:$name, :$as, :&collection, :$hint, :$placeholder);
+
+  self
+}
+
+method filter(Str:D $name, Str :$as = 'string', Str :$predicate, :&collection --> ::?CLASS) {
+  reject-unknown(%_, "filter '$name'");
+
+  die "unknown filter type '$as' for filter '$name'" unless FILTER-TYPES{$as};
+
+  @!filters.push: MVC::Keayl::Admin::Filter.new(:$name, :$as, :$predicate, :&collection);
+
+  self
+}
+
+method scope(Str:D $name, &block?, Bool :$default = False --> ::?CLASS) {
+  reject-unknown(%_, "scope '$name'");
+
+  @!scopes.push: MVC::Keayl::Admin::Scope.new(:$name, :&block, :$default);
+
+  self
+}
+
+method permit(*@names --> ::?CLASS) {
+  reject-unknown(%_, 'permit');
+
+  @!permitted.append: @names;
+
+  self
+}
+
+method menu(Str :$group, Str :$label, Int :$priority = 0, Str :$icon --> ::?CLASS) {
+  reject-unknown(%_, 'menu');
+
+  $!menu-entry = MVC::Keayl::Admin::MenuEntry.new(:$group, :$label, :$priority, :$icon);
+
+  self
+}
+
+method parse(&block --> ::?CLASS) {
+  my $*KEAYL-ADMIN-RESOURCE = self;
+
+  block();
+
+  self
 }

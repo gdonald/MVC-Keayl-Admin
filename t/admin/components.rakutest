@@ -18,9 +18,9 @@ isa-ok MVC::Keayl::Admin::Controller.new, MVC::Keayl::Controller, 'the base cont
 
 isa-ok MVC::Keayl::Admin::View.new, MVC::Keayl::View, 'the base view extends the framework view';
 
-is MVC::Keayl::Admin::Filter.new(:name<title>).predicate, 'eq', 'a filter defaults to the equality predicate';
+is MVC::Keayl::Admin::Filter.new(:name<title>).as, 'string', 'a filter defaults to the string type';
 
-is MVC::Keayl::Admin::Filter.new(:name<title>, :options({ :predicate<cont> })).predicate, 'cont',
-  'a filter reads its predicate from its options';
+is MVC::Keayl::Admin::Filter.new(:name<title>, :predicate<cont>).predicate, 'cont',
+  'a filter records its predicate';
 
 done-testing;

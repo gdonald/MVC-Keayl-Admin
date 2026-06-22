@@ -1,0 +1,59 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Resource;
+use MVC::Keayl::Admin::DSL;
+use MVC::Keayl::I18n;
+
+class BlogPost { }
+class Category { }
+
+MVC::Keayl::Admin.reset;
+
+my $posts      = MVC::Keayl::Admin.register(BlogPost, { ; });
+my $categories = MVC::Keayl::Admin.register(Category, { ; });
+
+# derived names and slug
+is $posts.slug, 'blog-posts', 'the slug is the dasherized plural of the model name';
+
+is $posts.singular-name, 'Blog post', 'the singular human name is derived from the model';
+
+is $posts.plural-name, 'Blog posts', 'the plural human name is derived from the model';
+
+is $categories.slug, 'categories', 'pluralization handles a trailing y';
+
+# registry indexing and lookup
+is MVC::Keayl::Admin.registry.by-slug('blog-posts'), $posts, 'a resource is found by slug';
+
+is MVC::Keayl::Admin.registry.by-model(BlogPost), $posts, 'a resource is found by model';
+
+is MVC::Keayl::Admin.registry.all.elems, 2, 'the registry lists every resource';
+
+is MVC::Keayl::Admin.registry.all[0], $posts, 'the listing preserves registration order';
+
+# overrides
+MVC::Keayl::Admin.reset;
+
+my $custom = MVC::Keayl::Admin.register(BlogPost, { ; }, slug => 'articles', singular => 'Article', plural => 'Articles');
+
+is $custom.slug, 'articles', 'the slug is overridable';
+
+is $custom.singular-name, 'Article', 'the singular name is overridable';
+
+is $custom.plural-name, 'Articles', 'the plural name is overridable';
+
+is MVC::Keayl::Admin.registry.by-slug('articles'), $custom, 'an overridden slug indexes the resource';
+
+# resolution through i18n
+my $i18n = MVC::Keayl::I18n.new(default-locale => 'en');
+$i18n.store-translations('en', { activerecord => { models => { blog_post => 'Journal entry' } } });
+
+MVC::Keayl::Admin.reset;
+my $translated = MVC::Keayl::Admin.register(BlogPost, { ; });
+
+is $translated.singular-name(i18n => $i18n), 'Journal entry', 'the human name resolves through i18n';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

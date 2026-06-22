@@ -4,6 +4,7 @@ repo_url: https://github.com/gdonald/MVC-Keayl-Admin
 nav:
   - Home: index.md
   - Mounting: mounting.md
+  - Registering resources: registration.md
   - Layout and chrome: layout.md
   - Assets: assets.md
   - Authentication: authentication.md

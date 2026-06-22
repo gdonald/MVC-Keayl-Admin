@@ -29,14 +29,14 @@ describe 'MVC::Keayl::Admin base classes', {
 }
 
 describe 'MVC::Keayl::Admin filter', {
-  it 'defaults to the equality predicate', {
-    expect(MVC::Keayl::Admin::Filter.new(:name<title>).predicate).to.be('eq');
+  it 'defaults to the string type', {
+    expect(MVC::Keayl::Admin::Filter.new(:name<title>).as).to.be('string');
   }
 
-  context 'with a predicate option', {
-    let(:filter, { MVC::Keayl::Admin::Filter.new(:name<title>, :options({ :predicate<cont> })) });
+  context 'with a predicate', {
+    let(:filter, { MVC::Keayl::Admin::Filter.new(:name<title>, :predicate<cont>) });
 
-    it 'reads the predicate from its options', {
+    it 'records the predicate', {
       expect(filter.predicate).to.be('cont');
     }
   }

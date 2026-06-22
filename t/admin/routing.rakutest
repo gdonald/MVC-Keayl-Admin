@@ -1,0 +1,47 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::DSL;
+
+class Widget { }
+
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.register(Widget, { ; });
+
+my $router = MVC::Keayl::Admin.engine.router;
+
+# the seven per-resource routes
+is $router.recognize('GET', '/widgets').action, 'index', 'index route is generated';
+
+is $router.recognize('GET', '/widgets/new').action, 'new', 'new route is generated';
+
+is $router.recognize('POST', '/widgets').action, 'create', 'create route is generated';
+
+is $router.recognize('GET', '/widgets/5').action, 'show', 'show route is generated';
+
+is $router.recognize('GET', '/widgets/5').params<id>, '5', 'the show route captures the id';
+
+is $router.recognize('GET', '/widgets/5/edit').action, 'edit', 'edit route is generated';
+
+is $router.recognize('PATCH', '/widgets/5').action, 'update', 'update route is generated';
+
+is $router.recognize('DELETE', '/widgets/5').action, 'destroy', 'destroy route is generated';
+
+# url helpers, prefixed with the mount path
+is MVC::Keayl::Admin.path-for('widgets'), '/admin/widgets', 'the collection path helper';
+
+is MVC::Keayl::Admin.path-for('widget', 5), '/admin/widgets/5', 'the member path helper';
+
+is MVC::Keayl::Admin.path-for('new-widget'), '/admin/widgets/new', 'the new path helper';
+
+is MVC::Keayl::Admin.path-for('edit-widget', 5), '/admin/widgets/5/edit', 'the edit path helper';
+
+# the mount path is reflected in the helpers
+MVC::Keayl::Admin.configure(mount-path => '/manage');
+
+is MVC::Keayl::Admin.path-for('widgets'), '/manage/widgets', 'the path helper reflects the configured mount path';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

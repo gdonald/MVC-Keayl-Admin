@@ -3,12 +3,32 @@ use Test;
 
 use MVC::Keayl::Admin;
 use MVC::Keayl::Admin::Resource;
+use MVC::Keayl::Admin::DSL;
 
 class TestModel { }
 
 MVC::Keayl::Admin.reset;
 
-my $resource = MVC::Keayl::Admin.register(TestModel, { ; });
+my $resource = MVC::Keayl::Admin.register(TestModel, {
+  menu(:group<Content>, :label<Posts>, :priority(10), :icon<file-text>);
+
+  scope('All', :default);
+  scope('Published', { .grep(*.published) });
+
+  column('title', :sortable);
+  column('author', :display({ .author-name }));
+
+  attribute('title');
+  attribute('body');
+
+  field('title', :as<string>);
+  field('published', :as<boolean>);
+
+  filter('title', :as<string>, :predicate<cont>);
+  filter('author-id', :as<select>, :collection({ <a b> }));
+
+  permit(<title body published>);
+});
 
 isa-ok $resource, MVC::Keayl::Admin::Resource, 'register returns a resource';
 
@@ -18,17 +38,52 @@ is MVC::Keayl::Admin.registry.all.elems, 1, 'register adds the resource to the r
 
 is MVC::Keayl::Admin.registry.all[0], $resource, 'the registered resource is the one returned';
 
+# recorded declarations
+is $resource.columns.elems, 2, 'columns are recorded';
+
+is $resource.columns[0].name, 'title', 'a column records its name';
+
+ok $resource.columns[0].sortable, 'a column records its sortable flag';
+
+ok $resource.columns[1].display.defined, 'a column records its display block';
+
+is $resource.attributes.elems, 2, 'attributes are recorded';
+
+is $resource.fields.elems, 2, 'fields are recorded';
+
+is $resource.fields[1].as, 'boolean', 'a field records its input type';
+
+is $resource.filters.elems, 2, 'filters are recorded';
+
+is $resource.filters[0].predicate, 'cont', 'a filter records its predicate';
+
+ok $resource.filters[1].collection.defined, 'a filter records its collection block';
+
+is $resource.scopes.elems, 2, 'scopes are recorded';
+
+ok $resource.scopes[0].default, 'a scope records its default flag';
+
+is $resource.permitted, <title body published>, 'permit records the allowlist';
+
+is $resource.menu-entry.group, 'Content', 'menu records the group';
+
+is $resource.menu-entry.priority, 10, 'menu records the priority';
+
 MVC::Keayl::Admin.reset;
 
 is MVC::Keayl::Admin.registry.all.elems, 0, 'reset clears the registry';
 
-$resource.declare('column', 'title', :sortable);
-$resource.declare('field', 'title');
+# registration-time validation
+dies-ok {
+  MVC::Keayl::Admin.register(TestModel, { field('title', :as<bogus>) })
+}, 'an unknown field type raises at registration time';
 
-is $resource.declarations-of('column').elems, 1, 'declarations-of returns declarations of one kind';
+dies-ok {
+  MVC::Keayl::Admin.register(TestModel, { filter('title', :as<bogus>) })
+}, 'an unknown filter type raises at registration time';
 
-is $resource.declarations-of('column')[0]<args>[0], 'title', 'a declaration records its positional arguments';
-
-is $resource.declarations-of('column')[0]<opts><sortable>, True, 'a declaration records its named options';
+dies-ok {
+  MVC::Keayl::Admin.register(TestModel, { column('title', :unknown-option) })
+}, 'an unknown declaration option raises at registration time';
 
 done-testing;
