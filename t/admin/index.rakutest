@@ -1,0 +1,48 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub index-body {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host   = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+  $host.call(MVC::Keayl::Request.new(method => 'GET', path => '/admin/posts')).body
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'First post', body => 'a', published => True }, { title => 'Second post', body => 'b' });
+
+my $body = index-body;
+
+ok $body.contains('<table'), 'the index renders a table';
+
+ok $body.contains('First post') && $body.contains('Second post'), 'the table lists the records';
+
+ok $body.contains('Headline'), 'a column header is humanized from the column name';
+
+ok $body.contains('FIRST POST'), 'a display block computes the cell value';
+
+ok $body.contains('Yes') && $body.contains('No'), 'the boolean formatter renders each row';
+
+ok $body.contains('/admin/posts/1/edit'), 'each row has an edit action';
+
+ok $body.contains('hx-delete'), 'each row has a delete action';
+
+ok $body.contains('href="/admin/posts/1"'), 'a link-to-show column links to the record';
+
+ok $body.contains('New Post'), 'the index has a new-record button';
+
+# empty state
+seed-posts();
+
+ok index-body.contains('No records yet'), 'an empty resource shows an empty state';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

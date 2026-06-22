@@ -9,6 +9,7 @@ use MVC::Keayl::Admin::Assets;
 use MVC::Keayl::Admin::Authentication;
 use MVC::Keayl::Admin::DashboardController;
 use MVC::Keayl::Admin::AssetsController;
+use MVC::Keayl::Admin::ResourceController;
 
 unit class MVC::Keayl::Admin;
 
@@ -53,15 +54,16 @@ method authenticate-with(::?CLASS:U: $strategy --> Nil) {
 }
 
 sub admin-routes {
-  my $dashboard = MVC::Keayl::Admin::DashboardController.controller-path ~ '#index';
-  my $assets    = MVC::Keayl::Admin::AssetsController.controller-path ~ '#show';
-  my @slugs     = MVC::Keayl::Admin::Registry.current.all.map(*.slug);
+  my $dashboard      = MVC::Keayl::Admin::DashboardController.controller-path ~ '#index';
+  my $assets         = MVC::Keayl::Admin::AssetsController.controller-path ~ '#show';
+  my $resource-ctrl  = MVC::Keayl::Admin::ResourceController.controller-path;
+  my @slugs          = MVC::Keayl::Admin::Registry.current.all.map(*.slug);
 
   my &block = {
     get '/admin-assets/*path', to => $assets;
 
     for @slugs -> $slug {
-      resources $slug;
+      resources $slug, :controller($resource-ctrl);
     }
 
     get '/', to => $dashboard;
@@ -81,6 +83,7 @@ method engine(::?CLASS:U: --> MVC::Keayl::Admin::Engine) {
     controllers  => [
       MVC::Keayl::Admin::DashboardController,
       MVC::Keayl::Admin::AssetsController,
+      MVC::Keayl::Admin::ResourceController,
     ],
     routes-block => admin-routes(),
   )
