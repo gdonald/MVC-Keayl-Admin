@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/layout/">
+        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/index-pages/">
       
       
-        <link rel="prev" href="../index-pages/">
+        <link rel="prev" href="../registration/">
       
       
-        <link rel="next" href="../assets/">
+        <link rel="next" href="../layout/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Layout and chrome - MVC::Keayl::Admin</title>
+        <title>Index pages - MVC::Keayl::Admin</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#layout-and-chrome" class="md-skip">
+        <a href="#index-pages" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Layout and chrome
+              Index pages
             
           </span>
         </div>
@@ -300,33 +300,6 @@
       
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../index-pages/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Index pages
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
     
   
   
@@ -346,7 +319,7 @@
   <span class="md-ellipsis">
     
   
-    Layout and chrome
+    Index pages
   
 
     
@@ -364,7 +337,7 @@
   <span class="md-ellipsis">
     
   
-    Layout and chrome
+    Index pages
   
 
     
@@ -390,10 +363,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rendering-a-page" class="md-nav__link">
+  <a href="#columns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rendering a page
+        Columns
       
     </span>
   </a>
@@ -401,10 +374,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-admin-context" class="md-nav__link">
+  <a href="#formatters" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The admin context
+        Formatters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rows-and-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rows and actions
       
     </span>
   </a>
@@ -415,6 +399,33 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../layout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layout and chrome
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -500,10 +511,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rendering-a-page" class="md-nav__link">
+  <a href="#columns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Rendering a page
+        Columns
       
     </span>
   </a>
@@ -511,10 +522,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-admin-context" class="md-nav__link">
+  <a href="#formatters" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The admin context
+        Formatters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rows-and-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rows and actions
       
     </span>
   </a>
@@ -541,50 +563,31 @@
   
 
 
-<h1 id="layout-and-chrome">Layout and chrome<a class="headerlink" href="#layout-and-chrome" title="Permanent link">&para;</a></h1>
-<p>Admin pages render inside a Bootstrap 5 layout: a top bar with the site brand, a
-collapsible left sidebar, a main content region, a flash area, and breadcrumbs.
-On small screens the sidebar becomes an offcanvas panel toggled from the top
-bar.</p>
-<h2 id="rendering-a-page">Rendering a page<a class="headerlink" href="#rendering-a-page" title="Permanent link">&para;</a></h2>
-<p>Controllers derive from <code>MVC::Keayl::Admin::Controller</code> and render through
-<code>render-admin</code>, which wires the chrome (asset tags, brand, menu, breadcrumbs,
-flash) into the layout and renders the named template into the main region.</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin::Controller</span>;
-
-<span class="k">unit</span> <span class="k">class</span> <span class="n">MyAdmin::PostsController</span> <span class="k">is</span> <span class="n">MVC::Keayl::Admin::Controller</span>;
-
-<span class="k">method</span> <span class="nb">index</span> {
-  <span class="nb">self</span>.<span class="n">render-admin</span>(
-    <span class="s">&#39;posts/index&#39;</span>,
-    <span class="n">page-title</span>  =&gt; <span class="s">&#39;Posts&#39;</span>,
-    <span class="n">breadcrumbs</span> =&gt; [ <span class="s">&#39;Posts&#39;</span> =&gt; <span class="nb">Nil</span> ],
-  )
-}
-</code></pre></div></td></tr></table></div>
+<h1 id="index-pages">Index pages<a class="headerlink" href="#index-pages" title="Permanent link">&para;</a></h1>
+<p>The index page lists a resource's records in a table built from the declared
+<code>column</code>s. A generic controller resolves the resource from the URL, queries the
+model's ORM relation, and renders the table.</p>
+<h2 id="columns">Columns<a class="headerlink" href="#columns" title="Permanent link">&para;</a></h2>
+<p>Each <code>column</code> becomes a table column. The header is the humanized column name.
+A column renders its value one of three ways:</p>
 <ul>
-<li><code>page-title</code> sets the document title and the page heading. It defaults to the
-  configured site title.</li>
-<li><code>breadcrumbs</code> is a list of <code>label =&gt; url</code> pairs. A pair whose url is <code>Nil</code>
-  (or empty) renders as the current, unlinked page. Typically the last crumb.</li>
+<li>a plain attribute read from the record (<code>column('title')</code>);</li>
+<li>a <code>display</code> block, called with the record, for a computed value
+  (<code>column('author', :display({ .author.name }))</code>);</li>
+<li>a <code>format</code>, applied to the attribute value.</li>
 </ul>
-<p>The template named in the first argument renders into the main content region.
-The vendored asset bundle, import map, brand, sidebar menu, and breadcrumbs are
-supplied by the layout, so a page template only renders its own content.</p>
-<h2 id="the-admin-context">The admin context<a class="headerlink" href="#the-admin-context" title="Permanent link">&para;</a></h2>
-<p>The base controller runs a <code>before-action</code> that builds a per-request context
-available as <code>admin-context</code> (site title, mount path, and the current path).
-Later phases extend it with the current resource and action.</p>
+<h2 id="formatters">Formatters<a class="headerlink" href="#formatters" title="Permanent link">&para;</a></h2>
+<p><code>MVC::Keayl::Admin::Formatter</code> provides value formatters shared by the index and
+the show page: <code>date</code>, <code>time</code>, <code>datetime</code>, <code>currency</code>, <code>boolean</code>, and
+<code>truncate</code>. A column with <code>:format&lt;boolean&gt;</code> renders Yes/No, <code>:format&lt;date&gt;</code>
+renders the date portion, and so on.</p>
+<p><code>:format&lt;link-to-show&gt;</code> is special: it links the value to the record's show
+page, so a title column can double as the row's primary link.</p>
+<h2 id="rows-and-actions">Rows and actions<a class="headerlink" href="#rows-and-actions" title="Permanent link">&para;</a></h2>
+<p>Every row ends in an actions column with Show, Edit, and Delete controls. Delete
+is wired for HTMX (the destroy flow lands in a later phase). When a resource has
+no records, the table shows an empty state instead of rows, and the page carries
+a New-record button linking to the new form.</p>
 
 
 
