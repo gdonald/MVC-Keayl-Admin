@@ -30,3 +30,33 @@ Every row ends in an actions column with Show, Edit, and Delete controls. Delete
 is wired for HTMX (the destroy flow lands in a later phase). When a resource has
 no records, the table shows an empty state instead of rows, and the page carries
 a New-record button linking to the new form.
+
+## Sorting
+
+A column declared `:sortable` renders its header as a link. Clicking it sorts the
+index by that column, adding an `ORDER BY` to the relation. The sort column and
+direction travel in the query string (`?sort=title&dir=desc`); the active column
+shows a direction arrow, and clicking it again toggles ascending and descending.
+Only declared sortable columns are accepted, so the order clause is never built
+from arbitrary input.
+
+## Pagination
+
+The index applies `LIMIT` and `OFFSET` for the current page. The page size
+defaults to 25 and is configurable per resource:
+
+```raku
+Keayl::Admin.register(Post, { ... }, per-page => 50);
+```
+
+A pagination control renders below the table with a page summary
+(`Showing 1–25 of 218`) and page links. The links carry the current sort state
+so it survives navigation.
+
+## HTMX
+
+The table and pagination live inside an `#admin-index` container. Sort-header and
+pagination links issue an `hx-get` that targets that container, so the table body
+swaps in place without a full-page reload. Each link also has a plain `href`, so
+with JavaScript disabled the same action degrades to a full-page request.
+

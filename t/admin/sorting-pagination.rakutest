@@ -1,0 +1,69 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub fetch(Str:D $path, :%headers) {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host   = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+  $host.call(MVC::Keayl::Request.new(method => 'GET', target => $path, :%headers))
+}
+
+# sorting
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'Banana' }, { title => 'Apple' }, { title => 'Cherry' });
+
+my $asc = fetch('/admin/posts?sort=title&dir=asc').body;
+ok $asc.index('Apple') < $asc.index('Banana') < $asc.index('Cherry'), 'ascending sort orders rows by the column';
+
+my $desc = fetch('/admin/posts?sort=title&dir=desc').body;
+ok $desc.index('Cherry') < $desc.index('Banana') < $desc.index('Apple'), 'descending sort reverses the order';
+
+ok $asc.contains('hx-get') && $asc.contains('sort=title'), 'a sortable header carries an htmx sort link';
+
+ok $asc.contains('dir=desc'), 'a column sorted ascending offers a descending toggle';
+
+ok $asc.contains('&uarr;'), 'the active sort column shows a direction indicator';
+
+# a non-sortable column has no sort link
+ok fetch('/admin/posts').body ~~ /'<th>Headline</th>'/, 'a non-sortable column header is plain';
+
+# htmx requests render only the table fragment, no layout
+my $fragment = fetch('/admin/posts', headers => { 'HX-Request' => 'true' }).body;
+ok $fragment.contains('<table') && !$fragment.contains('<html'), 'an htmx request renders the table fragment without the layout';
+
+# pagination
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts(per-page => 2);
+seed-posts({ title => 'P1' }, { title => 'P2' }, { title => 'P3' }, { title => 'P4' }, { title => 'P5' });
+
+my $page1 = fetch('/admin/posts?page=1').body;
+ok $page1.contains('P1') && $page1.contains('P2') && !$page1.contains('P3'), 'a page shows only its slice of records';
+
+ok $page1.contains('Showing 1&ndash;2 of 5'), 'the page summary reports the range and total';
+
+ok $page1.contains('pagination'), 'a pagination control is rendered';
+
+my $page3 = fetch('/admin/posts?page=3').body;
+ok $page3.contains('P5') && !$page3.contains('P1'), 'a later page shows its own slice';
+
+ok fetch('/admin/posts?page=1&sort=title&dir=desc').body.contains('sort=title'),
+  'pagination links preserve the sort state';
+
+# default per-page
+is MVC::Keayl::Admin.registry.by-slug('posts').per-page, 2, 'per-page is configurable per resource';
+
+MVC::Keayl::Admin.reset;
+register-posts;
+is MVC::Keayl::Admin.registry.by-slug('posts').per-page, 25, 'per-page defaults to 25';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

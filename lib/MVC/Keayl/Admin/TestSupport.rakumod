@@ -35,8 +35,8 @@ sub seed-posts(**@rows --> Nil) is export {
   Post.create($_) for @rows;
 }
 
-sub register-posts(--> Nil) is export {
-  MVC::Keayl::Admin.register(Post, {
+sub register-posts(Int :$per-page --> Nil) is export {
+  MVC::Keayl::Admin.register(Post, :$per-page, {
     column('title', :sortable, :format<link-to-show>);
     column('headline', :display({ .title.uc }));
     column('published', :sortable, :format<boolean>);

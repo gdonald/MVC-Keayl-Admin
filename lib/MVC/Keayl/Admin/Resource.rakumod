@@ -15,6 +15,7 @@ has Mu  $.model is required;
 has Str $.slug-override;
 has Str $.singular-override;
 has Str $.plural-override;
+has Int $.per-page-override;
 
 has MVC::Keayl::Admin::Column    @.columns;
 has MVC::Keayl::Admin::Attribute @.attributes;
@@ -39,6 +40,10 @@ method model-name(--> Str) {
 
 method slug(--> Str) {
   $!slug-override // dasherize(pluralize(underscore(self.model-name)))
+}
+
+method per-page(--> Int) {
+  $!per-page-override // 25
 }
 
 method singular-name(MVC::Keayl::I18n :$i18n = default-i18n() --> Str) {

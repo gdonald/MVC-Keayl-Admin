@@ -1,11 +1,25 @@
 use v6.d;
 use MVC::Keayl::Admin::Inflection;
 use MVC::Keayl::Admin::Formatter;
+use MVC::Keayl::Admin::Url;
 
 unit class MVC::Keayl::Admin::Table;
 
 sub column-label($column --> Str) {
   humanize($column.name)
+}
+
+sub header-cell($column, Str:D $base, $sort, $dir, Str:D $target --> Str) {
+  my $label = html-escape(column-label($column));
+
+  return '<th>' ~ $label ~ '</th>' unless $column.sortable;
+
+  my $active    = ($sort // '') eq $column.name;
+  my $next-dir  = ($active && ($dir // 'asc') eq 'asc') ?? 'desc' !! 'asc';
+  my $indicator = $active ?? (($dir // 'asc') eq 'asc' ?? ' &uarr;' !! ' &darr;') !! '';
+  my $url       = html-escape(query-url($base, sort => $column.name, dir => $next-dir, page => 1));
+
+  qq[<th><a class="text-decoration-none" hx-get="$url" hx-target="$target" hx-swap="innerHTML" href="$url">{$label}{$indicator}</a></th>]
 }
 
 sub cell-value($column, $record) {
@@ -37,11 +51,11 @@ sub row-actions(Str:D $base, $id --> Str) {
   HTML
 }
 
-method render(::?CLASS:U: $resource, @records, Str:D :$mount-path --> Str) {
+method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index' --> Str) {
   my @columns = $resource.columns;
   my $base    = $mount-path ~ '/' ~ $resource.slug;
 
-  my $head = @columns.map({ '<th>' ~ html-escape(column-label($_)) ~ '</th>' }).join
+  my $head = @columns.map({ header-cell($_, $base, $sort, $dir, $target) }).join
     ~ '<th class="text-end">Actions</th>';
 
   my $body;
