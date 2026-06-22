@@ -395,6 +395,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagination" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pagination
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#htmx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTMX
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -543,6 +576,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagination" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pagination
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#htmx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTMX
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -588,6 +654,26 @@ page, so a title column can double as the row's primary link.</p>
 is wired for HTMX (the destroy flow lands in a later phase). When a resource has
 no records, the table shows an empty state instead of rows, and the page carries
 a New-record button linking to the new form.</p>
+<h2 id="sorting">Sorting<a class="headerlink" href="#sorting" title="Permanent link">&para;</a></h2>
+<p>A column declared <code>:sortable</code> renders its header as a link. Clicking it sorts the
+index by that column, adding an <code>ORDER BY</code> to the relation. The sort column and
+direction travel in the query string (<code>?sort=title&amp;dir=desc</code>); the active column
+shows a direction arrow, and clicking it again toggles ascending and descending.
+Only declared sortable columns are accepted, so the order clause is never built
+from arbitrary input.</p>
+<h2 id="pagination">Pagination<a class="headerlink" href="#pagination" title="Permanent link">&para;</a></h2>
+<p>The index applies <code>LIMIT</code> and <code>OFFSET</code> for the current page. The page size
+defaults to 25 and is configurable per resource:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... }, <span class="n">per-page</span> =&gt; <span class="mi">50</span>);
+</code></pre></div></td></tr></table></div>
+<p>A pagination control renders below the table with a page summary
+(<code>Showing 1–25 of 218</code>) and page links. The links carry the current sort state
+so it survives navigation.</p>
+<h2 id="htmx">HTMX<a class="headerlink" href="#htmx" title="Permanent link">&para;</a></h2>
+<p>The table and pagination live inside an <code>#admin-index</code> container. Sort-header and
+pagination links issue an <code>hx-get</code> that targets that container, so the table body
+swaps in place without a full-page reload. Each link also has a plain <code>href</code>, so
+with JavaScript disabled the same action degrades to a full-page request.</p>
 
 
 
