@@ -9,6 +9,7 @@ nav:
   - Layout and chrome: layout.md
   - Filters: filters.md
   - Scopes: scopes.md
+  - Show pages: show-pages.md
   - Assets: assets.md
   - Authentication: authentication.md
 theme:

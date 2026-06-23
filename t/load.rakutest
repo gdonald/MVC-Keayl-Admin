@@ -1,7 +1,7 @@
 use v6.d;
 use Test;
 
-plan 32;
+plan 33;
 
 use-ok 'MVC::Keayl::Admin';
 use-ok 'MVC::Keayl::Admin::Assets';
@@ -31,6 +31,7 @@ use-ok 'MVC::Keayl::Admin::Resource';
 use-ok 'MVC::Keayl::Admin::ResourceController';
 use-ok 'MVC::Keayl::Admin::Scope';
 use-ok 'MVC::Keayl::Admin::Scopes';
+use-ok 'MVC::Keayl::Admin::Show';
 use-ok 'MVC::Keayl::Admin::Table';
 use-ok 'MVC::Keayl::Admin::TestSupport';
 use-ok 'MVC::Keayl::Admin::Url';

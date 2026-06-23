@@ -48,6 +48,7 @@
     "MVC::Keayl::Admin::ResourceController": "lib/MVC/Keayl/Admin/ResourceController.rakumod",
     "MVC::Keayl::Admin::Scope": "lib/MVC/Keayl/Admin/Scope.rakumod",
     "MVC::Keayl::Admin::Scopes": "lib/MVC/Keayl/Admin/Scopes.rakumod",
+    "MVC::Keayl::Admin::Show": "lib/MVC/Keayl/Admin/Show.rakumod",
     "MVC::Keayl::Admin::Table": "lib/MVC/Keayl/Admin/Table.rakumod",
     "MVC::Keayl::Admin::Url": "lib/MVC/Keayl/Admin/Url.rakumod",
     "MVC::Keayl::Admin::TestSupport": "lib/MVC/Keayl/Admin/TestSupport.rakumod",

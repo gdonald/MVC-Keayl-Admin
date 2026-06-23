@@ -6,6 +6,7 @@ use MVC::Keayl::Admin::Table;
 use MVC::Keayl::Admin::Pagination;
 use MVC::Keayl::Admin::FilterPanel;
 use MVC::Keayl::Admin::Scopes;
+use MVC::Keayl::Admin::Show;
 use MVC::Keayl::Admin::Predicate;
 use MVC::Keayl::Admin::Formatter;
 
@@ -125,6 +126,28 @@ method index {
     'resource/index',
     page-title  => $resource.plural-name,
     breadcrumbs => [ $resource.plural-name => Nil ],
+  )
+}
+
+method show {
+  my $resource = self.current-resource;
+  my $id       = (self.params<id> // '').Str;
+
+  my $record = $id ~~ /^ \d+ $/ ?? $resource.model.where({ id => $id.Int }).first !! Nil;
+
+  return self.head(404) without $record;
+
+  my $mount = MVC::Keayl::Admin::Config.current.mount-path;
+  my $base  = $mount ~ '/' ~ $resource.slug;
+  my $title = $resource.singular-name ~ ' #' ~ $record.id;
+
+  self.assign('admin_show_body',    MVC::Keayl::Admin::Show.render($resource, $record, mount-path => $mount));
+  self.assign('admin_show_actions', MVC::Keayl::Admin::Show.actions($resource, $record, mount-path => $mount));
+
+  self.render-admin(
+    'resource/show',
+    page-title  => $title,
+    breadcrumbs => [ $resource.plural-name => $base, $title => Nil ],
   )
 }
 

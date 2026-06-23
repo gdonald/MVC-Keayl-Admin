@@ -1,0 +1,62 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub fetch(Str:D $path) {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host   = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+  $host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+register-authors;
+
+my ($ann) = seed-authors({ name => 'Ann' });
+seed-posts(
+  { title => 'First post',  body => 'hello', published => True,  author_id => $ann.id },
+  { title => 'Second post', body => 'world', published => False },
+);
+
+my $post = Post.where({ title => 'First post' }).first;
+
+my $body = fetch('/admin/posts/' ~ $post.id).body;
+
+# attribute rows from declared attributes, using formatters
+ok $body.contains('First post'), 'the show page renders a declared attribute value';
+ok $body.contains('>Title<') || $body.contains('Title'), 'the show page labels attributes';
+ok $body.contains('hello'), 'the show page renders the body attribute';
+
+# action panel
+ok $body.contains('Edit') && $body.contains('/admin/posts/' ~ $post.id ~ '/edit'),
+  'the action panel has an edit link';
+ok $body.contains('hx-delete="/admin/posts/' ~ $post.id ~ '"'),
+  'the action panel has a destroy control';
+
+# belongs-to rendered as a link to the associated show page
+ok $body.contains('/admin/authors/' ~ $ann.id),
+  'a belongs-to attribute links to the associated record';
+
+# a missing belongs-to shows a blank, not a broken link
+my $orphan = Post.where({ title => 'Second post' }).first;
+my $orphan-body = fetch('/admin/posts/' ~ $orphan.id).body;
+ok !$orphan-body.contains('/admin/authors/'), 'a missing belongs-to renders no link';
+
+# has-many rendered as a sub-table linking into the associated resource
+my $author-body = fetch('/admin/authors/' ~ $ann.id).body;
+ok $author-body.contains('/admin/posts/' ~ $post.id),
+  'a has-many attribute links each associated record into its resource';
+
+# a missing record is a 404
+is fetch('/admin/posts/999999').status, 404, 'an unknown id is a 404';
+is fetch('/admin/posts/not-a-number').status, 404, 'a non-numeric id is a 404';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;
