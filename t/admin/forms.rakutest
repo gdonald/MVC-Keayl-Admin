@@ -1,0 +1,85 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub encode($value) {
+  $value.Str.subst(/(<-[A..Za..z0..9._-]>)/, { '%' ~ $0.ord.fmt('%02X') }, :g)
+}
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+sub submit(Str:D $path, %fields) {
+  my $body = %fields.map({ .key ~ '=' ~ encode(.value) }).join('&');
+
+  host.call(MVC::Keayl::Request.new(
+    method  => 'POST',
+    target  => $path,
+    headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
+    body    => $body,
+  ))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+register-authors;
+my ($ann) = seed-authors({ name => 'Ann' });
+
+# new form renders an input per declared field, by type
+my $new = fetch('/admin/posts/new').body;
+ok $new.contains('name="title"'),       'a string field renders a text input';
+ok $new.contains('<textarea'),          'a text field renders a textarea';
+ok $new.contains('type="checkbox"'),    'a boolean field renders a checkbox';
+ok $new.contains('<select') && $new.contains('Ann'), 'a select field renders options from its collection';
+ok $new.contains('placeholder="Headline"'), 'a field renders its placeholder';
+ok $new.contains('Keep it short.'),     'a field renders its hint';
+ok $new.contains('action="/admin/posts"'), 'the new form posts to the collection path';
+
+# create success: redirect to show with a flash
+my $created = submit('/admin/posts', { title => 'My first post', body => 'Hello', published => '1', 'author-id' => $ann.id });
+is $created.status, 302, 'a successful create redirects';
+ok $created.header('Location').contains('/admin/posts/'), 'create redirects to the show page';
+
+my $post = Post.where({ title => 'My first post' }).first;
+ok $post.defined && $post.read-attribute('body') eq 'Hello', 'create persists the permitted attributes';
+ok $post.read-attribute('author_id') == $ann.id, 'create persists the belongs-to selection';
+
+# strong params: an unpermitted attribute is ignored
+my $sneaky = submit('/admin/posts', { title => 'Sneaky', id => '99999' });
+isnt Post.where({ title => 'Sneaky' }).first.id, 99999, 'an unpermitted attribute is not mass-assigned';
+
+# create failure: re-render the form with errors
+my $bad = submit('/admin/posts', { title => '', body => 'x' });
+is $bad.status, 200, 'a failed create re-renders the form';
+ok $bad.body.contains('must be present'), 'a failed create shows the validation error';
+
+# edit form is pre-filled
+my $edit = fetch('/admin/posts/' ~ $post.id ~ '/edit').body;
+ok $edit.contains('value="My first post"'), 'the edit form pre-fills the current value';
+ok $edit.contains('action="/admin/posts/' ~ $post.id ~ '"'), 'the edit form posts to the member path';
+
+# update success
+my $updated = submit('/admin/posts/' ~ $post.id, { title => 'Renamed', body => 'Hello' });
+is $updated.status, 302, 'a successful update redirects';
+is Post.where({ id => $post.id }).first.read-attribute('title'), 'Renamed', 'update persists the change';
+
+# update failure
+my $bad-update = submit('/admin/posts/' ~ $post.id, { title => '', body => 'Hello' });
+is $bad-update.status, 200, 'a failed update re-renders the form';
+ok $bad-update.body.contains('must be present'), 'a failed update shows the validation error';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

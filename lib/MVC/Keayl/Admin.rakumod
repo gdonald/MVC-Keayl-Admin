@@ -66,6 +66,10 @@ sub admin-routes {
 
     for @slugs -> $slug {
       resources $slug, :controller($resource-ctrl);
+
+      # HTML forms cannot issue PATCH, so accept a plain POST to the member path
+      # for the update action too, keeping the edit form usable without JavaScript.
+      post '/' ~ $slug ~ '/:id', to => $resource-ctrl ~ '#update';
     }
 
     get '/', to => $dashboard;

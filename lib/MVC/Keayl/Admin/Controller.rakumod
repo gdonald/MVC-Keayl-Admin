@@ -23,6 +23,10 @@ class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
     }
   }
 
+  method dispatch(Str:D $action) {
+    callwith($action eq 'new' ?? 'new-record' !! $action)
+  }
+
   method set-admin-context {
     my $config = MVC::Keayl::Admin::Config.current;
 

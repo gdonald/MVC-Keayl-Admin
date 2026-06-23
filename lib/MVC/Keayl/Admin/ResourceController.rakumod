@@ -7,6 +7,7 @@ use MVC::Keayl::Admin::Pagination;
 use MVC::Keayl::Admin::FilterPanel;
 use MVC::Keayl::Admin::Scopes;
 use MVC::Keayl::Admin::Show;
+use MVC::Keayl::Admin::Form;
 use MVC::Keayl::Admin::Predicate;
 use MVC::Keayl::Admin::Formatter;
 
@@ -25,6 +26,25 @@ sub filter-value($filter, %params) {
   my $value = (%params{$filter.name} // '').Str;
 
   $value ne '' ?? $value !! Nil
+}
+
+sub strong-params($resource, %params) {
+  my %attrs;
+
+  for $resource.permitted -> $name {
+    my $field  = $resource.fields.first({ .name eq $name });
+    my $column = $name.subst('-', '_', :g);
+    my $type   = $field.defined ?? $field.as !! 'string';
+
+    if $type eq 'boolean' {
+      %attrs{$column} = so (%params{$name} // '').Str.lc eq any('1', 'true', 'on', 'yes');
+    } elsif %params{$name}:exists {
+      my $value = %params{$name};
+      %attrs{$column} = $type eq 'number' ?? +$value !! $value;
+    }
+  }
+
+  %attrs
 }
 
 sub resolve-scope($resource, %params) {
@@ -129,11 +149,85 @@ method index {
   )
 }
 
+method !find-record($resource) {
+  my $id = (self.params<id> // '').Str;
+
+  $id ~~ /^ \d+ $/ ?? $resource.model.where({ id => $id.Int }).first !! Nil
+}
+
+# The route action is `new`, but `new` is the object constructor and a reserved
+# method name, so the base controller's dispatch maps it here.
+method new-record {
+  my $resource = self.current-resource;
+  my $mount    = MVC::Keayl::Admin::Config.current.mount-path;
+  my $base     = $mount ~ '/' ~ $resource.slug;
+
+  self.render-form($resource, $resource.model.build, action => $base, submit => 'Create', :$base,
+    page-title => 'New ' ~ $resource.singular-name);
+}
+
+method create {
+  my $resource = self.current-resource;
+  my $mount    = MVC::Keayl::Admin::Config.current.mount-path;
+  my $base     = $mount ~ '/' ~ $resource.slug;
+
+  my $record = $resource.model.create(strong-params($resource, self.params.Hash));
+
+  if $record.id {
+    self.flash<notice> = $resource.singular-name ~ ' created.';
+
+    return self.redirect-to($base ~ '/' ~ $record.id);
+  }
+
+  self.render-form($resource, $record, action => $base, submit => 'Create', :$base,
+    page-title => 'New ' ~ $resource.singular-name);
+}
+
+method edit {
+  my $resource = self.current-resource;
+  my $record   = self!find-record($resource);
+
+  return self.head(404) without $record;
+
+  my $mount = MVC::Keayl::Admin::Config.current.mount-path;
+  my $base  = $mount ~ '/' ~ $resource.slug;
+
+  self.render-form($resource, $record, action => $base ~ '/' ~ $record.id, submit => 'Update', :$base,
+    page-title => 'Edit ' ~ $resource.singular-name ~ ' #' ~ $record.id);
+}
+
+method update {
+  my $resource = self.current-resource;
+  my $record   = self!find-record($resource);
+
+  return self.head(404) without $record;
+
+  my $mount = MVC::Keayl::Admin::Config.current.mount-path;
+  my $base  = $mount ~ '/' ~ $resource.slug;
+
+  if $record.update(strong-params($resource, self.params.Hash)) {
+    self.flash<notice> = $resource.singular-name ~ ' updated.';
+
+    return self.redirect-to($base ~ '/' ~ $record.id);
+  }
+
+  self.render-form($resource, $record, action => $base ~ '/' ~ $record.id, submit => 'Update', :$base,
+    page-title => 'Edit ' ~ $resource.singular-name ~ ' #' ~ $record.id);
+}
+
+method render-form($resource, $record, Str:D :$action, Str:D :$submit, Str:D :$base, Str:D :$page-title) {
+  self.assign('admin_form', MVC::Keayl::Admin::Form.render($resource, $record, :$action, :$submit, cancel => $base));
+
+  self.render-admin(
+    'resource/form',
+    :$page-title,
+    breadcrumbs => [ $resource.plural-name => $base, $page-title => Nil ],
+  )
+}
+
 method show {
   my $resource = self.current-resource;
-  my $id       = (self.params<id> // '').Str;
-
-  my $record = $id ~~ /^ \d+ $/ ?? $resource.model.where({ id => $id.Int }).first !! Nil;
+  my $record   = self!find-record($resource);
 
   return self.head(404) without $record;
 

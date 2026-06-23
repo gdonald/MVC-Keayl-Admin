@@ -10,6 +10,7 @@ nav:
   - Filters: filters.md
   - Scopes: scopes.md
   - Show pages: show-pages.md
+  - Forms: forms.md
   - Assets: assets.md
   - Authentication: authentication.md
 theme:

@@ -37,6 +37,7 @@
     "MVC::Keayl::Admin::Field": "lib/MVC/Keayl/Admin/Field.rakumod",
     "MVC::Keayl::Admin::Filter": "lib/MVC/Keayl/Admin/Filter.rakumod",
     "MVC::Keayl::Admin::FilterPanel": "lib/MVC/Keayl/Admin/FilterPanel.rakumod",
+    "MVC::Keayl::Admin::Form": "lib/MVC/Keayl/Admin/Form.rakumod",
     "MVC::Keayl::Admin::Formatter": "lib/MVC/Keayl/Admin/Formatter.rakumod",
     "MVC::Keayl::Admin::Inflection": "lib/MVC/Keayl/Admin/Inflection.rakumod",
     "MVC::Keayl::Admin::MenuEntry": "lib/MVC/Keayl/Admin/MenuEntry.rakumod",

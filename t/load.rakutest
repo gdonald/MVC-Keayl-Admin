@@ -1,7 +1,7 @@
 use v6.d;
 use Test;
 
-plan 33;
+plan 34;
 
 use-ok 'MVC::Keayl::Admin';
 use-ok 'MVC::Keayl::Admin::Assets';
@@ -20,6 +20,7 @@ use-ok 'MVC::Keayl::Admin::Engine';
 use-ok 'MVC::Keayl::Admin::Field';
 use-ok 'MVC::Keayl::Admin::Filter';
 use-ok 'MVC::Keayl::Admin::FilterPanel';
+use-ok 'MVC::Keayl::Admin::Form';
 use-ok 'MVC::Keayl::Admin::Formatter';
 use-ok 'MVC::Keayl::Admin::Inflection';
 use-ok 'MVC::Keayl::Admin::MenuEntry';

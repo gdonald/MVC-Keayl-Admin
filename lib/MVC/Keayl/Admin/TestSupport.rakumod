@@ -24,6 +24,8 @@ class Author is Model is export {
 class Post is Model is export {
   submethod BUILD {
     self.belongs-to: author => %( class-name => 'Author', optional => True );
+
+    self.validate: 'title', { :presence };
   }
 }
 
@@ -59,7 +61,9 @@ sub seed-posts(**@rows --> Nil) is export {
 sub seed-authors(**@rows --> List) is export {
   Author.destroy-all;
 
-  @rows.map({ Author.create($_) }).list
+  my @created;
+  @created.push: Author.create($_) for @rows;
+  @created.List
 }
 
 sub register-posts(Int :$per-page, Bool :$scope-counts --> Nil) is export {
@@ -78,6 +82,13 @@ sub register-posts(Int :$per-page, Bool :$scope-counts --> Nil) is export {
     attribute('body');
     attribute('published', :format<boolean>);
     attribute('author');
+
+    field('title', :as<string>, :placeholder<Headline>, :hint('Keep it short.'));
+    field('body', :as<text>);
+    field('published', :as<boolean>);
+    field('author-id', :as<select>, :collection({ Author.all.all.map(-> $a { $a.id => $a.read-attribute('name') }) }));
+
+    permit(<title body published author-id>);
   });
 }
 

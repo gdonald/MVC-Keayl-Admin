@@ -1,0 +1,32 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::DSL;
+use MVC::Keayl::Admin::Form;
+use MVC::Keayl::Admin::TestSupport;
+
+setup-admin-db;
+MVC::Keayl::Admin.reset;
+
+my $resource = MVC::Keayl::Admin.register(Post, {
+  field('title', :as<string>);
+  field('category-id', :as<select>, :collection({ (1 => 'News', 2 => 'Opinion') }));
+  field('tag-ids', :as<select>, :multiple, :collection({ (1 => 'Red', 2 => 'Blue') }));
+});
+
+my $form = MVC::Keayl::Admin::Form.render($resource, Post.build,
+  action => '/admin/posts', submit => 'Create', cancel => '/admin/posts');
+
+ok $form.contains('name="category-id"') && $form.contains('News'),
+  'a belongs-to select renders a single select from its collection';
+
+ok $form.contains('multiple') && $form.contains('name="tag-ids[]"'),
+  'a has-many select renders a multi-select posting an array parameter';
+
+ok $form.contains('Red') && $form.contains('Blue'),
+  'the multi-select renders its collection options';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;
