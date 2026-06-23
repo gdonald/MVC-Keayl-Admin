@@ -8,6 +8,7 @@ nav:
   - Index pages: index-pages.md
   - Layout and chrome: layout.md
   - Filters: filters.md
+  - Scopes: scopes.md
   - Assets: assets.md
   - Authentication: authentication.md
 theme:

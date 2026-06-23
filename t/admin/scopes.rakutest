@@ -1,0 +1,66 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub fetch(Str:D $path) {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host   = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+  $host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts(
+  { title => 'Alpha', published => True },
+  { title => 'Beta',  published => False },
+  { title => 'Gamma', published => True },
+);
+
+# default scope shows everything
+my $default = fetch('/admin/posts').body;
+ok $default.contains('Alpha') && $default.contains('Beta') && $default.contains('Gamma'),
+  'the default scope shows every record';
+
+# applying a scope filters the relation
+my $published = fetch('/admin/posts?scope=Published').body;
+ok $published.contains('Alpha') && !$published.contains('Beta') && $published.contains('Gamma'),
+  'a scope applies its block to the relation';
+
+# scope tabs are rendered and the active one is highlighted
+ok $default.contains('nav-tabs'), 'scope tabs are rendered';
+
+ok $published.contains('nav-link active') && $published.contains('Published'),
+  'the active scope tab is highlighted';
+
+# per-scope counts
+ok $default.contains('All') && $default ~~ /'badge' .*? '3'/, 'the All scope shows a count';
+
+ok $default ~~ /'Published' .*? 'badge' .*? '2'/ || $default.contains('>2</span>'),
+  'the Published scope shows its count';
+
+# scope composes with a filter: Published + title filter
+my $composed = fetch('/admin/posts?scope=Published&title=Alpha').body;
+ok $composed.contains('Alpha') && !$composed.contains('Gamma'),
+  'a scope composes with a filter';
+
+# scope is preserved across sort links
+ok $published.contains('scope=Published') && $published.contains('sort=title'),
+  'sort links preserve the active scope';
+
+# counts can be suppressed
+MVC::Keayl::Admin.reset;
+register-posts(scope-counts => False);
+
+my $no-counts = fetch('/admin/posts').body;
+ok $no-counts.contains('nav-tabs') && !($no-counts ~~ /'nav-link' .*? 'badge'/),
+  'per-scope counts are suppressible';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

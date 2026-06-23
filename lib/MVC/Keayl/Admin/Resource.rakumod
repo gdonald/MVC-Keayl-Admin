@@ -16,6 +16,7 @@ has Str $.slug-override;
 has Str $.singular-override;
 has Str $.plural-override;
 has Int $.per-page-override;
+has     $.scope-counts-override;
 
 has MVC::Keayl::Admin::Column    @.columns;
 has MVC::Keayl::Admin::Attribute @.attributes;
@@ -44,6 +45,14 @@ method slug(--> Str) {
 
 method per-page(--> Int) {
   $!per-page-override // 25
+}
+
+method scope-counts(--> Bool) {
+  $!scope-counts-override // True
+}
+
+method default-scope {
+  @!scopes.first(*.default) // @!scopes.first
 }
 
 method singular-name(MVC::Keayl::I18n :$i18n = default-i18n() --> Str) {

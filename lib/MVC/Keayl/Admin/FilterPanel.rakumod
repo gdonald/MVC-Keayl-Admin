@@ -98,14 +98,15 @@ method has-filters(::?CLASS:U: $resource --> Bool) {
   $resource.filters.elems > 0
 }
 
-method form(::?CLASS:U: $resource, %params, Str:D :$base, Str:D :$target, :$sort, :$dir --> Str) {
+method form(::?CLASS:U: $resource, %params, Str:D :$base, Str:D :$target, :$sort, :$dir, :$scope --> Str) {
   my $fields = $resource.filters.map({ field-for($_, %params) }).join;
 
   my $hidden = '';
-  $hidden ~= qq[<input type="hidden" name="sort" value="{html-escape($sort.Str)}">] if $sort.defined;
-  $hidden ~= qq[<input type="hidden" name="dir" value="{html-escape($dir.Str)}">]  if $dir.defined;
+  $hidden ~= qq[<input type="hidden" name="sort" value="{html-escape($sort.Str)}">]   if $sort.defined;
+  $hidden ~= qq[<input type="hidden" name="dir" value="{html-escape($dir.Str)}">]     if $dir.defined;
+  $hidden ~= qq[<input type="hidden" name="scope" value="{html-escape($scope.Str)}">] if $scope.defined;
 
-  my $clear = html-escape(query-url($base, sort => $sort, dir => $dir));
+  my $clear = html-escape(query-url($base, scope => $scope, sort => $sort, dir => $dir));
 
   qq:to/HTML/.trim;
   <form hx-get="{html-escape($base)}" hx-target="{$target}" hx-swap="innerHTML">
@@ -118,7 +119,7 @@ method form(::?CLASS:U: $resource, %params, Str:D :$base, Str:D :$target, :$sort
   HTML
 }
 
-method chips(::?CLASS:U: $resource, %params, Str:D :$base, Str:D :$target, :$sort, :$dir --> Str) {
+method chips(::?CLASS:U: $resource, %params, Str:D :$base, Str:D :$target, :$sort, :$dir, :$scope --> Str) {
   my @active = $resource.filters.grep({ filter-active($_, %params) });
 
   return '' unless @active;
@@ -129,14 +130,14 @@ method chips(::?CLASS:U: $resource, %params, Str:D :$base, Str:D :$target, :$sor
     my %remaining = gather-active-params($resource, %params);
     %remaining{$_}:delete for param-keys($filter);
 
-    my $url   = html-escape(query-url($base, |%remaining, sort => $sort, dir => $dir));
+    my $url   = html-escape(query-url($base, |%remaining, scope => $scope, sort => $sort, dir => $dir));
     my $shown = param-keys($filter).map({ %params{$_} // '' }).grep(*.Str ne '').join(' to ');
     my $label = html-escape(humanize($filter.name) ~ ': ' ~ $shown);
 
     @chips.push: qq[<a class="badge text-bg-secondary text-decoration-none me-2" hx-get="$url" hx-target="{$target}" hx-swap="innerHTML" href="$url">{$label} &times;</a>];
   }
 
-  my $clear = html-escape(query-url($base, sort => $sort, dir => $dir));
+  my $clear = html-escape(query-url($base, scope => $scope, sort => $sort, dir => $dir));
 
   @chips.push: qq[<a class="badge text-bg-light text-decoration-none" hx-get="$clear" hx-target="{$target}" hx-swap="innerHTML" href="$clear">Clear all</a>];
 

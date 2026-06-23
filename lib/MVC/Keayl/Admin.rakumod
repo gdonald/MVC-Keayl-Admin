@@ -30,13 +30,14 @@ method configure(::?CLASS:U: Str :$mount-path, Str :$site-title --> MVC::Keayl::
   $config
 }
 
-method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str :$plural, Int :$per-page --> MVC::Keayl::Admin::Resource) {
+method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str :$plural, Int :$per-page, Bool :$scope-counts --> MVC::Keayl::Admin::Resource) {
   my $resource = MVC::Keayl::Admin::Resource.new(
     :$model,
-    slug-override     => $slug,
-    singular-override => $singular,
-    plural-override   => $plural,
-    per-page-override => $per-page,
+    slug-override         => $slug,
+    singular-override     => $singular,
+    plural-override       => $plural,
+    per-page-override     => $per-page,
+    scope-counts-override => $scope-counts,
   );
 
   $resource.parse(&block);
