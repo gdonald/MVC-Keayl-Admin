@@ -8,11 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/authentication/">
+        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/forms/">
       
       
-        <link rel="prev" href="../assets/">
+        <link rel="prev" href="../show-pages/">
       
+      
+        <link rel="next" href="../assets/">
       
       
         
@@ -23,7 +25,7 @@
     
     
       
-        <title>Authentication - MVC::Keayl::Admin</title>
+        <title>Forms - MVC::Keayl::Admin</title>
       
     
     
@@ -64,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#authentication" class="md-skip">
+        <a href="#forms" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Authentication
+              Forms
             
           </span>
         </div>
@@ -433,10 +435,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../forms/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forms
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -452,6 +481,59 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#persistence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Persistence
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-yet-covered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not yet covered
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -487,37 +569,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
         
   
   
@@ -533,76 +588,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#strategies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Strategies
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Strategies">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#http-basic" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        HTTP basic
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#session" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Session
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-current-admin" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The current admin
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -634,49 +619,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#strategies" class="md-nav__link">
+  <a href="#persistence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Strategies
+        Persistence
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Strategies">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#http-basic" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        HTTP basic
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#session" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Session
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-current-admin" class="md-nav__link">
+  <a href="#validation-errors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The current admin
+        Validation errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-yet-covered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not yet covered
       
     </span>
   </a>
@@ -703,70 +671,94 @@
   
 
 
-<h1 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h1>
-<p>Every admin request runs through a pluggable authentication gate. Configure a
-strategy and the gate challenges or redirects unauthenticated visitors before
-any action runs. With no strategy configured the admin is open, which is
-convenient in development but should not be shipped to production.</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin</span>;
-<span class="k">use</span> <span class="n">MVC::Keayl::Admin::Authentication::Basic</span>;
-
-<span class="n">MVC::Keayl::Admin</span>.<span class="n">authenticate-with</span>(
-  <span class="n">MVC::Keayl::Admin::Authentication::Basic</span>.<span class="nb">new</span>(
-    <span class="nb">name</span>     =&gt; <span class="s">&#39;admin&#39;</span>,
-    <span class="n">password</span> =&gt; <span class="s">&#39;secret&#39;</span>,
-    <span class="n">realm</span>    =&gt; <span class="s">&#39;Admin&#39;</span>,
-  )
-);
-</code></pre></div></td></tr></table></div>
-<h2 id="strategies">Strategies<a class="headerlink" href="#strategies" title="Permanent link">&para;</a></h2>
-<p>A strategy does the <code>MVC::Keayl::Admin::Authentication::Strategy</code> role, which has
-two methods: <code>authenticate($controller)</code> returns the current admin or an
-undefined value, and <code>challenge($controller)</code> issues the response for an
-unauthenticated visitor.</p>
-<h3 id="http-basic">HTTP basic<a class="headerlink" href="#http-basic" title="Permanent link">&para;</a></h3>
-<p><code>MVC::Keayl::Admin::Authentication::Basic</code> compares the request's basic
-credentials against a configured <code>name</code> and <code>password</code> using a constant-time
-comparison, and challenges with a <code>401</code> and a <code>WWW-Authenticate</code> header.</p>
-<h3 id="session">Session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h3>
-<p><code>MVC::Keayl::Admin::Authentication::Session</code> reads an id from the session (<code>key</code>,
-default <code>admin_id</code>) and redirects an unauthenticated visitor to <code>login-path</code>
-(default <code>/login</code>). An optional <code>resolve</code> block maps the stored id to an admin
-object:</p>
+<h1 id="forms">Forms<a class="headerlink" href="#forms" title="Permanent link">&para;</a></h1>
+<p>New and edit forms are built from declared <code>field</code>s. Each field maps by <code>:as</code> to
+an input type:</p>
+<table>
+<thead>
+<tr>
+<th><code>:as</code></th>
+<th>Input</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>string</code></td>
+<td>text input</td>
+</tr>
+<tr>
+<td><code>text</code></td>
+<td>textarea</td>
+</tr>
+<tr>
+<td><code>select</code></td>
+<td>dropdown (from <code>:collection</code>)</td>
+</tr>
+<tr>
+<td><code>boolean</code></td>
+<td>checkbox</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>date picker</td>
+</tr>
+<tr>
+<td><code>time</code></td>
+<td>time picker</td>
+</tr>
+<tr>
+<td><code>datetime</code></td>
+<td>datetime-local picker</td>
+</tr>
+<tr>
+<td><code>number</code></td>
+<td>number input</td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td>password input</td>
+</tr>
+<tr>
+<td><code>hidden</code></td>
+<td>hidden input</td>
+</tr>
+<tr>
+<td><code>file</code></td>
+<td>file input</td>
+</tr>
+</tbody>
+</table>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
-<span class="normal">5</span>
-<span class="normal">6</span>
-<span class="normal">7</span>
-<span class="normal">8</span>
-<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin::Authentication::Session</span>;
-
-<span class="n">MVC::Keayl::Admin</span>.<span class="n">authenticate-with</span>(
-  <span class="n">MVC::Keayl::Admin::Authentication::Session</span>.<span class="nb">new</span>(
-    <span class="nb">key</span>        =&gt; <span class="s">&#39;admin_id&#39;</span>,
-    <span class="n">login-path</span> =&gt; <span class="s">&#39;/admin/login&#39;</span>,
-    <span class="nb">resolve</span>    =&gt; -&gt; <span class="nv">$id</span> { <span class="n">Admin</span>.<span class="n">find</span>(<span class="nv">$id</span>) },
-  )
-);
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">field</span>(<span class="s">&#39;title&#39;</span>,     :<span class="n">as</span><span class="s">&lt;string&gt;</span>, :<span class="n">placeholder</span><span class="s">&lt;Headline&gt;</span>, :<span class="n">hint</span>(<span class="s">&#39;Keep it short.&#39;</span>));
+<span class="n">field</span>(<span class="s">&#39;body&#39;</span>,      :<span class="n">as</span><span class="s">&lt;text&gt;</span>);
+<span class="n">field</span>(<span class="s">&#39;published&#39;</span>, :<span class="n">as</span><span class="s">&lt;boolean&gt;</span>);
+<span class="n">field</span>(<span class="s">&#39;author-id&#39;</span>, :<span class="n">as</span><span class="s">&lt;select&gt;</span>, :<span class="n">collection</span>({ <span class="n">Author</span>.<span class="nb">all</span>.<span class="nb">all</span>.<span class="n">map</span>(-&gt; <span class="nv">$a</span> { <span class="nv">$a</span>.<span class="nb">id</span> =&gt; <span class="nv">$a</span>.<span class="nb">name</span> }) }));
+<span class="n">field</span>(<span class="s">&#39;tag-ids&#39;</span>,   :<span class="n">as</span><span class="s">&lt;select&gt;</span>, :<span class="n">multiple</span>, :<span class="n">collection</span>({ <span class="n">Tag</span>.<span class="nb">all</span>.<span class="nb">all</span>.<span class="n">map</span>(-&gt; <span class="nv">$t</span> { <span class="nv">$t</span>.<span class="nb">id</span> =&gt; <span class="nv">$t</span>.<span class="nb">name</span> }) }));
 </code></pre></div></td></tr></table></div>
-<h2 id="the-current-admin">The current admin<a class="headerlink" href="#the-current-admin" title="Permanent link">&para;</a></h2>
-<p>When authentication succeeds the result is the current admin. It is available to
-controllers as <code>self.current-admin</code>, exposed to views as <code>$current_admin</code> (the
-layout shows a "Signed in as" indicator when present), and is the value the
-authorization layer will check.</p>
-<p>Assets are served by a controller outside the gate, so the stylesheet, script,
-and font bundle load without authentication.</p>
+<p>Field labels resolve through I18n (<code>human-attribute-name</code>), and a <code>:hint</code> and
+<code>:placeholder</code> render alongside the input. A <code>select</code> renders a dropdown from its
+explicit <code>collection</code>; with <code>:multiple</code> it renders a multi-select for a
+collection association.</p>
+<h2 id="persistence">Persistence<a class="headerlink" href="#persistence" title="Permanent link">&para;</a></h2>
+<p>Create and update assign only the attributes named in the resource's <code>permit</code>
+allowlist, so an unlisted parameter is never mass-assigned. On success the action
+redirects to the show page with a flash; on a validation failure it re-renders
+the form with the submitted values.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">permit</span>(<span class="s">&lt;title body published author-id&gt;</span>);
+</code></pre></div></td></tr></table></div>
+<p>Because an HTML form cannot issue a <code>PATCH</code>, the engine also accepts a plain
+<code>POST</code> to the member path for the update action, so editing works without
+JavaScript.</p>
+<h2 id="validation-errors">Validation errors<a class="headerlink" href="#validation-errors" title="Permanent link">&para;</a></h2>
+<p>A failed save re-renders the form. ORM validation errors show inline beneath each
+field and in a summary at the top, using the ORM's <code>full-messages</code>.</p>
+<h2 id="not-yet-covered">Not yet covered<a class="headerlink" href="#not-yet-covered" title="Permanent link">&para;</a></h2>
+<p>Nested attributes for associations (<code>accepts-nested-attributes-for</code>) and file
+uploads backed by Active Storage are planned and not yet implemented; the <code>file</code>
+input renders but is not wired to storage.</p>
 
 
 
