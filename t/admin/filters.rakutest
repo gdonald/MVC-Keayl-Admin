@@ -1,0 +1,63 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Predicate;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub fetch(Str:D $path, :%headers) {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host   = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+  $host.call(MVC::Keayl::Request.new(method => 'GET', target => $path, :%headers))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts(
+  { title => 'Alpha post',  published => True },
+  { title => 'Beta post',   published => False },
+  { title => 'Gamma entry', published => True },
+);
+
+# predicate compiler (unit) against the relation
+is apply-predicate(Post.all, 'title', 'cont', 'post').count, 2, 'cont compiles to a substring match';
+is apply-predicate(Post.all, 'title', 'eq', 'Beta post').count, 1, 'eq compiles to equality';
+is apply-predicate(Post.all, 'title', 'starts', 'Gamma').count, 1, 'starts compiles to a prefix match';
+is apply-predicate(Post.all, 'id', 'gteq', 2).count, 2, 'gteq compiles to a >= range';
+is apply-predicate(Post.all, 'id', 'lt', 2).count, 1, 'lt compiles to a < range';
+is apply-predicate(Post.all, 'id', 'in', '1,3').count, 2, 'in compiles to an IN list';
+is apply-predicate(Post.all, 'published', 'true', Nil).count, 2, 'true compiles to a boolean match';
+
+# string filter through the index (cont via LIKE)
+my $cont = fetch('/admin/posts?title=post').body;
+ok $cont.contains('Alpha post') && $cont.contains('Beta post') && !$cont.contains('Gamma'),
+  'a string filter narrows the index by substring';
+
+# boolean filter
+my $pub = fetch('/admin/posts?published=true').body;
+ok $pub.contains('Alpha post') && !$pub.contains('Beta post'),
+  'a boolean filter narrows the index';
+
+# filtered count drives pagination
+ok fetch('/admin/posts?title=post').body.contains('of 2'),
+  'the page summary reflects the filtered count';
+
+# filter state is a shareable url: the filter form and chips reflect it
+ok $cont.contains('Filters'), 'the index shows a filters control';
+ok $cont.contains('badge') && $cont.contains('Title: post'), 'an active filter shows a removable chip';
+
+# sort links preserve the active filter
+ok $cont.contains('title=post') && $cont.contains('sort=title'),
+  'sort links carry the active filter';
+
+# the filter form is rendered with inputs
+ok $cont.contains('name="title"') && $cont.contains('name="published"'),
+  'the filter form renders an input per declared filter';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

@@ -9,7 +9,7 @@ sub column-label($column --> Str) {
   humanize($column.name)
 }
 
-sub header-cell($column, Str:D $base, $sort, $dir, Str:D $target --> Str) {
+sub header-cell($column, Str:D $base, $sort, $dir, Str:D $target, %filters --> Str) {
   my $label = html-escape(column-label($column));
 
   return '<th>' ~ $label ~ '</th>' unless $column.sortable;
@@ -17,7 +17,7 @@ sub header-cell($column, Str:D $base, $sort, $dir, Str:D $target --> Str) {
   my $active    = ($sort // '') eq $column.name;
   my $next-dir  = ($active && ($dir // 'asc') eq 'asc') ?? 'desc' !! 'asc';
   my $indicator = $active ?? (($dir // 'asc') eq 'asc' ?? ' &uarr;' !! ' &darr;') !! '';
-  my $url       = html-escape(query-url($base, sort => $column.name, dir => $next-dir, page => 1));
+  my $url       = html-escape(query-url($base, |%filters, sort => $column.name, dir => $next-dir, page => 1));
 
   qq[<th><a class="text-decoration-none" hx-get="$url" hx-target="$target" hx-swap="innerHTML" href="$url">{$label}{$indicator}</a></th>]
 }
@@ -51,11 +51,11 @@ sub row-actions(Str:D $base, $id --> Str) {
   HTML
 }
 
-method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index' --> Str) {
+method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters --> Str) {
   my @columns = $resource.columns;
   my $base    = $mount-path ~ '/' ~ $resource.slug;
 
-  my $head = @columns.map({ header-cell($_, $base, $sort, $dir, $target) }).join
+  my $head = @columns.map({ header-cell($_, $base, $sort, $dir, $target, %filters) }).join
     ~ '<th class="text-end">Actions</th>';
 
   my $body;

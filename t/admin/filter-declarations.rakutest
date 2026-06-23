@@ -1,0 +1,34 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::DSL;
+
+class Doc { }
+
+MVC::Keayl::Admin.reset;
+
+# default predicate per filter type
+my $resource = MVC::Keayl::Admin.register(Doc, {
+  filter('title');
+  filter('views', :as<numeric>, :predicate<gteq>);
+  filter('author-id', :as<select>, :collection(-> { (1 => 'Ann',) }));
+  filter('tag', :as<select>, :predicate<cont>);
+});
+
+is $resource.filters[0].effective-predicate, 'cont', 'a string filter defaults to cont';
+
+is $resource.filters[1].effective-predicate, 'gteq', 'an explicit predicate wins';
+
+ok $resource.filters[2].has-collection, 'a select filter keeps its collection';
+
+is $resource.filters[3].effective-predicate, 'cont', 'a select with a search predicate keeps it';
+
+# a select/association filter without a collection or a search predicate is rejected
+dies-ok {
+  MVC::Keayl::Admin.register(Doc, { filter('category', :as<select>) })
+}, 'a select filter without a collection or predicate is rejected at registration';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

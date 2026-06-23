@@ -40,5 +40,8 @@ sub register-posts(Int :$per-page --> Nil) is export {
     column('title', :sortable, :format<link-to-show>);
     column('headline', :display({ .title.uc }));
     column('published', :sortable, :format<boolean>);
+
+    filter('title', :as<string>);
+    filter('published', :as<boolean>);
   });
 }

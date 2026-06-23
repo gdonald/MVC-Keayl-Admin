@@ -7,6 +7,7 @@ nav:
   - Registering resources: registration.md
   - Index pages: index-pages.md
   - Layout and chrome: layout.md
+  - Filters: filters.md
   - Assets: assets.md
   - Authentication: authentication.md
 theme:

@@ -95,6 +95,9 @@ method filter(Str:D $name, Str :$as = 'string', Str :$predicate, :&collection --
 
   die "unknown filter type '$as' for filter '$name'" unless FILTER-TYPES{$as};
 
+  die "filter '$name' is a select without a collection or a search predicate"
+    if $as eq 'select' && !&collection.defined && !$predicate.defined;
+
   @!filters.push: MVC::Keayl::Admin::Filter.new(:$name, :$as, :$predicate, :&collection);
 
   self
