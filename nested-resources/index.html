@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/mounting/">
+        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/nested-resources/">
       
       
-        <link rel="prev" href="../installation/">
+        <link rel="prev" href="../show-pages/">
       
       
-        <link rel="next" href="../registration/">
+        <link rel="next" href="../forms/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Mounting - MVC::Keayl::Admin</title>
+        <title>Nested resources - MVC::Keayl::Admin</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mounting-the-admin" class="md-skip">
+        <a href="#nested-resources" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Mounting
+              Nested resources
             
           </span>
         </div>
@@ -273,37 +273,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Mounting
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../mounting/" class="md-nav__link">
         
   
   
@@ -319,48 +292,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-admin-context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The admin context
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -558,10 +489,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../nested-resources/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nested resources
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -577,6 +535,48 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#nested-routes-and-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested routes and scoping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eager-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Eager loading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -878,10 +878,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#nested-routes-and-scoping" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        Nested routes and scoping
       
     </span>
   </a>
@@ -889,10 +889,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-admin-context" class="md-nav__link">
+  <a href="#eager-loading" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The admin context
+        Eager loading
       
     </span>
   </a>
@@ -919,66 +919,51 @@
   
 
 
-<h1 id="mounting-the-admin">Mounting the admin<a class="headerlink" href="#mounting-the-admin" title="Permanent link">&para;</a></h1>
-<p>The admin ships as a <code>MVC::Keayl</code> engine. A host application mounts it at a
-path, the same way it mounts any other engine.</p>
+<h1 id="nested-resources">Nested resources<a class="headerlink" href="#nested-resources" title="Permanent link">&para;</a></h1>
+<p>A resource that belongs to another can be nested under its parent, scoping every
+view to the parent record, in the spirit of Active Admin's <code>belongs_to</code>.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
 <span class="normal">4</span>
-<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin</span>;
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, {
+  <span class="n">belongs-to</span>(<span class="s">&#39;author&#39;</span>);
 
-<span class="n">routes</span> {
-  <span class="n">mount</span> <span class="n">MVC::Keayl::Admin</span>.<span class="n">endpoint</span>, <span class="nb">at</span> =&gt; <span class="n">MVC::Keayl::Admin</span>.<span class="nb">config</span>.<span class="n">mount-path</span>;
-}
+  <span class="nb">column</span>(<span class="s">&#39;title&#39;</span>);
+  <span class="n">field</span>(<span class="s">&#39;title&#39;</span>, :<span class="n">as</span><span class="s">&lt;string&gt;</span>);
+  <span class="n">permit</span>(<span class="s">&lt;title&gt;</span>);
+});
 </code></pre></div></td></tr></table></div>
-<p><code>MVC::Keayl::Admin.endpoint</code> returns a dispatcher for the admin engine. The
-engine isolates the <code>MVC::Keayl::Admin</code> namespace and carries its own view,
-helper, and asset paths, so its templates and assets never collide with the
-host application's.</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p><code>MVC::Keayl::Admin.config</code> returns the shared configuration. Two settings are
-available:</p>
-<table>
-<thead>
-<tr>
-<th>Setting</th>
-<th>Default</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>mount-path</code></td>
-<td><code>/admin</code></td>
-<td>The path the host mounts the engine at.</td>
-</tr>
-<tr>
-<td><code>site-title</code></td>
-<td><code>Admin</code></td>
-<td>The title shown in the admin chrome.</td>
-</tr>
-</tbody>
-</table>
-<p>Set them with <code>configure</code>:</p>
+<p><code>belongs-to</code> names a <code>belongs-to</code> association on the model. The admin reads the
+target class and foreign key from the ORM reflection.</p>
+<h2 id="nested-routes-and-scoping">Nested routes and scoping<a class="headerlink" href="#nested-routes-and-scoping" title="Permanent link">&para;</a></h2>
+<p>Alongside the standalone routes, the resource gains a nested set under its
+parent: <code>/admin/authors/:author-id/posts</code>, <code>/admin/authors/:author-id/posts/:id</code>,
+and so on. Within those:</p>
+<ul>
+<li>the index, show, edit, update, and destroy relations are scoped to the parent,
+  so a record under a different parent is a 404;</li>
+<li>the breadcrumbs show the parent chain (Authors, the author, Posts);</li>
+<li>the new button, row actions, and form post into the nested path;</li>
+<li>a create fixes the foreign key to the parent, so a new record belongs to it.</li>
+</ul>
+<p>The standalone routes still work and list every record. The nested resource is
+left out of the top menu; reach it from the parent's show page, which links to
+each resource nested under it.</p>
+<h2 id="eager-loading">Eager loading<a class="headerlink" href="#eager-loading" title="Permanent link">&para;</a></h2>
+<p><code>includes</code> names associations to eager-load on the index, avoiding a query per
+row when a column or block reads an association:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">configure</span>(
-  <span class="n">mount-path</span> =&gt; <span class="s">&#39;/manage&#39;</span>,
-  <span class="n">site-title</span> =&gt; <span class="s">&#39;Control Panel&#39;</span>,
-);
-</code></pre></div></td></tr></table></div>
-<p><code>mount-path</code> is read by the host when it mounts the engine. <code>site-title</code> is
-read on every request and exposed to controllers and views through the
-per-request admin context.</p>
-<h2 id="the-admin-context">The admin context<a class="headerlink" href="#the-admin-context" title="Permanent link">&para;</a></h2>
-<p>Every admin controller derives from <code>MVC::Keayl::Admin::Controller</code>, which runs
-a <code>before-action</code> that builds a per-request admin context. The context holds the
-site title, the mount path, and the current request path.</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
-<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">self</span>.<span class="n">admin-context</span><span class="s">&lt;site-title&gt;</span>;
-<span class="nb">self</span>.<span class="n">admin-context</span><span class="s">&lt;path&gt;</span>;
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, {
+  <span class="n">includes</span>(<span class="s">&#39;author&#39;</span>);
+
+  <span class="nb">column</span>(<span class="s">&#39;author&#39;</span>, :<span class="n">display</span>({ .<span class="n">author</span>.<span class="nb">name</span> }));
+});
 </code></pre></div></td></tr></table></div>
 
 
