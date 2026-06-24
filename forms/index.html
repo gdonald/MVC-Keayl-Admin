@@ -520,10 +520,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-yet-covered" class="md-nav__link">
+  <a href="#nested-attributes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Not yet covered
+        Nested attributes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-uploads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File uploads
       
     </span>
   </a>
@@ -641,10 +652,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#not-yet-covered" class="md-nav__link">
+  <a href="#nested-attributes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Not yet covered
+        Nested attributes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-uploads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File uploads
       
     </span>
   </a>
@@ -755,10 +777,28 @@ JavaScript.</p>
 <h2 id="validation-errors">Validation errors<a class="headerlink" href="#validation-errors" title="Permanent link">&para;</a></h2>
 <p>A failed save re-renders the form. ORM validation errors show inline beneath each
 field and in a summary at the top, using the ORM's <code>full-messages</code>.</p>
-<h2 id="not-yet-covered">Not yet covered<a class="headerlink" href="#not-yet-covered" title="Permanent link">&para;</a></h2>
-<p>Nested attributes for associations (<code>accepts-nested-attributes-for</code>) and file
-uploads backed by Active Storage are planned and not yet implemented; the <code>file</code>
-input renders but is not wired to storage.</p>
+<h2 id="nested-attributes">Nested attributes<a class="headerlink" href="#nested-attributes" title="Permanent link">&para;</a></h2>
+<p>Declare a nested association with <code>nested</code>, giving its own sub-fields. The model
+must back it with <code>accepts-nested-attributes-for</code>.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">nested</span>(<span class="s">&#39;posts&#39;</span>, :<span class="n">multiple</span>, {
+  <span class="n">field</span>(<span class="s">&#39;title&#39;</span>, :<span class="n">as</span><span class="s">&lt;string&gt;</span>);
+});
+</code></pre></div></td></tr></table></div>
+<p>A singular association renders one nested fieldset; a <code>:multiple</code> (has-many)
+association renders one fieldset per existing child plus a blank row for adding
+one. Submitting posts <code>posts-attributes</code> to the model, which creates new children,
+updates those with an <code>id</code>, and (with <code>allow-destroy</code>) removes those marked for
+deletion. Use the model's <code>reject-if</code> to skip a blank add-row.</p>
+<h2 id="file-uploads">File uploads<a class="headerlink" href="#file-uploads" title="Permanent link">&para;</a></h2>
+<p>A <code>file</code> field stores its upload through Active Storage. The form becomes
+<code>multipart/form-data</code>, and on save the upload is attached to the record by its
+type, id, and the field name (no storage role on the model required):</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">field</span>(<span class="s">&#39;cover&#39;</span>, :<span class="n">as</span><span class="s">&lt;file&gt;</span>);
+</code></pre></div></td></tr></table></div>
+<p>Configure a storage service and repository in your application's setup, the same
+as any Active Storage integration.</p>
 
 
 
