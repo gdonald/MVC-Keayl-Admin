@@ -8,6 +8,7 @@ use MVC::Keayl::Admin::FilterPanel;
 use MVC::Keayl::Admin::Scopes;
 use MVC::Keayl::Admin::Show;
 use MVC::Keayl::Admin::Form;
+use MVC::Keayl::Admin::Attachments;
 use MVC::Keayl::Admin::Predicate;
 use MVC::Keayl::Admin::Formatter;
 
@@ -28,6 +29,16 @@ sub filter-value($filter, %params) {
   $value ne '' ?? $value !! Nil
 }
 
+sub attach-files($resource, $record, %params) {
+  for $resource.fields.grep(*.as eq 'file') -> $field {
+    my $upload = %params{$field.name};
+
+    next unless $upload ~~ Associative && ($upload<filename> // '').Str ne '';
+
+    MVC::Keayl::Admin::Attachments.attach($record, $field.name, $upload);
+  }
+}
+
 sub strong-params($resource, %params) {
   my %attrs;
 
@@ -36,12 +47,20 @@ sub strong-params($resource, %params) {
     my $column = $name.subst('-', '_', :g);
     my $type   = $field.defined ?? $field.as !! 'string';
 
+    next if $type eq 'file';
+
     if $type eq 'boolean' {
       %attrs{$column} = so (%params{$name} // '').Str.lc eq any('1', 'true', 'on', 'yes');
     } elsif %params{$name}:exists {
       my $value = %params{$name};
       %attrs{$column} = $type eq 'number' ?? +$value !! $value;
     }
+  }
+
+  for $resource.nested-attributes -> $nested {
+    my $key = $nested.name ~ '-attributes';
+
+    %attrs{$key} = %params{$key} if %params{$key}:exists;
   }
 
   %attrs
@@ -174,6 +193,8 @@ method create {
   my $record = $resource.model.create(strong-params($resource, self.params.Hash));
 
   if $record.id {
+    attach-files($resource, $record, self.params.Hash);
+
     self.flash<notice> = $resource.singular-name ~ ' created.';
 
     return self.redirect-to($base ~ '/' ~ $record.id);
@@ -206,6 +227,8 @@ method update {
   my $base  = $mount ~ '/' ~ $resource.slug;
 
   if $record.update(strong-params($resource, self.params.Hash)) {
+    attach-files($resource, $record, self.params.Hash);
+
     self.flash<notice> = $resource.singular-name ~ ' updated.';
 
     return self.redirect-to($base ~ '/' ~ $record.id);

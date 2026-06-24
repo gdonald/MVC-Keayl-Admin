@@ -1,0 +1,68 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+sub submit(Str:D $path, *@pairs) {
+  my $body = @pairs.map({ .key ~ '=' ~ .value.subst(' ', '+', :g) }).join('&');
+
+  host.call(MVC::Keayl::Request.new(
+    method  => 'POST',
+    target  => $path,
+    headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
+    body    => $body,
+  ))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-authors-nested;
+
+# the new form renders a nested fieldset for the association
+my $new = fetch('/admin/authors/new').body;
+ok $new.contains('posts-attributes[][title]'), 'the form renders a nested array input for a has-many association';
+ok $new.contains('Posts'), 'the nested fieldset is labelled';
+
+# creating with nested attributes builds the associated records
+my $created = submit('/admin/authors',
+  'name' => 'Ann',
+  'posts-attributes[][title]' => 'First post',
+  'posts-attributes[][title]' => 'Second post');
+
+is $created.status, 302, 'creating with nested attributes succeeds';
+
+my $author = Author.where({ name => 'Ann' }).first;
+is $author.posts.list.elems, 2, 'the nested children are created';
+is $author.posts.list.map(*.read-attribute('title')).sort.join(','), 'First post,Second post',
+  'the nested attributes are applied to each child';
+
+# the edit form pre-fills the nested children
+my $first = $author.posts.list.sort({ .read-attribute('title') })[0];
+my $edit = fetch('/admin/authors/' ~ $author.id ~ '/edit').body;
+ok $edit.contains('value="First post"'), 'the edit form pre-fills the nested children';
+
+# updating a nested child by id, and destroying another
+submit('/admin/authors/' ~ $author.id,
+  'name' => 'Ann',
+  'posts-attributes[][id]'    => $first.id.Str,
+  'posts-attributes[][title]' => 'Renamed post');
+
+is Post.where({ id => $first.id }).first.read-attribute('title'), 'Renamed post',
+  'a nested entry with an id updates the existing child';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

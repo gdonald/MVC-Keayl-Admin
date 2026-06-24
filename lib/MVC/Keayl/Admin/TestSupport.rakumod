@@ -2,6 +2,9 @@ use v6.d;
 use ORM::ActiveRecord::Adapter::Sqlite;
 use ORM::ActiveRecord::DB;
 use ORM::ActiveRecord::Model;
+use MVC::Keayl::Storage::Service;
+use MVC::Keayl::Storage::Repository;
+use MVC::Keayl::Storage::Attached;
 use MVC::Keayl::Admin;
 use MVC::Keayl::Admin::DSL;
 
@@ -18,6 +21,10 @@ unit module MVC::Keayl::Admin::TestSupport;
 class Author is Model is export {
   submethod BUILD {
     self.has-many: posts => class-name => 'Post';
+
+    self.accepts-nested-attributes-for: 'posts',
+      allow-destroy => True,
+      reject-if     => -> %a { (%a<title> // '').trim eq '' };
   }
 }
 
@@ -39,6 +46,10 @@ sub setup-admin-db(--> Nil) is export {
   my $adapter = SqliteAdapter.new(database => ':memory:');
 
   DB.set-shared(DB.new(adapter => $adapter));
+
+  reset-storage;
+  set-storage-service(DiskService.new(root => $*TMPDIR.add('keayl-admin-storage-' ~ $*PID)));
+  set-storage-repository(MemoryRepository.new);
 
   $adapter.ddl-create-table('authors', [
     name => { :string, limit => 255 },
@@ -87,8 +98,19 @@ sub register-posts(Int :$per-page, Bool :$scope-counts --> Nil) is export {
     field('body', :as<text>);
     field('published', :as<boolean>);
     field('author-id', :as<select>, :collection({ Author.all.all.map(-> $a { $a.id => $a.read-attribute('name') }) }));
+    field('cover', :as<file>);
 
     permit(<title body published author-id>);
+  });
+}
+
+sub register-authors-nested(--> Nil) is export {
+  MVC::Keayl::Admin.register(Author, {
+    field('name', :as<string>);
+
+    permit(<name>);
+
+    nested('posts', :multiple, { field('title', :as<string>) });
   });
 }
 

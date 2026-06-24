@@ -8,6 +8,7 @@ use MVC::Keayl::Admin::Field;
 use MVC::Keayl::Admin::Filter;
 use MVC::Keayl::Admin::Scope;
 use MVC::Keayl::Admin::MenuEntry;
+use MVC::Keayl::Admin::Nested;
 
 unit class MVC::Keayl::Admin::Resource;
 
@@ -24,6 +25,7 @@ has MVC::Keayl::Admin::Field     @.fields;
 has MVC::Keayl::Admin::Filter    @.filters;
 has MVC::Keayl::Admin::Scope     @.scopes;
 has Str                          @.permitted;
+has MVC::Keayl::Admin::Nested    @.nested-attributes;
 has MVC::Keayl::Admin::MenuEntry $.menu-entry is rw;
 
 constant FIELD-TYPES  = set <string text select boolean date time datetime number password hidden file>;
@@ -124,6 +126,19 @@ method permit(*@names --> ::?CLASS) {
   reject-unknown(%_, 'permit');
 
   @!permitted.append: @names;
+
+  self
+}
+
+method nested(Str:D $name, &block, Bool :$multiple = False --> ::?CLASS) {
+  my $nested = MVC::Keayl::Admin::Nested.new(:$name, :$multiple);
+
+  {
+    my $*KEAYL-ADMIN-RESOURCE = $nested;
+    block();
+  }
+
+  @!nested-attributes.push: $nested;
 
   self
 }

@@ -1,11 +1,12 @@
 use v6.d;
 use Test;
 
-plan 34;
+plan 36;
 
 use-ok 'MVC::Keayl::Admin';
 use-ok 'MVC::Keayl::Admin::Assets';
 use-ok 'MVC::Keayl::Admin::AssetsController';
+use-ok 'MVC::Keayl::Admin::Attachments';
 use-ok 'MVC::Keayl::Admin::Attribute';
 use-ok 'MVC::Keayl::Admin::Authentication';
 use-ok 'MVC::Keayl::Admin::Authentication::Basic';
@@ -24,6 +25,7 @@ use-ok 'MVC::Keayl::Admin::Form';
 use-ok 'MVC::Keayl::Admin::Formatter';
 use-ok 'MVC::Keayl::Admin::Inflection';
 use-ok 'MVC::Keayl::Admin::MenuEntry';
+use-ok 'MVC::Keayl::Admin::Nested';
 use-ok 'MVC::Keayl::Admin::Pagination';
 use-ok 'MVC::Keayl::Admin::Paths';
 use-ok 'MVC::Keayl::Admin::Predicate';

@@ -19,9 +19,9 @@ sub label-for($model, $field --> Str) {
   html-escape(i18n.human-attribute-name($model, column-of($field)))
 }
 
-sub select-input($field, $record --> Str) {
-  my $current  = ($record.read-attribute(column-of($field)) // '').Str;
-  my $name     = $field.multiple ?? $field.name ~ '[]' !! $field.name;
+sub select-html($field, Str:D $input-name, $raw --> Str) {
+  my $current  = ($raw // '').Str;
+  my $name     = $field.multiple ?? $input-name ~ '[]' !! $input-name;
   my $multiple = $field.multiple ?? ' multiple' !! '';
 
   my @options = $field.multiple ?? () !! ('<option value=""></option>',);
@@ -36,27 +36,30 @@ sub select-input($field, $record --> Str) {
   qq[<select class="form-select" name="{$name}"{$multiple}>{@options.join}</select>]
 }
 
-sub control-for($field, $record --> Str) {
-  my $name  = $field.name;
-  my $value = html-escape(($record.read-attribute(column-of($field)) // '').Str);
+sub control-html($field, Str:D $input-name, $raw --> Str) {
+  my $value = html-escape(($raw // '').Str);
   my $place = $field.placeholder.defined ?? qq[ placeholder="{html-escape($field.placeholder)}"] !! '';
 
   given $field.as {
-    when 'text'     { qq[<textarea class="form-control" name="{$name}"{$place}>{$value}</textarea>] }
-    when 'select'   { select-input($field, $record) }
+    when 'text'     { qq[<textarea class="form-control" name="{$input-name}"{$place}>{$value}</textarea>] }
+    when 'select'   { select-html($field, $input-name, $raw) }
     when 'boolean'  {
-      my $checked = $record.read-attribute(column-of($field)) ?? ' checked' !! '';
-      qq[<div class="form-check"><input class="form-check-input" type="checkbox" name="{$name}" value="1"{$checked}></div>]
+      my $checked = $raw ?? ' checked' !! '';
+      qq[<div class="form-check"><input class="form-check-input" type="checkbox" name="{$input-name}" value="1"{$checked}></div>]
     }
-    when 'number'   { qq[<input class="form-control" type="number" name="{$name}" value="{$value}"{$place}>] }
-    when 'date'     { qq[<input class="form-control" type="date" name="{$name}" value="{$value}">] }
-    when 'time'     { qq[<input class="form-control" type="time" name="{$name}" value="{$value}">] }
-    when 'datetime' { qq[<input class="form-control" type="datetime-local" name="{$name}" value="{$value}">] }
-    when 'password' { qq[<input class="form-control" type="password" name="{$name}"{$place}>] }
-    when 'hidden'   { qq[<input type="hidden" name="{$name}" value="{$value}">] }
-    when 'file'     { qq[<input class="form-control" type="file" name="{$name}">] }
-    default         { qq[<input class="form-control" type="text" name="{$name}" value="{$value}"{$place}>] }
+    when 'number'   { qq[<input class="form-control" type="number" name="{$input-name}" value="{$value}"{$place}>] }
+    when 'date'     { qq[<input class="form-control" type="date" name="{$input-name}" value="{$value}">] }
+    when 'time'     { qq[<input class="form-control" type="time" name="{$input-name}" value="{$value}">] }
+    when 'datetime' { qq[<input class="form-control" type="datetime-local" name="{$input-name}" value="{$value}">] }
+    when 'password' { qq[<input class="form-control" type="password" name="{$input-name}"{$place}>] }
+    when 'hidden'   { qq[<input type="hidden" name="{$input-name}" value="{$value}">] }
+    when 'file'     { qq[<input class="form-control" type="file" name="{$input-name}">] }
+    default         { qq[<input class="form-control" type="text" name="{$input-name}" value="{$value}"{$place}>] }
   }
+}
+
+sub control-for($field, $record --> Str) {
+  control-html($field, $field.name, $record.read-attribute(column-of($field)))
 }
 
 sub field-errors($record, $field --> Str) {
@@ -76,6 +79,37 @@ sub field-group($model, $record, $field --> Str) {
   qq[<div class="mb-3"><label class="form-label">{$label}</label>{control-for($field, $record)}{$hint}{field-errors($record, $field)}</div>]
 }
 
+sub nested-group($field, Str:D $input-name, $value --> Str) {
+  return control-html($field, $input-name, $value) if $field.as eq 'hidden';
+
+  my $label = html-escape(humanize($field.name));
+
+  qq[<div class="mb-3"><label class="form-label">{$label}</label>{control-html($field, $input-name, $value)}</div>]
+}
+
+sub nested-fieldset($record, $nested --> Str) {
+  my $prefix   = $nested.name ~ '-attributes';
+  my $assoc    = $record."{$nested.name}"();
+
+  # A has-many nested fieldset renders its existing children plus one blank row
+  # for adding a new child. A blank row is skipped on save by the model's
+  # reject-if.
+  my @children = $nested.multiple ?? (|$assoc.list, Nil) !! ($assoc,);
+
+  my @rows = @children.map(-> $child {
+    my $groups = $nested.fields.map(-> $field {
+      my $input = $nested.multiple ?? "{$prefix}[][{$field.name}]" !! "{$prefix}[{$field.name}]";
+      my $value = $child.defined ?? $child.read-attribute(column-of($field)) !! Nil;
+
+      nested-group($field, $input, $value)
+    }).join;
+
+    qq[<div class="border rounded p-3 mb-2">{$groups}</div>]
+  });
+
+  qq[<fieldset class="mb-3"><legend class="fs-6">{html-escape(humanize($nested.name))}</legend>{@rows.join}</fieldset>]
+}
+
 sub error-summary($record --> Str) {
   my @messages = $record.errors.full-messages;
 
@@ -87,12 +121,14 @@ sub error-summary($record --> Str) {
 }
 
 method render(::?CLASS:U: $resource, $record, Str:D :$action, Str:D :$submit, Str:D :$cancel --> Str) {
-  my $fields = $resource.fields.map({ field-group($resource.model, $record, $_) }).join;
+  my $fields  = $resource.fields.map({ field-group($resource.model, $record, $_) }).join;
+  my $nested  = $resource.nested-attributes.map({ nested-fieldset($record, $_) }).join;
+  my $enctype = $resource.fields.first(*.as eq 'file').defined ?? ' enctype="multipart/form-data"' !! '';
 
   qq:to/HTML/.trim;
-  <form method="post" action="{html-escape($action)}">
+  <form method="post" action="{html-escape($action)}"{$enctype}>
     {error-summary($record)}
-    {$fields}
+    {$fields}{$nested}
     <div class="d-flex gap-2">
       <button type="submit" class="btn btn-primary">{html-escape($submit)}</button>
       <a class="btn btn-outline-secondary" href="{html-escape($cancel)}">Cancel</a>

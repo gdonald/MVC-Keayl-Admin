@@ -1,0 +1,78 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Attachments;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+sub upload(Str:D $path, %text, :$file-field, :$filename, :$content, :$content-type = 'image/png') {
+  my $boundary = 'KEAYLBOUNDARY';
+  my $body = '';
+
+  for %text.kv -> $name, $value {
+    $body ~= "--$boundary\r\nContent-Disposition: form-data; name=\"$name\"\r\n\r\n$value\r\n";
+  }
+
+  if $file-field {
+    $body ~= "--$boundary\r\nContent-Disposition: form-data; name=\"$file-field\"; filename=\"$filename\"\r\nContent-Type: $content-type\r\n\r\n$content\r\n";
+  }
+
+  $body ~= "--$boundary--\r\n";
+
+  host.call(MVC::Keayl::Request.new(
+    method  => 'POST',
+    target  => $path,
+    headers => { 'Content-Type' => "multipart/form-data; boundary=$boundary" },
+    body    => $body,
+  ))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+register-authors;
+
+# the new form is multipart because it has a file field
+ok fetch('/admin/posts/new').body.contains('enctype="multipart/form-data"'),
+  'a form with a file field is multipart';
+
+ok fetch('/admin/posts/new').body.contains('type="file"'),
+  'a file field renders a file input';
+
+# uploading a file on create attaches it through Active Storage
+my $response = upload('/admin/posts', { title => 'With cover', body => 'b' },
+  file-field => 'cover', filename => 'cover.png', content => 'PNGBYTES');
+
+is $response.status, 302, 'creating with a file upload succeeds';
+
+my $post = Post.where({ title => 'With cover' }).first;
+
+my $attachment = MVC::Keayl::Admin::Attachments.attachment-for($post, 'cover');
+
+ok $attachment.defined, 'the upload is stored as an attachment';
+
+is $attachment.blob.filename, 'cover.png', 'the attachment keeps the uploaded filename';
+
+is $attachment.blob.content-type, 'image/png', 'the attachment keeps the content type';
+
+# creating without a file leaves no attachment
+my $plain = upload('/admin/posts', { title => 'No cover', body => 'b' });
+my $no-cover = Post.where({ title => 'No cover' }).first;
+nok MVC::Keayl::Admin::Attachments.attachment-for($no-cover, 'cover').defined,
+  'a create without a file attaches nothing';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

@@ -50,8 +50,32 @@ JavaScript.
 A failed save re-renders the form. ORM validation errors show inline beneath each
 field and in a summary at the top, using the ORM's `full-messages`.
 
-## Not yet covered
+## Nested attributes
 
-Nested attributes for associations (`accepts-nested-attributes-for`) and file
-uploads backed by Active Storage are planned and not yet implemented; the `file`
-input renders but is not wired to storage.
+Declare a nested association with `nested`, giving its own sub-fields. The model
+must back it with `accepts-nested-attributes-for`.
+
+```raku
+nested('posts', :multiple, {
+  field('title', :as<string>);
+});
+```
+
+A singular association renders one nested fieldset; a `:multiple` (has-many)
+association renders one fieldset per existing child plus a blank row for adding
+one. Submitting posts `posts-attributes` to the model, which creates new children,
+updates those with an `id`, and (with `allow-destroy`) removes those marked for
+deletion. Use the model's `reject-if` to skip a blank add-row.
+
+## File uploads
+
+A `file` field stores its upload through Active Storage. The form becomes
+`multipart/form-data`, and on save the upload is attached to the record by its
+type, id, and the field name (no storage role on the model required):
+
+```raku
+field('cover', :as<file>);
+```
+
+Configure a storage service and repository in your application's setup, the same
+as any Active Storage integration.

@@ -33,3 +33,7 @@ sub permit(|args) is export {
 sub menu(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.menu(|args)
 }
+
+sub nested(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.nested(|args)
+}
