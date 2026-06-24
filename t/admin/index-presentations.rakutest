@@ -37,8 +37,8 @@ ok $grid.contains('<h5 class="card-title">Gridded</h5>'), 'the grid uses the per
 nok $grid.contains('<table'), 'the grid does not render a table';
 
 # batch selection is preserved in the grid
-ok $grid.contains('data-batch-select'), 'grid cards carry a batch selection checkbox';
-ok $grid.contains('data-batch-all'), 'the batch toolbar has a select-all control';
+ok $grid.contains('name="ids[]"'), 'grid cards carry a batch selection checkbox';
+ok $grid.contains('id="admin-batch-all"'), 'the batch toolbar has a select-all control';
 
 # row actions are present in the grid
 ok $grid.contains('hx-delete='), 'grid cards have a delete action';

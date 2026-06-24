@@ -10,6 +10,18 @@ sub index(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.index(|args)
 }
 
+sub actions(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.actions(|args)
+}
+
+sub sort-order(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.sort-order(|args)
+}
+
+sub action-item(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.action-item(|args)
+}
+
 sub column(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.column(|args)
 }

@@ -14,6 +14,7 @@ nav:
   - Show pages: show-pages.md
   - Forms: forms.md
   - Actions: actions.md
+  - Action availability and toolbar: actions-availability.md
   - Navigation: navigation.md
   - Authorization: authorization.md
   - Customization: customization.md

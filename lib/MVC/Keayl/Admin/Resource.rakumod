@@ -13,6 +13,7 @@ use MVC::Keayl::Admin::Nested;
 use MVC::Keayl::Admin::BatchAction;
 use MVC::Keayl::Admin::CustomAction;
 use MVC::Keayl::Admin::Panel;
+use MVC::Keayl::Admin::ActionItem;
 
 unit class MVC::Keayl::Admin::Resource;
 
@@ -22,6 +23,8 @@ has Str $.singular-override;
 has Str $.plural-override;
 has Int $.per-page-override;
 has     $.scope-counts-override;
+has     $.filters-override;
+has     $.batch-override;
 
 has MVC::Keayl::Admin::Column    @.columns;
 has MVC::Keayl::Admin::Attribute @.attributes;
@@ -38,7 +41,11 @@ has MVC::Keayl::Admin::CustomAction @.collection-actions;
 has MVC::Keayl::Admin::Panel        @.sidebars;
 has MVC::Keayl::Admin::Panel        @.panels;
 has MVC::Keayl::Admin::Panel        @.tabs;
+has MVC::Keayl::Admin::ActionItem   @.action-items;
 has MVC::Keayl::Admin::MenuEntry    $.menu-entry is rw;
+has Str                             @.enabled-actions = <index show new edit destroy>;
+has Str                             $.sort-column;
+has Str                             $.sort-dir = 'asc';
 
 constant FIELD-TYPES  = set <string text select boolean date time datetime number password hidden file>;
 constant FILTER-TYPES = set <string numeric boolean date date-range select>;
@@ -62,6 +69,22 @@ method per-page(--> Int) {
 
 method scope-counts(--> Bool) {
   $!scope-counts-override // True
+}
+
+method filters-enabled(--> Bool) {
+  $!filters-override // True
+}
+
+method batch-enabled(--> Bool) {
+  $!batch-override // True
+}
+
+method allows-action(Str:D $name --> Bool) {
+  my $key = $name eq 'create' ?? 'new' !! $name eq 'update' ?? 'edit' !! $name;
+
+  return True unless $key (elem) <index show new edit destroy>;
+
+  so $key (elem) @!enabled-actions
 }
 
 method default-scope {
@@ -95,6 +118,46 @@ method index(&block?, Str:D :$as = 'table' --> ::?CLASS) {
   &!index-block = &block;
 
   self
+}
+
+method actions(*@only, :$except --> ::?CLASS) {
+  reject-unknown(%_, 'actions');
+
+  if @only.elems {
+    @!enabled-actions = @only>>.Str;
+  } elsif $except.defined {
+    my @drop = $except.list>>.Str;
+    @!enabled-actions = <index show new edit destroy>.grep({ $_ !(elem) @drop });
+  }
+
+  self
+}
+
+method sort-order(Str:D $column, Str :$dir = 'asc' --> ::?CLASS) {
+  reject-unknown(%_, 'sort-order');
+
+  $!sort-column = $column;
+  $!sort-dir    = $dir eq 'desc' ?? 'desc' !! 'asc';
+
+  self
+}
+
+method action-item(Str:D $label, &block, :$only, :$except, Str :$if-can --> ::?CLASS) {
+  reject-unknown(%_, "action-item '$label'");
+
+  my @only   = $only.defined   ?? $only.list>>.Str   !! ();
+  my @except = $except.defined ?? $except.list>>.Str !! ();
+
+  @!action-items.push: MVC::Keayl::Admin::ActionItem.new(:$label, :&block, :@only, :@except, :$if-can);
+
+  self
+}
+
+method visible-action-items(Str:D $action, $abilities --> List) {
+  @!action-items
+    .grep({ .shows-on($action) })
+    .grep({ !.if-can.defined || !$abilities.defined || $abilities.can(.if-can) })
+    .List
 }
 
 method column(Str:D $name, Bool :$sortable = False, :&display, Str :$format --> ::?CLASS) {

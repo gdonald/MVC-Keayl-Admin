@@ -206,7 +206,7 @@ method index {
   my $page = max(1, (self.params<page> // 1).Int);
   my $per  = $resource.per-page;
 
-  my %filters = MVC::Keayl::Admin::FilterPanel.active-params($resource, %params);
+  my %filters = $resource.filters-enabled ?? MVC::Keayl::Admin::FilterPanel.active-params($resource, %params) !! %();
 
   my $scope      = resolve-scope($resource, %params);
   my $scope-name = ($scope.defined && !$scope.default) ?? $scope.name !! Str;
@@ -229,14 +229,18 @@ method index {
 
   my $abilities = self.abilities-for($resource);
 
+  my $batch = $resource.batch-enabled;
+
   my $tabs  = MVC::Keayl::Admin::Scopes.render($resource, :active($scope), :$base, :%filters, :$sort, :$dir, :%counts);
-  my $chips = MVC::Keayl::Admin::FilterPanel.chips($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, scope => $scope-name);
-  my $table = MVC::Keayl::Admin::IndexView.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry, :batch, :$abilities);
+  my $chips = $resource.filters-enabled ?? MVC::Keayl::Admin::FilterPanel.chips($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, scope => $scope-name) !! '';
+  my $table = MVC::Keayl::Admin::IndexView.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry, :$batch, :$abilities);
   my $pager = MVC::Keayl::Admin::Pagination.render(:$base, :$page, :$per, :$total, :$sort, :$dir, filters => %carry);
 
-  my $body = $tabs ~ $chips ~ batch-form($base, $resource, $table, $pager, :$abilities);
+  my $body = $tabs ~ $chips ~ ($batch ?? batch-form($base, $resource, $table, $pager, :$abilities) !! ($table ~ $pager));
 
   return self.render(:html($body)) if self.request.header('HX-Request');
+
+  my $items = self.action-items-html($resource, 'index', $abilities);
 
   my $collection-actions = $resource.collection-actions.grep({ $abilities.can(.name) }).map(-> $action {
     my $url     = html-escape($base ~ '/' ~ $action.name);
@@ -256,7 +260,7 @@ method index {
 
   self.assign('admin_index_body', $body);
   self.assign('admin_index_sidebar', $sidebars ?? qq[<div class="col-lg-3">{$sidebars}</div>] !! '');
-  self.assign('admin_new_link', $collection-actions ~ $export ~ $new-link);
+  self.assign('admin_new_link', $items ~ $collection-actions ~ $export ~ $new-link);
   self.assign('admin_filters_panel', self.filters-panel($resource, %params, :$base, :$sort, :$dir, scope => $scope-name));
 
   self.render-admin(
@@ -348,16 +352,23 @@ method !list-relation($resource, %params) {
   my $visible = self.policy-scope($resource, $resource.model.all);
   my $scope   = resolve-scope($resource, %params);
 
-  my $relation = apply-filters($resource, apply-scope($scope, $visible), %params);
+  my $relation = apply-scope($scope, $visible);
+  $relation = apply-filters($resource, $relation, %params) if $resource.filters-enabled;
 
   my $sort = %params<sort>;
   my $dir  = (%params<dir> // 'asc') eq 'desc' ?? 'desc' !! 'asc';
 
   if $sort.defined && $resource.columns.first({ .name eq $sort && .sortable }) {
     $relation = $relation.order($sort ~ ($dir eq 'desc' ?? ' DESC' !! ' ASC'));
+  } elsif $resource.sort-column.defined {
+    $relation = $relation.order($resource.sort-column ~ ($resource.sort-dir eq 'desc' ?? ' DESC' !! ' ASC'));
   }
 
   $relation
+}
+
+method action-items-html($resource, Str:D $action, $abilities, $record = Nil --> Str) {
+  $resource.visible-action-items($action, $abilities).map({ .block.(self, $record) }).join
 }
 
 method export {
@@ -473,6 +484,8 @@ method show {
 
   my $abilities = self.abilities-for($resource);
 
+  my $toolbar = self.action-items-html($resource, 'show', $abilities, $record);
+  self.assign('admin_show_toolbar', $toolbar ?? qq[<div class="d-flex justify-content-end gap-2 mb-3">{$toolbar}</div>] !! '');
   self.assign('admin_show_body',     MVC::Keayl::Admin::Show.render($resource, $record, mount-path => $mount));
   self.assign('admin_show_actions',  MVC::Keayl::Admin::Show.actions($resource, $record, mount-path => $mount, :$abilities));
   self.assign('admin_show_panels',   MVC::Keayl::Admin::Panels.panels($resource.panels, $record, $abilities));
@@ -487,7 +500,7 @@ method show {
 }
 
 method filters-panel($resource, %params, Str:D :$base, :$sort, :$dir, :$scope --> Str) {
-  return '' unless MVC::Keayl::Admin::FilterPanel.has-filters($resource);
+  return '' unless $resource.filters-enabled && MVC::Keayl::Admin::FilterPanel.has-filters($resource);
 
   my $form = MVC::Keayl::Admin::FilterPanel.form($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, :$scope);
 

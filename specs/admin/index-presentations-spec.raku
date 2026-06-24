@@ -46,7 +46,7 @@ describe 'MVC::Keayl::Admin grid presentation', {
   }
 
   it 'preserves batch selection on the cards', {
-    expect(body.contains('data-batch-select') && body.contains('data-batch-all')).to.be-truthy;
+    expect(body.contains('name="ids[]"') && body.contains('id="admin-batch-all"')).to.be-truthy;
   }
 
   it 'shows the empty state with no records', {

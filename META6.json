@@ -21,6 +21,7 @@
   ],
   "provides": {
     "MVC::Keayl::Admin": "lib/MVC/Keayl/Admin.rakumod",
+    "MVC::Keayl::Admin::ActionItem": "lib/MVC/Keayl/Admin/ActionItem.rakumod",
     "MVC::Keayl::Admin::Assets": "lib/MVC/Keayl/Admin/Assets.rakumod",
     "MVC::Keayl::Admin::AssetsController": "lib/MVC/Keayl/Admin/AssetsController.rakumod",
     "MVC::Keayl::Admin::Attachments": "lib/MVC/Keayl/Admin/Attachments.rakumod",

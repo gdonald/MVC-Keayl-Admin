@@ -143,6 +143,57 @@ sub register-posts-grid(--> Nil) is export {
   });
 }
 
+sub register-posts-readonly(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    actions('index', 'show');
+
+    column('title');
+    attribute('title');
+  });
+}
+
+sub register-posts-no-destroy(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    actions(except => <destroy>);
+
+    column('title');
+    field('title', :as<string>);
+    permit(<title>);
+  });
+}
+
+sub register-posts-sorted(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    sort-order('title', :dir<desc>);
+
+    column('title');
+  });
+}
+
+sub register-posts-no-filters(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title');
+    filter('title', :as<string>);
+  }, filters => False);
+}
+
+sub register-posts-no-batch(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title');
+  }, batch-actions => False);
+}
+
+sub register-posts-action-items(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title');
+    attribute('title');
+
+    action-item('IndexItem', -> $controller, $record { '<a class="ai-index" href="#">Index Item</a>' }, :only<index>);
+    action-item('ShowItem',  -> $controller, $record { '<a class="ai-show" href="#">Show Item</a>' }, :only<show>);
+    action-item('Danger',    -> $controller, $record { '<a class="ai-danger" href="#">Danger</a>' }, :if-can<destroy>);
+  });
+}
+
 sub register-posts-panels(--> Nil) is export {
   MVC::Keayl::Admin.register(Post, {
     column('title');

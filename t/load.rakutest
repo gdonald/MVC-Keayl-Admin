@@ -1,9 +1,10 @@
 use v6.d;
 use Test;
 
-plan 52;
+plan 53;
 
 use-ok 'MVC::Keayl::Admin';
+use-ok 'MVC::Keayl::Admin::ActionItem';
 use-ok 'MVC::Keayl::Admin::Assets';
 use-ok 'MVC::Keayl::Admin::AssetsController';
 use-ok 'MVC::Keayl::Admin::Attachments';

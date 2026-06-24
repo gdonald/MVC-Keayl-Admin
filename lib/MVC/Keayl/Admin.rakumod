@@ -37,7 +37,7 @@ method configure(::?CLASS:U: Str :$mount-path, Str :$site-title --> MVC::Keayl::
   $config
 }
 
-method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str :$plural, Int :$per-page, Bool :$scope-counts --> MVC::Keayl::Admin::Resource) {
+method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str :$plural, Int :$per-page, Bool :$scope-counts, Bool :$filters, Bool :$batch-actions --> MVC::Keayl::Admin::Resource) {
   my $resource = MVC::Keayl::Admin::Resource.new(
     :$model,
     slug-override         => $slug,
@@ -45,6 +45,8 @@ method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str
     plural-override       => $plural,
     per-page-override     => $per-page,
     scope-counts-override => $scope-counts,
+    filters-override      => $filters,
+    batch-override        => $batch-actions,
   );
 
   $resource.parse(&block);
@@ -117,8 +119,8 @@ sub admin-routes {
 
       # Literal paths are registered before `resources` so they win over the
       # member `:id` route.
-      post '/' ~ $slug ~ '/batch',  to => $resource-ctrl ~ '#apply-batch';
-      get  '/' ~ $slug ~ '/export', to => $resource-ctrl ~ '#export', :format;
+      post '/' ~ $slug ~ '/batch',  to => $resource-ctrl ~ '#apply-batch' if $res.batch-enabled;
+      get  '/' ~ $slug ~ '/export', to => $resource-ctrl ~ '#export', :format if $res.allows-action('index');
 
       for $res.collection-actions -> $action {
         post '/' ~ $slug ~ '/' ~ $action.name, to => $resource-ctrl ~ '#run-collection-action';
@@ -128,13 +130,19 @@ sub admin-routes {
         post '/' ~ $slug ~ '/:id/' ~ $action.name, to => $resource-ctrl ~ '#run-member-action';
       }
 
-      resources $slug, :controller($resource-ctrl);
+      my @only = ('index'           if $res.allows-action('index')),
+                 ('show'            if $res.allows-action('show')),
+                 (|<new create>     if $res.allows-action('new')),
+                 (|<edit update>    if $res.allows-action('edit')),
+                 ('destroy'         if $res.allows-action('destroy'));
+
+      resources $slug, :controller($resource-ctrl), only => @only.grep(*.defined);
 
       # HTML forms cannot issue PATCH or DELETE, so accept a plain POST to the
       # member path for update, and to a delete sub-path for destroy, keeping
       # both usable without JavaScript.
-      post '/' ~ $slug ~ '/:id',         to => $resource-ctrl ~ '#update';
-      post '/' ~ $slug ~ '/:id/delete',  to => $resource-ctrl ~ '#destroy';
+      post '/' ~ $slug ~ '/:id',         to => $resource-ctrl ~ '#update'  if $res.allows-action('edit');
+      post '/' ~ $slug ~ '/:id/delete',  to => $resource-ctrl ~ '#destroy' if $res.allows-action('destroy');
     }
 
     get '/', to => $dashboard;

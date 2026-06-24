@@ -40,6 +40,9 @@ a declaration on the resource config:
 | Declaration          | Records                                                                   | Detail |
 | -------------------- | ------------------------------------------------------------------------- | ------ |
 | `index`              | the index presentation (`:as` table/grid/blog, a per-record block)        | [Index presentations and panels](presentations.md) |
+| `actions`            | which default actions the resource exposes (`:except`)                    | [Action availability and toolbar](actions-availability.md) |
+| `sort-order`         | the default ordering (`:dir`)                                             | [Action availability and toolbar](actions-availability.md) |
+| `action-item`        | a page-toolbar button (`:only`, `:except`, `:if-can`)                     | [Action availability and toolbar](actions-availability.md) |
 | `column`             | an index column (`:sortable`, `:display`, `:format`)                      | [Index pages](index-pages.md) |
 | `attribute`          | a show-page row (`:display`, `:format`)                                   | [Show pages](show-pages.md) |
 | `field`              | a form input (`:as`, `:collection`, `:hint`, `:placeholder`, `:multiple`) | [Forms](forms.md) |
@@ -67,6 +70,8 @@ resource as a whole:
 | `plural`        | pluralized singular  | The plural human name.                                        |
 | `per-page`      | `25`                 | Index page size ([Index pages](index-pages.md)).              |
 | `scope-counts`  | `True`               | Whether scope tabs show counts ([Scopes](scopes.md)).         |
+| `filters`       | `True`               | Whether the filter UI renders ([Action availability](actions-availability.md)). |
+| `batch-actions` | `True`               | Whether batch selection renders ([Action availability](actions-availability.md)). |
 
 ```raku
 MVC::Keayl::Admin.register(Post, { ... },

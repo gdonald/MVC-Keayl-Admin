@@ -1,0 +1,107 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Authorization::Policy;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+class DenyDestroy is MVC::Keayl::Admin::Authorization::Policy {
+  method allows(Str:D $action, :$admin, :$resource, :$record --> Bool) {
+    $action ne 'destroy'
+  }
+}
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub call(Str:D $method, Str:D $path) {
+  host.call(MVC::Keayl::Request.new(:$method, target => $path))
+}
+
+# a read-only resource exposes only index and show
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-readonly;
+seed-posts({ title => 'Readme' });
+
+my $rid = Post.all.all[0].id;
+
+is call('GET', '/admin/posts').status, 200, 'a read-only index responds';
+is call('GET', '/admin/posts/' ~ $rid).status, 200, 'a read-only show responds';
+is call('GET', '/admin/posts/' ~ $rid ~ '/edit').status, 404, 'edit is unrouted on a read-only resource';
+is call('POST', '/admin/posts/' ~ $rid ~ '/delete').status, 404, 'destroy is unrouted on a read-only resource';
+
+my $ro-index = call('GET', '/admin/posts').body;
+nok $ro-index.contains('>New Post<'), 'no new button on a read-only resource';
+nok $ro-index.contains('/edit"'), 'no edit row action on a read-only resource';
+nok $ro-index.contains('hx-delete'), 'no delete row action on a read-only resource';
+
+# excluding destroy keeps the other actions
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-no-destroy;
+seed-posts({ title => 'Keeper' });
+
+my $nid = Post.all.all[0].id;
+is call('GET', '/admin/posts/' ~ $nid ~ '/edit').status, 200, 'edit still works when only destroy is excluded';
+is call('POST', '/admin/posts/' ~ $nid ~ '/delete').status, 404, 'destroy is unrouted when excluded';
+nok call('GET', '/admin/posts').body.contains('hx-delete'), 'no delete row action when destroy is excluded';
+nok call('GET', '/admin/posts').body.contains('>Destroy<'), 'no batch destroy option when destroy is excluded';
+
+# a declared default sort order applies with no query sort
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-sorted;
+seed-posts({ title => 'Apple' }, { title => 'Cherry' }, { title => 'Banana' });
+
+my $sorted = call('GET', '/admin/posts').body;
+ok $sorted.index('Cherry') < $sorted.index('Banana') < $sorted.index('Apple'),
+  'the default sort order applies descending when no sort is given';
+
+# filters can be disabled per resource
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-no-filters;
+seed-posts({ title => 'A' });
+
+nok call('GET', '/admin/posts').body.contains('Filters'), 'the filter control is gone when filters are disabled';
+
+# batch actions can be disabled per resource
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-no-batch;
+seed-posts({ title => 'A' });
+
+my $no-batch = call('GET', '/admin/posts').body;
+nok $no-batch.contains('name="ids[]"'), 'no row checkboxes when batch actions are disabled';
+nok $no-batch.contains('id="admin-batch-all"'), 'no select-all control when batch actions are disabled';
+
+# toolbar action items render on their chosen pages
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-action-items;
+seed-posts({ title => 'Item' });
+
+my $aid = Post.all.all[0].id;
+my $ai-index = call('GET', '/admin/posts').body;
+my $ai-show  = call('GET', '/admin/posts/' ~ $aid).body;
+
+ok  $ai-index.contains('ai-index'), 'an index-only action item shows on the index';
+nok $ai-index.contains('ai-show'), 'a show-only action item does not show on the index';
+ok  $ai-show.contains('ai-show'), 'a show-only action item shows on the show page';
+nok $ai-show.contains('ai-index'), 'an index-only action item does not show on the show page';
+
+# an ability-gated action item is hidden when the policy forbids it
+ok $ai-index.contains('ai-danger'), 'a gated action item shows under the default policy';
+
+MVC::Keayl::Admin.authorize-with(DenyDestroy.new);
+nok call('GET', '/admin/posts').body.contains('ai-danger'), 'a gated action item is hidden when forbidden';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;
