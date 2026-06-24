@@ -1,0 +1,40 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub dashboard-body {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host   = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+
+  $host.call(MVC::Keayl::Request.new(method => 'GET', target => '/admin')).body
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+register-authors;
+seed-posts({ title => 'One' }, { title => 'Two' });
+
+my $body = dashboard-body;
+
+ok $body.contains('Welcome to'), 'the dashboard renders at the mount root';
+ok $body.contains('>Posts</h5>') || $body.contains('Posts</h5>'), 'the default block lists a registered resource';
+ok $body.contains('href="/admin/posts"'), 'a resource card links to its index';
+ok $body.contains('>2<'), 'a resource card shows the record count';
+
+# custom dashboard panel
+MVC::Keayl::Admin.dashboard-block(title => 'Recent activity', { '<p class="activity">nothing yet</p>' });
+
+my $with-panel = dashboard-body;
+
+ok $with-panel.contains('Recent activity'), 'a custom dashboard block renders its title';
+ok $with-panel.contains('<p class="activity">nothing yet</p>'), 'a custom dashboard block renders its content';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

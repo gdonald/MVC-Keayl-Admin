@@ -3,6 +3,7 @@ use MVC::Keayl::Controller;
 use MVC::Keayl::Admin::Config;
 use MVC::Keayl::Admin::Assets;
 use MVC::Keayl::Admin::Chrome;
+use MVC::Keayl::Admin::Menu;
 use MVC::Keayl::Admin::Authentication;
 
 class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
@@ -50,7 +51,8 @@ class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
     self.assign('admin_importmap', MVC::Keayl::Admin::Assets.importmap-tags);
 
     self.assign('admin_brand',       MVC::Keayl::Admin::Chrome.brand-html);
-    self.assign('admin_menu',        MVC::Keayl::Admin::Chrome.menu-html(:$path));
+    my $active-slug = $path.split('/').grep(*.chars).head // '';
+    self.assign('admin_menu',        MVC::Keayl::Admin::Menu.render(mount => $config.mount-path, :$active-slug));
     self.assign('admin_breadcrumbs', MVC::Keayl::Admin::Chrome.breadcrumbs-html(@breadcrumbs));
 
     self.assign('current_admin', $!current-admin);

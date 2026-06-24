@@ -1,6 +1,7 @@
 use BDD::Behave;
 use MVC::Keayl::Admin;
 use MVC::Keayl::Admin::Chrome;
+use MVC::Keayl::Admin::Menu;
 use MVC::Keayl::Routing;
 use MVC::Keayl::Dispatcher;
 use MVC::Keayl::Request;
@@ -74,7 +75,7 @@ describe 'MVC::Keayl::Admin chrome', {
   }
 
   it 'marks the dashboard menu entry active at the mount root', {
-    expect(MVC::Keayl::Admin::Chrome.menu-html(path => '/').contains('active')).to.be-truthy;
+    expect(MVC::Keayl::Admin::Menu.render(mount => '/admin', active-slug => '').contains('active')).to.be-truthy;
   }
 
   it 'renders empty breadcrumbs without crumbs', {

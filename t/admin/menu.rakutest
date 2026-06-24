@@ -1,0 +1,53 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Menu;
+use MVC::Keayl::Admin::DSL;
+use MVC::Keayl::Admin::TestSupport;
+
+setup-admin-db;
+
+# grouped, ordered, labelled, icon, and active highlighting
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.register(Post,   { column('title'); menu(group => 'Content', label => 'Articles', icon => 'file-text', priority => 2); });
+MVC::Keayl::Admin.register(Author, { column('name');  menu(group => 'Content', priority => 1); });
+
+my $grouped = MVC::Keayl::Admin::Menu.render(mount => '/admin', active-slug => 'posts');
+
+ok $grouped.contains('Dashboard'), 'the menu has a dashboard entry';
+ok $grouped.contains('Content') && $grouped.contains('menu-group-content'), 'resources render under their group section';
+ok $grouped.contains('>Articles'), 'a menu entry uses its overridden label';
+ok $grouped.contains('bi-file-text'), 'a menu entry uses its overridden icon';
+ok $grouped.contains('data-bs-toggle="collapse"'), 'groups are collapsible';
+ok $grouped.contains('nav-link active'), 'the current resource is highlighted';
+ok $grouped.contains('collapse show'), 'the group holding the active entry is expanded';
+ok $grouped.index('/admin/authors') < $grouped.index('/admin/posts'), 'item order within a group follows priority';
+
+# hide-from-menu
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.register(Post,   { column('title'); menu(:hide); });
+MVC::Keayl::Admin.register(Author, { column('name'); });
+
+my $hidden = MVC::Keayl::Admin::Menu.render(mount => '/admin');
+
+nok $hidden.contains('/admin/posts'), 'a hidden resource is left out of the menu';
+ok  $hidden.contains('/admin/authors'), 'a visible resource still appears';
+
+# explicit group order, external and internal custom links
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.register(Post,   { column('title'); menu(group => 'Content'); });
+MVC::Keayl::Admin.register(Author, { column('name');  menu(group => 'System'); });
+MVC::Keayl::Admin.menu-group-order('System', 'Content');
+MVC::Keayl::Admin.menu-link(label => 'Docs', url => 'https://example.com/docs', group => 'System', :external);
+MVC::Keayl::Admin.menu-link(label => 'Reports', url => '/reports');
+
+my $links = MVC::Keayl::Admin::Menu.render(mount => '/admin');
+
+ok $links.index('menu-group-system') < $links.index('menu-group-content'), 'explicit group ordering wins';
+ok $links.contains('target="_blank"') && $links.contains('href="https://example.com/docs"'), 'an external link opens in a new tab';
+ok $links.contains('href="/admin/reports"'), 'an internal link is prefixed with the mount path';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

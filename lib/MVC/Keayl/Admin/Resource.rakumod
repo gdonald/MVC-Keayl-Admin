@@ -172,10 +172,10 @@ method collection-action(Str:D $name, &block, Str :$confirm --> ::?CLASS) {
   self
 }
 
-method menu(Str :$group, Str :$label, Int :$priority = 0, Str :$icon --> ::?CLASS) {
+method menu(Str :$group, Str :$label, Int :$priority = 0, Str :$icon, Bool :$hide = False --> ::?CLASS) {
   reject-unknown(%_, 'menu');
 
-  $!menu-entry = MVC::Keayl::Admin::MenuEntry.new(:$group, :$label, :$priority, :$icon);
+  $!menu-entry = MVC::Keayl::Admin::MenuEntry.new(:$group, :$label, :$priority, :$icon, :$hide);
 
   self
 }

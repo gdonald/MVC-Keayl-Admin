@@ -3,6 +3,7 @@ use Test;
 
 use MVC::Keayl::Admin;
 use MVC::Keayl::Admin::Chrome;
+use MVC::Keayl::Admin::Menu;
 use MVC::Keayl::Routing;
 use MVC::Keayl::Dispatcher;
 use MVC::Keayl::Request;
@@ -49,7 +50,7 @@ ok $body.contains('Welcome to Admin'), 'the dashboard content renders inside the
 ok MVC::Keayl::Admin::Chrome.brand-html.contains('navbar-brand') && MVC::Keayl::Admin::Chrome.brand-html.contains('/admin'),
   'the brand links to the mount path';
 
-ok MVC::Keayl::Admin::Chrome.menu-html(path => '/').contains('active'),
+ok MVC::Keayl::Admin::Menu.render(mount => '/admin', active-slug => '').contains('active'),
   'the dashboard menu entry is active at the mount root';
 
 is MVC::Keayl::Admin::Chrome.breadcrumbs-html([]), '', 'breadcrumbs are empty without crumbs';

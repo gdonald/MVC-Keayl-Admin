@@ -1,7 +1,7 @@
 use v6.d;
 use Test;
 
-plan 38;
+plan 40;
 
 use-ok 'MVC::Keayl::Admin';
 use-ok 'MVC::Keayl::Admin::Assets';
@@ -17,6 +17,7 @@ use-ok 'MVC::Keayl::Admin::Column';
 use-ok 'MVC::Keayl::Admin::Config';
 use-ok 'MVC::Keayl::Admin::Controller';
 use-ok 'MVC::Keayl::Admin::CustomAction';
+use-ok 'MVC::Keayl::Admin::Dashboard';
 use-ok 'MVC::Keayl::Admin::DashboardController';
 use-ok 'MVC::Keayl::Admin::DSL';
 use-ok 'MVC::Keayl::Admin::Engine';
@@ -26,6 +27,7 @@ use-ok 'MVC::Keayl::Admin::FilterPanel';
 use-ok 'MVC::Keayl::Admin::Form';
 use-ok 'MVC::Keayl::Admin::Formatter';
 use-ok 'MVC::Keayl::Admin::Inflection';
+use-ok 'MVC::Keayl::Admin::Menu';
 use-ok 'MVC::Keayl::Admin::MenuEntry';
 use-ok 'MVC::Keayl::Admin::Nested';
 use-ok 'MVC::Keayl::Admin::Pagination';

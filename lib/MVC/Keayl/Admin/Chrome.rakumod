@@ -9,13 +9,6 @@ method brand-html(::?CLASS:U: --> Str) {
   qq[<a class="navbar-brand text-white" href="{$config.mount-path}">{$config.site-title}</a>]
 }
 
-method menu-html(::?CLASS:U: Str :$path = '' --> Str) {
-  my $mount  = MVC::Keayl::Admin::Config.current.mount-path;
-  my $active = ($path eq '' || $path eq '/') ?? ' active' !! '';
-
-  qq[<ul class="nav nav-pills flex-column"><li class="nav-item"><a class="nav-link{$active}" href="{$mount}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li></ul>]
-}
-
 method breadcrumbs-html(::?CLASS:U: @crumbs --> Str) {
   return '' unless @crumbs;
 

@@ -6,6 +6,8 @@ use MVC::Keayl::Admin::Resource;
 use MVC::Keayl::Admin::Config;
 use MVC::Keayl::Admin::Engine;
 use MVC::Keayl::Admin::Assets;
+use MVC::Keayl::Admin::Menu;
+use MVC::Keayl::Admin::Dashboard;
 use MVC::Keayl::Admin::Authentication;
 use MVC::Keayl::Admin::DashboardController;
 use MVC::Keayl::Admin::AssetsController;
@@ -53,6 +55,18 @@ method use-stylesheet(::?CLASS:U: Str:D $url --> Nil) {
 
 method authenticate-with(::?CLASS:U: $strategy --> Nil) {
   MVC::Keayl::Admin::Authentication.use-strategy($strategy);
+}
+
+method menu-link(::?CLASS:U: |args --> Nil) {
+  MVC::Keayl::Admin::Menu.add-link(|args);
+}
+
+method menu-group-order(::?CLASS:U: *@groups --> Nil) {
+  MVC::Keayl::Admin::Menu.group-order(|@groups);
+}
+
+method dashboard-block(::?CLASS:U: &block, Str:D :$title --> Nil) {
+  MVC::Keayl::Admin::Dashboard.add-block(:$title, :&block);
 }
 
 sub admin-routes {
@@ -119,5 +133,7 @@ method reset(::?CLASS:U: --> Nil) {
   MVC::Keayl::Admin::Registry.reset;
   MVC::Keayl::Admin::Config.reset;
   MVC::Keayl::Admin::Assets.reset;
+  MVC::Keayl::Admin::Menu.reset;
+  MVC::Keayl::Admin::Dashboard.reset;
   MVC::Keayl::Admin::Authentication.reset;
 }

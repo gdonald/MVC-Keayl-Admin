@@ -12,6 +12,7 @@ nav:
   - Show pages: show-pages.md
   - Forms: forms.md
   - Actions: actions.md
+  - Navigation: navigation.md
   - Assets: assets.md
   - Authentication: authentication.md
 theme:
