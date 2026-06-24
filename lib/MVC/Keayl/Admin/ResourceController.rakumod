@@ -154,9 +154,74 @@ sub apply-filters($resource, $relation, %params) {
 }
 
 method current-resource {
-  my $slug = self.request.path.split('/').grep(*.chars).head;
+  my $registry = MVC::Keayl::Admin::Registry.current;
+  my $found;
 
-  MVC::Keayl::Admin::Registry.current.by-slug($slug)
+  for self.request.path.split('/').grep(*.chars) -> $segment {
+    my $resource = $registry.by-slug($segment);
+    $found = $resource if $resource.defined;
+  }
+
+  $found
+}
+
+method parent-resource($resource) {
+  with $resource.parent-reflection -> $reflection {
+    return MVC::Keayl::Admin::Registry.current.by-model($reflection.klass);
+  }
+
+  Nil
+}
+
+method nested-parent($resource) {
+  my $parent-id = self.params<parent_id>;
+
+  return Nil without $parent-id;
+
+  with $resource.parent-reflection -> $reflection {
+    return $reflection.klass.where({ id => $parent-id.Int }).first;
+  }
+
+  Nil
+}
+
+method parent-fk($resource --> Str) {
+  $resource.parent-reflection.foreign-key
+}
+
+method parent-scoped($resource, $relation) {
+  with self.nested-parent($resource) -> $parent {
+    return $relation.where({ self.parent-fk($resource) => $parent.id });
+  }
+
+  $relation
+}
+
+method resource-base($resource --> Str) {
+  my $mount = MVC::Keayl::Admin::Config.current.mount-path;
+
+  with self.nested-parent($resource) -> $parent {
+    return $mount ~ '/' ~ self.parent-resource($resource).slug ~ '/' ~ $parent.id ~ '/' ~ $resource.slug;
+  }
+
+  $mount ~ '/' ~ $resource.slug
+}
+
+method resource-breadcrumbs($resource, *@tail) {
+  my $mount = MVC::Keayl::Admin::Config.current.mount-path;
+  my @crumbs;
+
+  with self.nested-parent($resource) -> $parent {
+    my $parent-resource = self.parent-resource($resource);
+    my $parent-base     = $mount ~ '/' ~ $parent-resource.slug;
+
+    @crumbs.push: ($parent-resource.plural-name => $parent-base);
+    @crumbs.push: ($parent-resource.singular-name ~ ' #' ~ $parent.id => $parent-base ~ '/' ~ $parent.id);
+  }
+
+  @crumbs.append: @tail;
+
+  @crumbs
 }
 
 method action-ability {
@@ -198,7 +263,7 @@ method !authorize-record(Str:D $ability, $resource, $record --> Bool) {
 method index {
   my $resource = self.current-resource;
   my $mount    = MVC::Keayl::Admin::Config.current.mount-path;
-  my $base     = $mount ~ '/' ~ $resource.slug;
+  my $base     = self.resource-base($resource);
   my %params   = self.params.Hash;
 
   my $sort = self.params<sort>;
@@ -233,7 +298,7 @@ method index {
 
   my $tabs  = MVC::Keayl::Admin::Scopes.render($resource, :active($scope), :$base, :%filters, :$sort, :$dir, :%counts);
   my $chips = $resource.filters-enabled ?? MVC::Keayl::Admin::FilterPanel.chips($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, scope => $scope-name) !! '';
-  my $table = MVC::Keayl::Admin::IndexView.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry, :$batch, :$abilities);
+  my $table = MVC::Keayl::Admin::IndexView.render($resource, @records, :$base, :$sort, :$dir, filters => %carry, :$batch, :$abilities);
   my $pager = MVC::Keayl::Admin::Pagination.render(:$base, :$page, :$per, :$total, :$sort, :$dir, filters => %carry);
 
   my $body = $tabs ~ $chips ~ ($batch ?? batch-form($base, $resource, $table, $pager, :$abilities) !! ($table ~ $pager));
@@ -266,7 +331,7 @@ method index {
   self.render-admin(
     'resource/index',
     page-title  => $resource.plural-name,
-    breadcrumbs => [ $resource.plural-name => Nil ],
+    breadcrumbs => self.resource-breadcrumbs($resource, $resource.plural-name => Nil),
   )
 }
 
@@ -345,11 +410,13 @@ method destroy {
 method !find-record($resource) {
   my $id = (self.params<id> // '').Str;
 
-  $id ~~ /^ \d+ $/ ?? self.policy-scope($resource, $resource.model.all).where({ id => $id.Int }).first !! Nil
+  return Nil unless $id ~~ /^ \d+ $/;
+
+  self.policy-scope($resource, self.parent-scoped($resource, $resource.model.all)).where({ id => $id.Int }).first
 }
 
 method !list-relation($resource, %params) {
-  my $visible = self.policy-scope($resource, $resource.model.all);
+  my $visible = self.policy-scope($resource, self.parent-scoped($resource, $resource.model.all));
   my $scope   = resolve-scope($resource, %params);
 
   my $relation = apply-scope($scope, $visible);
@@ -363,6 +430,8 @@ method !list-relation($resource, %params) {
   } elsif $resource.sort-column.defined {
     $relation = $relation.order($resource.sort-column ~ ($resource.sort-dir eq 'desc' ?? ' DESC' !! ' ASC'));
   }
+
+  $relation = $relation.includes(|$resource.eager-loads) if $resource.eager-loads;
 
   $relation
 }
@@ -399,8 +468,7 @@ method export {
 # method name, so the base controller's dispatch maps it here.
 method new-record {
   my $resource = self.current-resource;
-  my $mount    = MVC::Keayl::Admin::Config.current.mount-path;
-  my $base     = $mount ~ '/' ~ $resource.slug;
+  my $base     = self.resource-base($resource);
 
   self.render-form($resource, $resource.model.build, action => $base, submit => 'Create', :$base,
     page-title => 'New ' ~ $resource.singular-name);
@@ -408,10 +476,15 @@ method new-record {
 
 method create {
   my $resource = self.current-resource;
-  my $mount    = MVC::Keayl::Admin::Config.current.mount-path;
-  my $base     = $mount ~ '/' ~ $resource.slug;
+  my $base     = self.resource-base($resource);
 
-  my $record = $resource.model.create(strong-params($resource, self.params.Hash));
+  my %attrs = strong-params($resource, self.params.Hash);
+
+  with self.nested-parent($resource) -> $parent {
+    %attrs{self.parent-fk($resource)} = $parent.id;
+  }
+
+  my $record = $resource.model.create(%attrs);
 
   if $record.id {
     attach-files($resource, $record, self.params.Hash);
@@ -432,8 +505,7 @@ method edit {
   return self.head(404) without $record;
   return self.forbidden unless self!authorize-record('update', $resource, $record);
 
-  my $mount = MVC::Keayl::Admin::Config.current.mount-path;
-  my $base  = $mount ~ '/' ~ $resource.slug;
+  my $base = self.resource-base($resource);
 
   self.render-form($resource, $record, action => $base ~ '/' ~ $record.id, submit => 'Update', :$base,
     page-title => 'Edit ' ~ $resource.singular-name ~ ' #' ~ $record.id);
@@ -446,8 +518,7 @@ method update {
   return self.head(404) without $record;
   return self.forbidden unless self!authorize-record('update', $resource, $record);
 
-  my $mount = MVC::Keayl::Admin::Config.current.mount-path;
-  my $base  = $mount ~ '/' ~ $resource.slug;
+  my $base = self.resource-base($resource);
 
   if $record.update(strong-params($resource, self.params.Hash)) {
     attach-files($resource, $record, self.params.Hash);
@@ -467,7 +538,7 @@ method render-form($resource, $record, Str:D :$action, Str:D :$submit, Str:D :$b
   self.render-admin(
     'resource/form',
     :$page-title,
-    breadcrumbs => [ $resource.plural-name => $base, $page-title => Nil ],
+    breadcrumbs => self.resource-breadcrumbs($resource, $resource.plural-name => $base, $page-title => Nil),
   )
 }
 
@@ -479,7 +550,7 @@ method show {
   return self.forbidden unless self!authorize-record('show', $resource, $record);
 
   my $mount = MVC::Keayl::Admin::Config.current.mount-path;
-  my $base  = $mount ~ '/' ~ $resource.slug;
+  my $base  = self.resource-base($resource);
   my $title = $resource.singular-name ~ ' #' ~ $record.id;
 
   my $abilities = self.abilities-for($resource);
@@ -487,15 +558,22 @@ method show {
   my $toolbar = self.action-items-html($resource, 'show', $abilities, $record);
   self.assign('admin_show_toolbar', $toolbar ?? qq[<div class="d-flex justify-content-end gap-2 mb-3">{$toolbar}</div>] !! '');
   self.assign('admin_show_body',     MVC::Keayl::Admin::Show.render($resource, $record, mount-path => $mount));
-  self.assign('admin_show_actions',  MVC::Keayl::Admin::Show.actions($resource, $record, mount-path => $mount, :$abilities));
+  self.assign('admin_show_actions',  MVC::Keayl::Admin::Show.actions($resource, $record, :$base, :$abilities));
   self.assign('admin_show_panels',   MVC::Keayl::Admin::Panels.panels($resource.panels, $record, $abilities));
   self.assign('admin_show_tabs',     MVC::Keayl::Admin::Panels.tabs($resource.tabs, $record, $abilities));
   self.assign('admin_show_sidebars', MVC::Keayl::Admin::Panels.sidebars($resource.sidebars, $record, $abilities, placement => 'show'));
 
+  my @child-links = MVC::Keayl::Admin::Registry.current.children-of($resource.model).map(-> $child {
+    qq[<a class="list-group-item list-group-item-action" href="{html-escape($base ~ '/' ~ $record.id ~ '/' ~ $child.slug)}">{html-escape($child.plural-name)}</a>]
+  });
+  self.assign('admin_show_children', @child-links
+    ?? qq[<div class="card mb-3"><div class="card-header">{html-escape(MVC::Keayl::Admin::I18n.chrome('related', 'Related'))}</div><div class="list-group list-group-flush">{@child-links.join}</div></div>]
+    !! '');
+
   self.render-admin(
     'resource/show',
     page-title  => $title,
-    breadcrumbs => [ $resource.plural-name => $base, $title => Nil ],
+    breadcrumbs => self.resource-breadcrumbs($resource, $resource.plural-name => $base, $title => Nil),
   )
 }
 

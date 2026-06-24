@@ -143,6 +143,18 @@ sub register-posts-grid(--> Nil) is export {
   });
 }
 
+sub register-posts-nested(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    belongs-to('author');
+    includes('author');
+
+    column('title');
+    attribute('title');
+    field('title', :as<string>);
+    permit(<title>);
+  });
+}
+
 sub register-posts-readonly(--> Nil) is export {
   MVC::Keayl::Admin.register(Post, {
     actions('index', 'show');

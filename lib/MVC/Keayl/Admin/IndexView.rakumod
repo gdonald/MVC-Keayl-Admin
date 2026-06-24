@@ -70,12 +70,10 @@ sub blog-html($resource, @records, Str:D $base, $abilities, Bool $batch --> Str)
   qq[<div class="admin-blog">{$items}</div>]
 }
 
-method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters, Bool :$batch = False, :$abilities --> Str) {
-  my $base = $mount-path ~ '/' ~ $resource.slug;
-
+method render(::?CLASS:U: $resource, @records, Str:D :$base, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters, Bool :$batch = False, :$abilities --> Str) {
   given $resource.index-as {
     when 'grid' { grid-html($resource, @records, $base, $abilities, $batch) }
     when 'blog' { blog-html($resource, @records, $base, $abilities, $batch) }
-    default     { MVC::Keayl::Admin::Table.render($resource, @records, :$mount-path, :$sort, :$dir, :$target, :%filters, :$batch, :$abilities) }
+    default     { MVC::Keayl::Admin::Table.render($resource, @records, :$base, :$sort, :$dir, :$target, :%filters, :$batch, :$abilities) }
   }
 }

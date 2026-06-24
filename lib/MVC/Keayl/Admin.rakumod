@@ -145,6 +145,27 @@ sub admin-routes {
       post '/' ~ $slug ~ '/:id/delete',  to => $resource-ctrl ~ '#destroy' if $res.allows-action('destroy');
     }
 
+    # Nested routes for resources that declare a parent, scoping the relation to
+    # the parent record. Registered after the standalone routes so the parent
+    # resources are known.
+    for @resources -> $res {
+      next without $res.parent-association;
+
+      my $parent = MVC::Keayl::Admin::Registry.current.by-model($res.parent-reflection.klass) with $res.parent-reflection;
+      next without $parent;
+
+      my $nbase = '/' ~ $parent.slug ~ '/:parent_id/' ~ $res.slug;
+
+      get    $nbase,                 to => $resource-ctrl ~ '#index'   if $res.allows-action('index');
+      get    $nbase ~ '/new',        to => $resource-ctrl ~ '#new'     if $res.allows-action('new');
+      post   $nbase,                 to => $resource-ctrl ~ '#create'  if $res.allows-action('new');
+      get    $nbase ~ '/:id/edit',   to => $resource-ctrl ~ '#edit'    if $res.allows-action('edit');
+      post   $nbase ~ '/:id/delete', to => $resource-ctrl ~ '#destroy' if $res.allows-action('destroy');
+      delete $nbase ~ '/:id',        to => $resource-ctrl ~ '#destroy' if $res.allows-action('destroy');
+      post   $nbase ~ '/:id',        to => $resource-ctrl ~ '#update'  if $res.allows-action('edit');
+      get    $nbase ~ '/:id',        to => $resource-ctrl ~ '#show'    if $res.allows-action('show');
+    }
+
     get '/', to => $dashboard;
   };
 

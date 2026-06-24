@@ -40,6 +40,8 @@ a declaration on the resource config:
 | Declaration          | Records                                                                   | Detail |
 | -------------------- | ------------------------------------------------------------------------- | ------ |
 | `index`              | the index presentation (`:as` table/grid/blog, a per-record block)        | [Index presentations and panels](presentations.md) |
+| `belongs-to`         | nests the resource under a parent association                             | [Nested resources](nested-resources.md) |
+| `includes`           | associations to eager-load on the index                                   | [Nested resources](nested-resources.md) |
 | `actions`            | which default actions the resource exposes (`:except`)                    | [Action availability and toolbar](actions-availability.md) |
 | `sort-order`         | the default ordering (`:dir`)                                             | [Action availability and toolbar](actions-availability.md) |
 | `action-item`        | a page-toolbar button (`:only`, `:except`, `:if-can`)                     | [Action availability and toolbar](actions-availability.md) |

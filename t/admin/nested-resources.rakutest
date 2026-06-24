@@ -1,0 +1,79 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Menu;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub call(Str:D $method, Str:D $path, Str :$body) {
+  my %args = :$method, target => $path;
+
+  if $body.defined {
+    %args<body>    = $body;
+    %args<headers> = { 'Content-Type' => 'application/x-www-form-urlencoded' };
+  }
+
+  host.call(MVC::Keayl::Request.new(|%args))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-authors;
+register-posts-nested;
+
+my $alice = Author.create({ name => 'Alice' });
+my $bob   = Author.create({ name => 'Bob' });
+
+Post.create({ title => 'Alice One', author_id => $alice.id });
+Post.create({ title => 'Alice Two', author_id => $alice.id });
+Post.create({ title => 'Bob One',   author_id => $bob.id });
+
+my $abase = '/admin/authors/' ~ $alice.id ~ '/posts';
+
+# the nested index is scoped to the parent
+my $index = call('GET', $abase).body;
+ok $index.contains('Alice One') && $index.contains('Alice Two'), 'the nested index lists the parent records';
+nok $index.contains('Bob One'), 'the nested index excludes other parents records';
+
+# nested breadcrumbs reflect the parent chain
+ok $index.contains('Authors') && $index.contains('Alice'), 'the breadcrumbs show the parent chain';
+
+# nested links carry the parent in the path
+ok $index.contains('href="' ~ $abase ~ '/new"'), 'the new button links into the parent path';
+
+# creating under a parent fixes the foreign key
+call('POST', $abase, body => 'title=Created Nested');
+my $created = Post.where({ title => 'Created Nested' }).first;
+ok $created.defined && $created.read-attribute('author_id') == $alice.id, 'a nested create fixes the parent foreign key';
+
+# show is scoped: a record under the right parent works
+my $alice-post = Post.where({ title => 'Alice One' }).first;
+is call('GET', $abase ~ '/' ~ $alice-post.id).status, 200, 'a record under its parent is shown';
+
+# a record under a different parent is not reachable through this parent
+my $bob-post = Post.where({ title => 'Bob One' }).first;
+is call('GET', $abase ~ '/' ~ $bob-post.id).status, 404, 'a record under another parent is a 404';
+
+# the parent show page links to the nested resource
+my $author-show = call('GET', '/admin/authors/' ~ $alice.id).body;
+ok $author-show.contains('href="' ~ $abase ~ '"'), 'the parent show page links to the nested index';
+
+# a nested resource is hidden from the top menu
+nok MVC::Keayl::Admin::Menu.render(mount => '/admin').contains('href="/admin/posts"'),
+  'a nested resource is not listed standalone in the menu';
+
+# the standalone route still works over every record
+my $standalone = call('GET', '/admin/posts').body;
+ok $standalone.contains('Alice One') && $standalone.contains('Bob One'), 'the standalone index still lists every record';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

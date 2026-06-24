@@ -81,8 +81,7 @@ sub allowed($abilities, Str:D $action --> Bool) {
   !$abilities.defined || $abilities.can($action)
 }
 
-method actions(::?CLASS:U: $resource, $record, Str:D :$mount-path, :$abilities --> Str) {
-  my $base   = $mount-path ~ '/' ~ $resource.slug;
+method actions(::?CLASS:U: $resource, $record, Str:D :$base, :$abilities --> Str) {
   my $edit   = html-escape($base ~ '/' ~ $record.id ~ '/edit');
   my $delete = html-escape($base ~ '/' ~ $record.id ~ '/delete');
 

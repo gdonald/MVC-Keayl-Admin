@@ -46,6 +46,8 @@ has MVC::Keayl::Admin::MenuEntry    $.menu-entry is rw;
 has Str                             @.enabled-actions = <index show new edit destroy>;
 has Str                             $.sort-column;
 has Str                             $.sort-dir = 'asc';
+has Str                             $.parent-association;
+has Str                             @.eager-loads;
 
 constant FIELD-TYPES  = set <string text select boolean date time datetime number password hidden file>;
 constant FILTER-TYPES = set <string numeric boolean date date-range select>;
@@ -140,6 +142,28 @@ method sort-order(Str:D $column, Str :$dir = 'asc' --> ::?CLASS) {
   $!sort-dir    = $dir eq 'desc' ?? 'desc' !! 'asc';
 
   self
+}
+
+method belongs-to(Str:D $name --> ::?CLASS) {
+  reject-unknown(%_, "belongs-to '$name'");
+
+  $!parent-association = $name;
+
+  self
+}
+
+method includes(*@names --> ::?CLASS) {
+  reject-unknown(%_, 'includes');
+
+  @!eager-loads = @names>>.Str;
+
+  self
+}
+
+method parent-reflection {
+  return Nil without $!parent-association;
+
+  $!model.reflect-on-association($!parent-association)
 }
 
 method action-item(Str:D $label, &block, :$only, :$except, Str :$if-can --> ::?CLASS) {

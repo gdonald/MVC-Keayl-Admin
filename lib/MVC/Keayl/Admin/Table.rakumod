@@ -51,9 +51,8 @@ sub row-actions(Str:D $base, $id, $abilities --> Str) {
   qq[<div class="btn-group btn-group-sm" role="group">{$buttons}</div>]
 }
 
-method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters, Bool :$batch = False, :$abilities --> Str) {
+method render(::?CLASS:U: $resource, @records, Str:D :$base, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters, Bool :$batch = False, :$abilities --> Str) {
   my @columns = $resource.columns;
-  my $base    = $mount-path ~ '/' ~ $resource.slug;
 
   my $select-head = $batch ?? '<th style="width: 1rem"></th>' !! '';
 

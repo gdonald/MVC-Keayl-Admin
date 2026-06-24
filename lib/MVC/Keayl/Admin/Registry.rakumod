@@ -31,11 +31,21 @@ method all(--> List) {
 }
 
 method by-slug(Str:D $slug --> MVC::Keayl::Admin::Resource) {
-  %!by-slug{$slug}
+  %!by-slug{$slug} // MVC::Keayl::Admin::Resource
 }
 
 method by-model(Mu:U $model --> MVC::Keayl::Admin::Resource) {
-  %!by-model{$model.^name}
+  %!by-model{$model.^name} // MVC::Keayl::Admin::Resource
+}
+
+method children-of(Mu:U $model --> List) {
+  @!resources.grep(-> $resource {
+    with $resource.parent-reflection -> $reflection {
+      $reflection.klass.^name eq $model.^name
+    } else {
+      False
+    }
+  }).List
 }
 
 method clear(--> ::?CLASS) {

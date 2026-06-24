@@ -12,6 +12,7 @@ nav:
   - Filters: filters.md
   - Scopes: scopes.md
   - Show pages: show-pages.md
+  - Nested resources: nested-resources.md
   - Forms: forms.md
   - Actions: actions.md
   - Action availability and toolbar: actions-availability.md

@@ -18,6 +18,14 @@ sub sort-order(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.sort-order(|args)
 }
 
+sub belongs-to(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.belongs-to(|args)
+}
+
+sub includes(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.includes(|args)
+}
+
 sub action-item(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.action-item(|args)
 }

@@ -59,6 +59,7 @@ method render(::?CLASS:U: Str:D :$mount, Str:D :$active-slug = '', :$admin --> S
     my $entry = $resource.menu-entry;
 
     next if $entry.defined && $entry.hide;
+    next if $resource.parent-association.defined;
     next unless MVC::Keayl::Admin::Authorization.allows('index', :$admin, :$resource);
 
     @items.push: %(
