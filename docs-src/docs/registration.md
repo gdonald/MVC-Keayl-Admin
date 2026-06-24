@@ -39,6 +39,7 @@ a declaration on the resource config:
 
 | Declaration          | Records                                                                   | Detail |
 | -------------------- | ------------------------------------------------------------------------- | ------ |
+| `index`              | the index presentation (`:as` table/grid/blog, a per-record block)        | [Index presentations and panels](presentations.md) |
 | `column`             | an index column (`:sortable`, `:display`, `:format`)                      | [Index pages](index-pages.md) |
 | `attribute`          | a show-page row (`:display`, `:format`)                                   | [Show pages](show-pages.md) |
 | `field`              | a form input (`:as`, `:collection`, `:hint`, `:placeholder`, `:multiple`) | [Forms](forms.md) |
@@ -49,6 +50,9 @@ a declaration on the resource config:
 | `batch-action`       | a bulk operation over selected records                                    | [Actions](actions.md) |
 | `member-action`      | a per-record action (`:confirm`)                                          | [Actions](actions.md) |
 | `collection-action`  | a whole-collection action (`:confirm`)                                    | [Actions](actions.md) |
+| `sidebar`            | a right-column content panel (`:on`, `:priority`, `:if-can`)              | [Index presentations and panels](presentations.md) |
+| `panel`              | a show-page main-column panel (`:priority`, `:if-can`)                    | [Index presentations and panels](presentations.md) |
+| `tab`                | a show-page tabbed panel (`:priority`, `:if-can`)                        | [Index presentations and panels](presentations.md) |
 | `menu`               | the sidebar entry (`:group`, `:label`, `:priority`, `:icon`, `:hide`)     | [Navigation](navigation.md) |
 
 ## Resource options

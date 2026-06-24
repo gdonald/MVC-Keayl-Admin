@@ -1,0 +1,67 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Authorization::Policy;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+class DenyDestroy is MVC::Keayl::Admin::Authorization::Policy {
+  method allows(Str:D $action, :$admin, :$resource, :$record --> Bool) {
+    $action ne 'destroy'
+  }
+}
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-panels;
+seed-posts({ title => 'Subject' });
+
+my $id = Post.all.all[0].id;
+
+# index sidebar sections render in the right column
+my $index = fetch('/admin/posts').body;
+ok $index.contains('col-lg-3'), 'the index has a sidebar column';
+ok $index.contains('Need help?'), 'a both-placement sidebar renders on the index';
+ok $index.contains('index tip'), 'an index-placement sidebar renders on the index';
+
+# show page panels in the main column
+my $show = fetch('/admin/posts/' ~ $id).body;
+ok $show.contains('<div class="notes">Subject</div>'), 'a panel renders in the show main column with the record';
+
+# show page tabs
+ok $show.contains('nav-tabs'), 'tabs render as a tabbed card';
+ok $show.contains('Overview') && $show.contains('tab-overview'), 'the first tab renders';
+ok $show.contains('History') && $show.contains('tab-history'), 'a second tab renders';
+
+# show page sidebars honour placement
+ok $show.contains('Need help?'), 'a both-placement sidebar renders on the show page';
+nok $show.contains('index tip'), 'an index-only sidebar does not render on the show page';
+
+# a sidebar gated by an ability shows under the default policy
+ok $index.contains('audit log'), 'an ability-gated sidebar shows when the policy allows it';
+ok $show.contains('audit log'), 'the gated sidebar shows on the show page too';
+
+# and is hidden when the policy forbids that ability
+MVC::Keayl::Admin.authorize-with(DenyDestroy.new);
+
+nok fetch('/admin/posts').body.contains('audit log'), 'the gated sidebar is hidden on the index when forbidden';
+nok fetch('/admin/posts/' ~ $id).body.contains('audit log'), 'the gated sidebar is hidden on the show page when forbidden';
+
+# the non-gated panels still render under the restrictive policy
+ok fetch('/admin/posts/' ~ $id).body.contains('Need help?'), 'an ungated sidebar still renders';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

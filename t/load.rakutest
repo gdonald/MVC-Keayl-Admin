@@ -1,7 +1,7 @@
 use v6.d;
 use Test;
 
-plan 49;
+plan 52;
 
 use-ok 'MVC::Keayl::Admin';
 use-ok 'MVC::Keayl::Admin::Assets';
@@ -32,10 +32,13 @@ use-ok 'MVC::Keayl::Admin::Form';
 use-ok 'MVC::Keayl::Admin::Formatter';
 use-ok 'MVC::Keayl::Admin::Generators';
 use-ok 'MVC::Keayl::Admin::I18n';
+use-ok 'MVC::Keayl::Admin::IndexView';
 use-ok 'MVC::Keayl::Admin::Inflection';
 use-ok 'MVC::Keayl::Admin::Menu';
 use-ok 'MVC::Keayl::Admin::MenuEntry';
 use-ok 'MVC::Keayl::Admin::Page';
+use-ok 'MVC::Keayl::Admin::Panel';
+use-ok 'MVC::Keayl::Admin::Panels';
 use-ok 'MVC::Keayl::Admin::Pages';
 use-ok 'MVC::Keayl::Admin::PageController';
 use-ok 'MVC::Keayl::Admin::Nested';

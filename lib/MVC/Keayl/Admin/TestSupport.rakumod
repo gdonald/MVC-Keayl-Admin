@@ -134,3 +134,37 @@ sub register-authors(--> Nil) is export {
     attribute('posts');
   });
 }
+
+sub register-posts-grid(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    index(as => 'grid', -> $post { '<h5 class="card-title">' ~ $post.read-attribute('title') ~ '</h5>' });
+
+    column('title');
+  });
+}
+
+sub register-posts-panels(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title');
+    attribute('title');
+
+    sidebar('Help',       -> $context  { '<p class="help">Need help?</p>' });
+    sidebar('Index Tips', -> $relation { '<p class="idx-tip">index tip</p>' }, :on<index>);
+    sidebar('Audit',      -> $record   { '<p class="audit">audit log</p>' }, :if-can<destroy>);
+
+    panel('Notes', -> $record { '<div class="notes">' ~ $record.read-attribute('title') ~ '</div>' });
+
+    tab('Overview', -> $record { '<div class="tab-overview">overview</div>' });
+    tab('History',  -> $record { '<div class="tab-history">history</div>' });
+  });
+}
+
+sub register-posts-blog(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    index(as => 'blog', -> $post { '<h2 class="post-headline">' ~ $post.read-attribute('title') ~ '</h2>' });
+
+    column('title');
+
+    filter('title', :as<string>);
+  });
+}

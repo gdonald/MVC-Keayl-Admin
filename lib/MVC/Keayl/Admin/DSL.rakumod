@@ -6,6 +6,10 @@ unit module MVC::Keayl::Admin::DSL;
 # onto the resource being configured, which `Resource.parse` exposes through the
 # $*KEAYL-ADMIN-RESOURCE dynamic variable.
 
+sub index(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.index(|args)
+}
+
 sub column(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.column(|args)
 }
@@ -48,4 +52,16 @@ sub member-action(|args) is export {
 
 sub collection-action(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.collection-action(|args)
+}
+
+sub sidebar(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.sidebar(|args)
+}
+
+sub panel(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.panel(|args)
+}
+
+sub tab(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.tab(|args)
 }

@@ -1,0 +1,69 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+# the table is still the default presentation
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'Tabular' });
+
+ok fetch('/admin/posts').body.contains('<table'), 'the table is the default index presentation';
+
+# grid presentation renders a card grid from the per-record block
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-grid;
+seed-posts({ title => 'Gridded' }, { title => 'Carded' });
+
+my $grid = fetch('/admin/posts').body;
+ok $grid.contains('row-cols'), 'the grid presentation renders a card row';
+ok $grid.contains('card-body'), 'the grid renders cards';
+ok $grid.contains('<h5 class="card-title">Gridded</h5>'), 'the grid uses the per-record block';
+nok $grid.contains('<table'), 'the grid does not render a table';
+
+# batch selection is preserved in the grid
+ok $grid.contains('data-batch-select'), 'grid cards carry a batch selection checkbox';
+ok $grid.contains('data-batch-all'), 'the batch toolbar has a select-all control';
+
+# row actions are present in the grid
+ok $grid.contains('hx-delete='), 'grid cards have a delete action';
+
+# blog presentation renders a stacked list from the per-record block
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-blog;
+seed-posts({ title => 'Posted' });
+
+my $blog = fetch('/admin/posts').body;
+ok $blog.contains('admin-blog'), 'the blog presentation renders a stacked list';
+ok $blog.contains('<h2 class="post-headline">Posted</h2>'), 'the blog uses the per-record block';
+nok $blog.contains('<table'), 'the blog does not render a table';
+
+# scopes, filters, and pagination still wrap an alternate presentation
+ok $blog.contains('Filters'), 'the filter control is present in a non-table presentation';
+
+# empty state for a grid with no records
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-grid;
+
+ok fetch('/admin/posts').body.contains('No records yet'), 'an empty grid shows the empty state';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

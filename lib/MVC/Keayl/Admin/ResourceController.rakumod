@@ -3,10 +3,12 @@ use MVC::Keayl::Admin::Controller;
 use MVC::Keayl::Admin::Config;
 use MVC::Keayl::Admin::Registry;
 use MVC::Keayl::Admin::Table;
+use MVC::Keayl::Admin::IndexView;
 use MVC::Keayl::Admin::Pagination;
 use MVC::Keayl::Admin::FilterPanel;
 use MVC::Keayl::Admin::Scopes;
 use MVC::Keayl::Admin::Show;
+use MVC::Keayl::Admin::Panels;
 use MVC::Keayl::Admin::Form;
 use MVC::Keayl::Admin::Attachments;
 use MVC::Keayl::Admin::Predicate;
@@ -102,7 +104,9 @@ sub batch-toolbar($base, $resource, $abilities --> Str) {
 
   my $options = @names.map({ qq[<option value="{html-escape($_)}">{html-escape($_)}</option>] }).join;
 
-  qq[<div class="d-flex gap-2 mb-2 align-items-center"><select class="form-select form-select-sm w-auto" name="batch-action">{$options}</select><button type="submit" class="btn btn-outline-secondary btn-sm">Apply to <span data-batch-count>0</span> selected</button></div>]
+  my $select-all = qq[<div class="form-check me-1"><input class="form-check-input" type="checkbox" id="admin-batch-all" data-batch-all><label class="form-check-label" for="admin-batch-all">All</label></div>];
+
+  qq[<div class="d-flex gap-2 mb-2 align-items-center">{$select-all}<select class="form-select form-select-sm w-auto" name="batch-action">{$options}</select><button type="submit" class="btn btn-outline-secondary btn-sm">Apply to <span data-batch-count>0</span> selected</button></div>]
 }
 
 sub batch-form($base, $resource, Str:D $table, Str:D $pager, :$abilities --> Str) {
@@ -227,7 +231,7 @@ method index {
 
   my $tabs  = MVC::Keayl::Admin::Scopes.render($resource, :active($scope), :$base, :%filters, :$sort, :$dir, :%counts);
   my $chips = MVC::Keayl::Admin::FilterPanel.chips($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, scope => $scope-name);
-  my $table = MVC::Keayl::Admin::Table.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry, :batch, :$abilities);
+  my $table = MVC::Keayl::Admin::IndexView.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry, :batch, :$abilities);
   my $pager = MVC::Keayl::Admin::Pagination.render(:$base, :$page, :$per, :$total, :$sort, :$dir, filters => %carry);
 
   my $body = $tabs ~ $chips ~ batch-form($base, $resource, $table, $pager, :$abilities);
@@ -248,7 +252,10 @@ method index {
     ?? qq[<a class="btn btn-primary ms-2" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('new', 'New') ~ ' ' ~ $resource.singular-name)}</a>]
     !! '';
 
+  my $sidebars = MVC::Keayl::Admin::Panels.sidebars($resource.sidebars, $relation, $abilities, placement => 'index');
+
   self.assign('admin_index_body', $body);
+  self.assign('admin_index_sidebar', $sidebars ?? qq[<div class="col-lg-3">{$sidebars}</div>] !! '');
   self.assign('admin_new_link', $collection-actions ~ $export ~ $new-link);
   self.assign('admin_filters_panel', self.filters-panel($resource, %params, :$base, :$sort, :$dir, scope => $scope-name));
 
@@ -466,8 +473,11 @@ method show {
 
   my $abilities = self.abilities-for($resource);
 
-  self.assign('admin_show_body',    MVC::Keayl::Admin::Show.render($resource, $record, mount-path => $mount));
-  self.assign('admin_show_actions', MVC::Keayl::Admin::Show.actions($resource, $record, mount-path => $mount, :$abilities));
+  self.assign('admin_show_body',     MVC::Keayl::Admin::Show.render($resource, $record, mount-path => $mount));
+  self.assign('admin_show_actions',  MVC::Keayl::Admin::Show.actions($resource, $record, mount-path => $mount, :$abilities));
+  self.assign('admin_show_panels',   MVC::Keayl::Admin::Panels.panels($resource.panels, $record, $abilities));
+  self.assign('admin_show_tabs',     MVC::Keayl::Admin::Panels.tabs($resource.tabs, $record, $abilities));
+  self.assign('admin_show_sidebars', MVC::Keayl::Admin::Panels.sidebars($resource.sidebars, $record, $abilities, placement => 'show'));
 
   self.render-admin(
     'resource/show',

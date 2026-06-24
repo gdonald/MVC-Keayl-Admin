@@ -12,6 +12,7 @@ use MVC::Keayl::Admin::MenuEntry;
 use MVC::Keayl::Admin::Nested;
 use MVC::Keayl::Admin::BatchAction;
 use MVC::Keayl::Admin::CustomAction;
+use MVC::Keayl::Admin::Panel;
 
 unit class MVC::Keayl::Admin::Resource;
 
@@ -28,14 +29,20 @@ has MVC::Keayl::Admin::Field     @.fields;
 has MVC::Keayl::Admin::Filter    @.filters;
 has MVC::Keayl::Admin::Scope     @.scopes;
 has Str                          @.permitted;
+has Str                             $.index-as = 'table';
+has                                 &.index-block;
 has MVC::Keayl::Admin::Nested       @.nested-attributes;
 has MVC::Keayl::Admin::BatchAction  @.batch-actions;
 has MVC::Keayl::Admin::CustomAction @.member-actions;
 has MVC::Keayl::Admin::CustomAction @.collection-actions;
+has MVC::Keayl::Admin::Panel        @.sidebars;
+has MVC::Keayl::Admin::Panel        @.panels;
+has MVC::Keayl::Admin::Panel        @.tabs;
 has MVC::Keayl::Admin::MenuEntry    $.menu-entry is rw;
 
 constant FIELD-TYPES  = set <string text select boolean date time datetime number password hidden file>;
 constant FILTER-TYPES = set <string numeric boolean date date-range select>;
+constant INDEX-TYPES  = set <table grid blog>;
 
 sub default-i18n(--> MVC::Keayl::I18n) {
   MVC::Keayl::Admin::I18n.backend
@@ -77,6 +84,17 @@ method plural-name(MVC::Keayl::I18n :$i18n = default-i18n() --> Str) {
 
 sub reject-unknown(%extra, Str:D $declaration) {
   die "unknown option '{%extra.keys.sort.join(q{, })}' in $declaration declaration" if %extra;
+}
+
+method index(&block?, Str:D :$as = 'table' --> ::?CLASS) {
+  reject-unknown(%_, 'index');
+
+  die "unknown index type '$as'" unless INDEX-TYPES{$as};
+
+  $!index-as    = $as;
+  &!index-block = &block;
+
+  self
 }
 
 method column(Str:D $name, Bool :$sortable = False, :&display, Str :$format --> ::?CLASS) {
@@ -167,6 +185,32 @@ method collection-action(Str:D $name, &block, Str :$confirm --> ::?CLASS) {
   reject-unknown(%_, "collection-action '$name'");
 
   @!collection-actions.push: MVC::Keayl::Admin::CustomAction.new(:$name, scope => 'collection', :&block, :$confirm);
+
+  self
+}
+
+method sidebar(Str:D $title, &block, Str :$on = 'both', Int :$priority = 0, Str :$if-can --> ::?CLASS) {
+  reject-unknown(%_, "sidebar '$title'");
+
+  die "unknown sidebar placement '$on'" unless $on eq any('index', 'show', 'both');
+
+  @!sidebars.push: MVC::Keayl::Admin::Panel.new(:$title, :&block, :$on, :$priority, :$if-can);
+
+  self
+}
+
+method panel(Str:D $title, &block, Int :$priority = 0, Str :$if-can --> ::?CLASS) {
+  reject-unknown(%_, "panel '$title'");
+
+  @!panels.push: MVC::Keayl::Admin::Panel.new(:$title, :&block, on => 'show', :$priority, :$if-can);
+
+  self
+}
+
+method tab(Str:D $title, &block, Int :$priority = 0, Str :$if-can --> ::?CLASS) {
+  reject-unknown(%_, "tab '$title'");
+
+  @!tabs.push: MVC::Keayl::Admin::Panel.new(:$title, :&block, on => 'show', :$priority, :$if-can);
 
   self
 }

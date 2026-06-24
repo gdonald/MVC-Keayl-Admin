@@ -55,7 +55,7 @@ method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir
   my @columns = $resource.columns;
   my $base    = $mount-path ~ '/' ~ $resource.slug;
 
-  my $select-head = $batch ?? '<th style="width: 1rem"><input class="form-check-input" type="checkbox" data-batch-all></th>' !! '';
+  my $select-head = $batch ?? '<th style="width: 1rem"></th>' !! '';
 
   my $head = $select-head
     ~ @columns.map({ header-cell($_, $resource.model, $base, $sort, $dir, $target, %filters) }).join
