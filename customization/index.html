@@ -722,6 +722,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Export">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#export-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limiting-the-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limiting the formats
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -936,6 +964,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Export">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#export-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limiting-the-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limiting the formats
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1021,8 +1077,8 @@
 
 <h1 id="customization-and-polish">Customization and polish<a class="headerlink" href="#customization-and-polish" title="Permanent link">&para;</a></h1>
 <h2 id="export">Export<a class="headerlink" href="#export" title="Permanent link">&para;</a></h2>
-<p>Each index exports its current scoped-and-filtered view. The toolbar offers CSV
-and JSON, and the export honours the active scope, filters, and sort.</p>
+<p>Each index exports its current scoped-and-filtered view. The toolbar offers the
+enabled formats, and the export honours the active scope, filters, and sort.</p>
 <ul>
 <li><code>GET /admin/&lt;resource&gt;/export.csv</code> streams a CSV: a header row of column labels
   followed by one row per record, with values quoted when they contain a comma,
@@ -1031,7 +1087,29 @@ and JSON, and the export honours the active scope, filters, and sort.</p>
 <li><code>GET /admin/&lt;resource&gt;/export.json</code> returns the same view as JSON, rendered
   through the controller's custom-renderer registry. Each object carries the
   column values.</li>
+<li><code>GET /admin/&lt;resource&gt;/export.xml</code> returns the same view as XML through the
+  renderer registry, one <code>&lt;record&gt;</code> per row.</li>
 </ul>
+<h3 id="export-columns">Export columns<a class="headerlink" href="#export-columns" title="Permanent link">&para;</a></h3>
+<p>By default the export uses the index columns. A <code>csv</code> block declares an explicit
+set of export columns instead, applied to CSV, JSON, and XML alike:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">csv</span>({
+  <span class="nb">column</span>(<span class="s">&#39;title&#39;</span>);
+  <span class="nb">column</span>(<span class="s">&#39;author&#39;</span>, :<span class="n">display</span>({ .<span class="n">author</span>.<span class="nb">name</span> }));
+});
+</code></pre></div></td></tr></table></div>
+<h3 id="limiting-the-formats">Limiting the formats<a class="headerlink" href="#limiting-the-formats" title="Permanent link">&para;</a></h3>
+<p>The export is on by default with all three formats. Restrict or disable it per
+resource with the <code>export</code> option:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... }, <span class="k">export</span> =&gt; <span class="s">&lt;csv json&gt;</span>);   <span class="c1"># only CSV and JSON</span>
+<span class="n">MVC::Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Log</span>,  { ... }, <span class="k">export</span> =&gt; <span class="nb">False</span>);        <span class="c1"># no export</span>
+</code></pre></div></td></tr></table></div>
+<p>Only the offered formats get a route and a toolbar link; a disabled format is a
+404.</p>
 <h2 id="standalone-pages">Standalone pages<a class="headerlink" href="#standalone-pages" title="Permanent link">&para;</a></h2>
 <p>A page has no backing model. It is registered with a block that returns HTML,
 rendered inside the admin layout, and added to the menu:</p>

@@ -1027,6 +1027,14 @@ the show page: <code>date</code>, <code>time</code>, <code>datetime</code>, <cod
 renders the date portion, and so on.</p>
 <p><code>:format&lt;link-to-show&gt;</code> is special: it links the value to the record's show
 page, so a title column can double as the row's primary link.</p>
+<p><code>:format&lt;status-tag&gt;</code> renders the value as a colored Bootstrap badge, reused on
+the show page. A boolean renders as a green Yes or a grey No; a string maps known
+states to colors (<code>active</code>/<code>published</code>/<code>approved</code> green, <code>pending</code> amber,
+<code>draft</code>/<code>inactive</code> grey, <code>rejected</code>/<code>failed</code> red) and humanizes the label,
+defaulting to grey for an unknown value. Pair it with a <code>display</code> block to derive
+the state from the record:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">column</span>(<span class="s">&#39;state&#39;</span>, :<span class="n">format</span><span class="s">&lt;status-tag&gt;</span>, :<span class="n">display</span>({ .<span class="n">published</span> ?? <span class="s">&#39;active&#39;</span> !! <span class="s">&#39;draft&#39;</span> }));
+</code></pre></div></td></tr></table></div>
 <h2 id="rows-and-actions">Rows and actions<a class="headerlink" href="#rows-and-actions" title="Permanent link">&para;</a></h2>
 <p>Every row ends in an actions column with Show, Edit, and Delete controls. Delete
 issues an HTMX destroy with a confirmation and removes the row in place; see
