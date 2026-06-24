@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/scopes/">
+        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/actions/">
       
       
-        <link rel="prev" href="../filters/">
+        <link rel="prev" href="../forms/">
       
       
-        <link rel="next" href="../show-pages/">
+        <link rel="next" href="../assets/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Scopes - MVC::Keayl::Admin</title>
+        <title>Actions - MVC::Keayl::Admin</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#scopes" class="md-skip">
+        <a href="#destroy-batch-and-custom-actions" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Scopes
+              Actions
             
           </span>
         </div>
@@ -381,37 +381,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Scopes
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../scopes/" class="md-nav__link">
         
   
   
@@ -427,59 +400,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#resolution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resolution
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#scope-tabs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Scope tabs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#per-scope-counts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Per-scope counts
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -542,10 +462,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../actions/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Actions
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -561,6 +508,59 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#destroy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Destroy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#batch-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch actions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-member-and-collection-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom member and collection actions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -646,10 +646,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#resolution" class="md-nav__link">
+  <a href="#destroy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Resolution
+        Destroy
       
     </span>
   </a>
@@ -657,10 +657,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scope-tabs" class="md-nav__link">
+  <a href="#batch-actions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Scope tabs
+        Batch actions
       
     </span>
   </a>
@@ -668,10 +668,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#per-scope-counts" class="md-nav__link">
+  <a href="#custom-member-and-collection-actions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Per-scope counts
+        Custom member and collection actions
       
     </span>
   </a>
@@ -698,32 +698,48 @@
   
 
 
-<h1 id="scopes">Scopes<a class="headerlink" href="#scopes" title="Permanent link">&para;</a></h1>
-<p>A scope is a named view over the resource, declared with a block that is applied
-to the base relation. One scope can be marked <code>:default</code>.</p>
+<h1 id="destroy-batch-and-custom-actions">Destroy, batch, and custom actions<a class="headerlink" href="#destroy-batch-and-custom-actions" title="Permanent link">&para;</a></h1>
+<h2 id="destroy">Destroy<a class="headerlink" href="#destroy" title="Permanent link">&para;</a></h2>
+<p>Each index row has a delete control that issues an HTMX <code>DELETE</code> with a
+confirmation and removes the row in place on success. The show page deletes
+through a plain form that redirects back to the index, so deletion works without
+JavaScript too. Dependent handling (cascading, nullifying) is delegated to the
+ORM's <code>destroy</code>.</p>
+<h2 id="batch-actions">Batch actions<a class="headerlink" href="#batch-actions" title="Permanent link">&para;</a></h2>
+<p>The index wraps its rows in a form with a per-row selection checkbox, a
+select-all-on-page control, and a selected-count indicator. A toolbar applies a
+chosen action to the selected ids. Batch <strong>Destroy</strong> is always available, and a
+<code>batch-action</code> declares a custom bulk operation whose block receives the selected
+records:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
-<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">scope</span>(<span class="s">&#39;All&#39;</span>, :<span class="n">default</span>);
-<span class="nb">scope</span>(<span class="s">&#39;Published&#39;</span>, { .<span class="n">where</span>({ <span class="n">published</span> =&gt; <span class="nb">True</span> }) });
-<span class="nb">scope</span>(<span class="s">&#39;Drafts&#39;</span>,    { .<span class="n">where</span>({ <span class="n">published</span> =&gt; <span class="nb">False</span> }) });
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">batch-action</span>(<span class="s">&#39;Publish&#39;</span>, -&gt; <span class="nv">@records</span> {
+  .<span class="n">update</span>({ <span class="n">published</span> =&gt; <span class="nb">True</span> }) <span class="k">for</span> <span class="nv">@records</span>;
+});
 </code></pre></div></td></tr></table></div>
-<p>The block receives the relation and returns a narrowed one, so it composes with
-the ORM like any other query step.</p>
-<h2 id="resolution">Resolution<a class="headerlink" href="#resolution" title="Permanent link">&para;</a></h2>
-<p>The active scope comes from the query string (<code>?scope=Published</code>), falling back
-to the <code>:default</code> scope when none is given or the name is unknown. The scope is
-applied before filters and sort, and the filtered, scoped count drives
-pagination.</p>
-<h2 id="scope-tabs">Scope tabs<a class="headerlink" href="#scope-tabs" title="Permanent link">&para;</a></h2>
-<p>Scopes render as tabs above the table, with the active one highlighted. Each tab
-carries the current filters and sort, and switching scopes swaps the index body
-over HTMX. Sort, pagination, and filter links carry the active scope in turn, so
-the three compose.</p>
-<h2 id="per-scope-counts">Per-scope counts<a class="headerlink" href="#per-scope-counts" title="Permanent link">&para;</a></h2>
-<p>By default each tab shows a count, computed by running the scope (with the
-current filters) through a count query. For an expensive data set, suppress the
-counts per resource:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... }, <span class="n">scope-counts</span> =&gt; <span class="nb">False</span>);
+<h2 id="custom-member-and-collection-actions">Custom member and collection actions<a class="headerlink" href="#custom-member-and-collection-actions" title="Permanent link">&para;</a></h2>
+<p><code>member-action</code> and <code>collection-action</code> declare developer-defined actions. Each
+generates a route and a button (on the show page for member actions, on the index
+for collection actions), with an optional confirmation. The handler block
+receives the controller and either the record (member) or the relation
+(collection), and returns a response — a redirect or a rendered partial.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">member-action</span>(<span class="s">&#39;approve&#39;</span>, -&gt; <span class="nv">$controller</span>, <span class="nv">$record</span> {
+  <span class="nv">$record</span>.<span class="n">update</span>({ <span class="n">approved</span> =&gt; <span class="nb">True</span> });
+  <span class="nv">$controller</span>.<span class="n">redirect-to</span>(<span class="nv">$controller</span>.<span class="n">path-for</span>(<span class="s">&#39;post&#39;</span>, <span class="nv">$record</span>.<span class="nb">id</span>));
+}, :<span class="n">confirm</span>(<span class="s">&#39;Approve this post?&#39;</span>));
+
+<span class="n">collection-action</span>(<span class="s">&#39;publish-all&#39;</span>, -&gt; <span class="nv">$controller</span>, <span class="nv">$relation</span> {
+  .<span class="n">update</span>({ <span class="n">published</span> =&gt; <span class="nb">True</span> }) <span class="k">for</span> <span class="nv">$relation</span>.<span class="nb">all</span>;
+  <span class="nv">$controller</span>.<span class="n">redirect-to</span>(<span class="nv">$controller</span>.<span class="n">path-for</span>(<span class="s">&#39;posts&#39;</span>));
+});
 </code></pre></div></td></tr></table></div>
 
 
