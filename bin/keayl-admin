@@ -1,0 +1,21 @@
+#!/usr/bin/env raku
+use v6.d;
+use MVC::Keayl::Admin::Generators;
+
+multi sub MAIN('generate', 'admin:install') {
+  exit generate-admin-install();
+}
+
+multi sub MAIN('generate', 'admin', Str:D $model) {
+  try require ::($model);
+  exit generate-admin($model);
+}
+
+multi sub MAIN('g', 'admin:install') {
+  exit generate-admin-install();
+}
+
+multi sub MAIN('g', 'admin', Str:D $model) {
+  try require ::($model);
+  exit generate-admin($model);
+}

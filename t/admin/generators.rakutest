@@ -1,0 +1,95 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin::Generators;
+use MVC::Keayl::Admin::TestSupport;
+
+class StringSink {
+  has Str $.text is rw = '';
+  method print(*@args) { $!text ~= @args.join;        Nil }
+  method say(*@args)   { $!text ~= @args.join ~ "\n"; Nil }
+  method note(*@args)  { $!text ~= @args.join ~ "\n"; Nil }
+}
+
+sub scratch(Str:D $label --> IO::Path) {
+  my $dir = $*TMPDIR.add("keayl-admin-gen-$label-$*PID");
+  $dir.mkdir;
+  $dir
+}
+
+sub base-routes(IO() $root) {
+  $root.add('config').mkdir;
+  $root.add('config/routes.raku').spurt(qq:to/RAKU/);
+  use MVC::Keayl::Routing;
+
+  routes \{
+    root to => 'home#index';
+  \}
+  RAKU
+}
+
+setup-admin-db;
+
+# generate admin <Model> introspects the schema into an explicit registration
+{
+  my $root = scratch('admin');
+  my $out  = StringSink.new;
+
+  is generate-admin('Post', model => Post, root => $root, out => $out, err => StringSink.new), 0,
+    'the admin generator succeeds';
+
+  my $file = $root.add('app/admin/post.raku');
+  ok $file.e, 'the registration file is created';
+
+  my $source = $file.slurp;
+  like $source, /'MVC::Keayl::Admin.register(Post'/, 'the registration registers the model';
+  like $source, /"column('title')"/,                'a column is emitted from the schema';
+  like $source, /"field('title'"/,                   'a field is emitted from the schema';
+  like $source, /"filter('"/,                        'a filter is emitted from the schema';
+  like $source, /'permit('/,                         'permitted attributes are emitted';
+  unlike $source, /"field('id')"/,                   'the primary key is not an editable field';
+
+  ok $root.add('t/admin/post.rakutest').e,     'a parallel t/ test is generated';
+  ok $root.add('specs/admin/post-spec.raku').e, 'a parallel spec is generated';
+}
+
+# the field type follows the column type
+{
+  my $root = scratch('types');
+  generate-admin('Post', model => Post, root => $root, out => StringSink.new, err => StringSink.new);
+
+  my $source = $root.add('app/admin/post.raku').slurp;
+  like $source, /"field('body', :as<text>)"/, 'a text column becomes a text field';
+}
+
+# generate admin:install mounts the engine and writes the scaffolding
+{
+  my $root = scratch('install');
+  base-routes($root);
+  my $out = StringSink.new;
+
+  is generate-admin-install(root => $root, out => $out, err => StringSink.new), 0,
+    'the install generator succeeds';
+
+  like $root.add('config/routes.raku').slurp, /'mount MVC::Keayl::Admin.endpoint'/, 'the engine is mounted in the routes';
+  ok $root.add('config/initializers/admin.raku').e,                 'a config initializer is written';
+  like $root.add('config/initializers/admin.raku').slurp, /'configure'/, 'the initializer configures the admin';
+  ok $root.add('app/admin/dashboard.raku').e,                       'a dashboard stub is written';
+  ok $root.add('config/initializers/admin_authentication.raku').e,  'an auth stub is written';
+  ok $root.add('t/admin/install.rakutest').e,                       'a parallel t/ test is generated for install';
+  ok $root.add('specs/admin/install-spec.raku').e,                  'a parallel spec is generated for install';
+}
+
+# install does not duplicate the mount on a second run
+{
+  my $root = scratch('idempotent');
+  base-routes($root);
+
+  generate-admin-install(root => $root, out => StringSink.new, err => StringSink.new);
+  generate-admin-install(root => $root, out => StringSink.new, err => StringSink.new);
+
+  is $root.add('config/routes.raku').slurp.comb(/'mount MVC::Keayl::Admin.endpoint'/).elems, 1,
+    'a repeated install does not duplicate the mount';
+}
+
+done-testing;
