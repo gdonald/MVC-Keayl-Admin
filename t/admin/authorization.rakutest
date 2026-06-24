@@ -1,0 +1,135 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Menu;
+use MVC::Keayl::Admin::Authorization;
+use MVC::Keayl::Admin::Authorization::Policy;
+use MVC::Keayl::Admin::Authorization::Role;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+class DenyDestroy is MVC::Keayl::Admin::Authorization::Policy {
+  method allows(Str:D $action, :$admin, :$resource, :$record --> Bool) {
+    $action ne 'destroy'
+  }
+}
+
+class DenyCreate is MVC::Keayl::Admin::Authorization::Policy {
+  method allows(Str:D $action, :$admin, :$resource, :$record --> Bool) {
+    $action ne 'create'
+  }
+}
+
+class OddRecordsOnly is MVC::Keayl::Admin::Authorization::Policy {
+  method allows(Str:D $action, :$admin, :$resource, :$record --> Bool) {
+    return True without $record;
+    $record.id %% 2 ?? False !! True
+  }
+}
+
+class OnlyPublished is MVC::Keayl::Admin::Authorization::Policy {
+  method scope($relation, :$admin, :$resource) {
+    $relation.where({ published => True })
+  }
+}
+
+class HidePosts is MVC::Keayl::Admin::Authorization::Policy {
+  method allows(Str:D $action, :$admin, :$resource, :$record --> Bool) {
+    !($action eq 'index' && $resource.defined && $resource.slug eq 'posts')
+  }
+}
+
+class FakeAdmin { has $.role }
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub call(Str:D $method, Str:D $path) {
+  host.call(MVC::Keayl::Request.new(:$method, target => $path))
+}
+
+sub fresh {
+  MVC::Keayl::Admin.reset;
+  setup-admin-db;
+  register-posts;
+}
+
+# default policy allows everything
+fresh;
+ok MVC::Keayl::Admin::Authorization.allows('destroy'), 'the default policy allows every action';
+
+# a forbidden action renders a 403 page
+fresh;
+seed-posts({ title => 'Doomed' });
+MVC::Keayl::Admin.authorize-with(DenyDestroy.new);
+
+my $doomed = Post.where({ title => 'Doomed' }).first;
+my $denied = call('POST', '/admin/posts/' ~ $doomed.id ~ '/delete');
+
+is $denied.status, 403, 'a forbidden action responds with 403';
+ok $denied.body.contains('Forbidden'), 'the 403 response renders the forbidden page';
+ok Post.where({ id => $doomed.id }).first.defined, 'the forbidden action did not run';
+
+# allowed actions still pass under a restrictive policy
+is call('GET', '/admin/posts').status, 200, 'an allowed action is not blocked';
+
+# record-level authorization
+fresh;
+seed-posts({ title => 'One' }, { title => 'Two' });
+MVC::Keayl::Admin.authorize-with(OddRecordsOnly.new);
+
+my @posts = Post.all.all;
+my $odd  = @posts.first({ .id !%% 2 });
+my $even = @posts.first({ .id %% 2 });
+
+is call('GET', '/admin/posts/' ~ $odd.id).status,  200, 'a permitted record is shown';
+is call('GET', '/admin/posts/' ~ $even.id).status, 403, 'a forbidden record is a 403';
+
+# base-relation scoping restricts the visible records
+fresh;
+seed-posts({ title => 'Public', published => True }, { title => 'Private', published => False });
+MVC::Keayl::Admin.authorize-with(OnlyPublished.new);
+
+my $index = call('GET', '/admin/posts').body;
+ok  $index.contains('Public'),  'a record inside the policy scope is listed';
+nok $index.contains('Private'), 'a record outside the policy scope is hidden';
+
+my $private = Post.where({ title => 'Private' }).first;
+is call('GET', '/admin/posts/' ~ $private.id).status, 404, 'a record outside the scope cannot be reached';
+
+# buttons hidden when the policy forbids them
+fresh;
+seed-posts({ title => 'Item' });
+MVC::Keayl::Admin.authorize-with(DenyDestroy.new);
+
+my $no-delete = call('GET', '/admin/posts').body;
+nok $no-delete.contains('hx-delete'), 'the delete row action is hidden when destroy is forbidden';
+
+fresh;
+seed-posts({ title => 'Item' });
+MVC::Keayl::Admin.authorize-with(DenyCreate.new);
+
+nok call('GET', '/admin/posts').body.contains('>New Post<'), 'the new button is hidden when create is forbidden';
+
+# menu entries hidden when the policy forbids index
+fresh;
+MVC::Keayl::Admin.authorize-with(HidePosts.new);
+nok MVC::Keayl::Admin::Menu.render(mount => '/admin').contains('/admin/posts'), 'a forbidden resource is hidden from the menu';
+
+# the role-based adapter authorizes by role
+MVC::Keayl::Admin.reset;
+my $policy = MVC::Keayl::Admin::Authorization::Role.new(permissions => { editor => <index show>, super => <*> });
+
+ok  $policy.allows('index',   admin => FakeAdmin.new(role => 'editor')), 'a role allows a permitted action';
+nok $policy.allows('destroy', admin => FakeAdmin.new(role => 'editor')), 'a role denies an unlisted action';
+ok  $policy.allows('destroy', admin => FakeAdmin.new(role => 'super')),  'a wildcard role allows everything';
+nok $policy.allows('index',   admin => FakeAdmin),                       'an admin without a role is denied';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

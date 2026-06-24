@@ -38,6 +38,29 @@ class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
     );
   }
 
+  method forbidden {
+    my $mount = MVC::Keayl::Admin::Config.current.mount-path;
+
+    self.assign('admin_forbidden_body', qq:to/HTML/.trim);
+    <div class="text-center py-5">
+      <i class="bi bi-shield-lock display-1 text-muted"></i>
+      <h1 class="h3 mt-3">Forbidden</h1>
+      <p class="text-muted">You are not allowed to perform this action.</p>
+      <a class="btn btn-primary" href="$mount">Back to dashboard</a>
+    </div>
+    HTML
+
+    my $response = self.render-admin(
+      'errors/forbidden',
+      page-title  => 'Forbidden',
+      breadcrumbs => [ 'Forbidden' => Nil ],
+    );
+
+    self.response.status = 403;
+
+    $response
+  }
+
   method render-admin($template, Str :$page-title, :@breadcrumbs, *%options) {
     my $config = MVC::Keayl::Admin::Config.current;
     my $path   = self.request.defined ?? self.request.path !! '';
@@ -52,7 +75,7 @@ class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
 
     self.assign('admin_brand',       MVC::Keayl::Admin::Chrome.brand-html);
     my $active-slug = $path.split('/').grep(*.chars).head // '';
-    self.assign('admin_menu',        MVC::Keayl::Admin::Menu.render(mount => $config.mount-path, :$active-slug));
+    self.assign('admin_menu',        MVC::Keayl::Admin::Menu.render(mount => $config.mount-path, :$active-slug, admin => $!current-admin));
     self.assign('admin_breadcrumbs', MVC::Keayl::Admin::Chrome.breadcrumbs-html(@breadcrumbs));
 
     self.assign('current_admin', $!current-admin);

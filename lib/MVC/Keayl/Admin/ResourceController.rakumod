@@ -12,6 +12,8 @@ use MVC::Keayl::Admin::Attachments;
 use MVC::Keayl::Admin::Predicate;
 use MVC::Keayl::Admin::Formatter;
 use MVC::Keayl::Admin::Inflection;
+use MVC::Keayl::Admin::Authorization;
+use MVC::Keayl::Admin::Authorization::Abilities;
 
 unit class MVC::Keayl::Admin::ResourceController is MVC::Keayl::Admin::Controller;
 
@@ -67,15 +69,20 @@ sub strong-params($resource, %params) {
   %attrs
 }
 
-sub batch-toolbar($base, $resource --> Str) {
-  my @names   = ('Destroy', |$resource.batch-actions.map(*.name));
+sub batch-toolbar($base, $resource, $abilities --> Str) {
+  my @names = ();
+  @names.push('Destroy') if $abilities.can('destroy');
+  @names.append: $resource.batch-actions.map(*.name).grep({ $abilities.can($_) });
+
+  return '' unless @names;
+
   my $options = @names.map({ qq[<option value="{html-escape($_)}">{html-escape($_)}</option>] }).join;
 
   qq[<div class="d-flex gap-2 mb-2 align-items-center"><select class="form-select form-select-sm w-auto" name="batch-action">{$options}</select><button type="submit" class="btn btn-outline-secondary btn-sm">Apply to <span data-batch-count>0</span> selected</button></div>]
 }
 
-sub batch-form($base, $resource, Str:D $table, Str:D $pager --> Str) {
-  qq[<form method="post" action="{html-escape($base ~ '/batch')}">{batch-toolbar($base, $resource)}{$table}{$pager}</form>]
+sub batch-form($base, $resource, Str:D $table, Str:D $pager, :$abilities --> Str) {
+  qq[<form method="post" action="{html-escape($base ~ '/batch')}">{batch-toolbar($base, $resource, $abilities)}{$table}{$pager}</form>]
 }
 
 sub resolve-scope($resource, %params) {
@@ -124,6 +131,42 @@ method current-resource {
   MVC::Keayl::Admin::Registry.current.by-slug($slug)
 }
 
+method action-ability {
+  given self.current-action {
+    when 'index'                                     { 'index' }
+    when 'show'                                      { 'show' }
+    when 'new-record' | 'create'                     { 'create' }
+    when 'edit' | 'update'                           { 'update' }
+    when 'destroy' | 'apply-batch'                   { 'destroy' }
+    when 'run-member-action' | 'run-collection-action' {
+      self.request.path.split('/').grep(*.chars).tail
+    }
+    default                                          { $_ }
+  }
+}
+
+method authorize-action {
+  my $resource = self.current-resource;
+
+  return without $resource;
+
+  return if MVC::Keayl::Admin::Authorization.allows(self.action-ability, admin => self.current-admin, :$resource);
+
+  self.forbidden;
+}
+
+method abilities-for($resource) {
+  MVC::Keayl::Admin::Authorization::Abilities.new(admin => self.current-admin, :$resource)
+}
+
+method policy-scope($resource, $relation) {
+  MVC::Keayl::Admin::Authorization.scope($relation, admin => self.current-admin, :$resource)
+}
+
+method !authorize-record(Str:D $ability, $resource, $record --> Bool) {
+  MVC::Keayl::Admin::Authorization.allows($ability, admin => self.current-admin, :$resource, :$record)
+}
+
 method index {
   my $resource = self.current-resource;
   my $mount    = MVC::Keayl::Admin::Config.current.mount-path;
@@ -143,8 +186,10 @@ method index {
   my %carry = %filters;
   %carry<scope> = $scope-name if $scope-name.defined;
 
-  my $total    = apply-filters($resource, apply-scope($scope, $resource.model.all), %params).count;
-  my $relation = apply-filters($resource, apply-scope($scope, $resource.model.all), %params);
+  my $visible  = self.policy-scope($resource, $resource.model.all);
+
+  my $total    = apply-filters($resource, apply-scope($scope, $visible), %params).count;
+  my $relation = apply-filters($resource, apply-scope($scope, $visible), %params);
 
   if $sort.defined && $resource.columns.first({ .name eq $sort && .sortable }) {
     $relation = $relation.order($sort ~ ($dir eq 'desc' ?? ' DESC' !! ' ASC'));
@@ -155,20 +200,22 @@ method index {
   my %counts;
   if $resource.scope-counts {
     for $resource.scopes -> $each {
-      %counts{$each.name} = apply-filters($resource, apply-scope($each, $resource.model.all), %params).count;
+      %counts{$each.name} = apply-filters($resource, apply-scope($each, $visible), %params).count;
     }
   }
 
+  my $abilities = self.abilities-for($resource);
+
   my $tabs  = MVC::Keayl::Admin::Scopes.render($resource, :active($scope), :$base, :%filters, :$sort, :$dir, :%counts);
   my $chips = MVC::Keayl::Admin::FilterPanel.chips($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, scope => $scope-name);
-  my $table = MVC::Keayl::Admin::Table.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry, :batch);
+  my $table = MVC::Keayl::Admin::Table.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry, :batch, :$abilities);
   my $pager = MVC::Keayl::Admin::Pagination.render(:$base, :$page, :$per, :$total, :$sort, :$dir, filters => %carry);
 
-  my $body = $tabs ~ $chips ~ batch-form($base, $resource, $table, $pager);
+  my $body = $tabs ~ $chips ~ batch-form($base, $resource, $table, $pager, :$abilities);
 
   return self.render(:html($body)) if self.request.header('HX-Request');
 
-  my $collection-actions = $resource.collection-actions.map(-> $action {
+  my $collection-actions = $resource.collection-actions.grep({ $abilities.can(.name) }).map(-> $action {
     my $url     = html-escape($base ~ '/' ~ $action.name);
     my $label   = html-escape(humanize($action.name));
     my $confirm = $action.confirm.defined ?? qq[ onsubmit="return confirm('{html-escape($action.confirm)}')"] !! '';
@@ -176,9 +223,12 @@ method index {
     qq[<form method="post" action="$url"{$confirm} class="d-inline"><button type="submit" class="btn btn-outline-secondary">{$label}</button></form>]
   }).join;
 
+  my $new-link = $abilities.can('create')
+    ?? qq[<a class="btn btn-primary ms-2" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>New {html-escape($resource.singular-name)}</a>]
+    !! '';
+
   self.assign('admin_index_body', $body);
-  self.assign('admin_new_link',
-    $collection-actions ~ qq[<a class="btn btn-primary ms-2" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>New {html-escape($resource.singular-name)}</a>]);
+  self.assign('admin_new_link', $collection-actions ~ $new-link);
   self.assign('admin_filters_panel', self.filters-panel($resource, %params, :$base, :$sort, :$dir, scope => $scope-name));
 
   self.render-admin(
@@ -220,6 +270,7 @@ method run-member-action {
   my $record   = self!find-record($resource);
 
   return self.head(404) without $record;
+  return self.forbidden unless self!authorize-record($name, $resource, $record);
 
   with $resource.member-actions.first({ .name eq $name }) -> $action {
     return $action.block.(self, $record);
@@ -244,6 +295,7 @@ method destroy {
   my $record   = self!find-record($resource);
 
   return self.head(404) without $record;
+  return self.forbidden unless self!authorize-record('destroy', $resource, $record);
 
   my $index = MVC::Keayl::Admin::Config.current.mount-path ~ '/' ~ $resource.slug;
 
@@ -261,7 +313,7 @@ method destroy {
 method !find-record($resource) {
   my $id = (self.params<id> // '').Str;
 
-  $id ~~ /^ \d+ $/ ?? $resource.model.where({ id => $id.Int }).first !! Nil
+  $id ~~ /^ \d+ $/ ?? self.policy-scope($resource, $resource.model.all).where({ id => $id.Int }).first !! Nil
 }
 
 # The route action is `new`, but `new` is the object constructor and a reserved
@@ -299,6 +351,7 @@ method edit {
   my $record   = self!find-record($resource);
 
   return self.head(404) without $record;
+  return self.forbidden unless self!authorize-record('update', $resource, $record);
 
   my $mount = MVC::Keayl::Admin::Config.current.mount-path;
   my $base  = $mount ~ '/' ~ $resource.slug;
@@ -312,6 +365,7 @@ method update {
   my $record   = self!find-record($resource);
 
   return self.head(404) without $record;
+  return self.forbidden unless self!authorize-record('update', $resource, $record);
 
   my $mount = MVC::Keayl::Admin::Config.current.mount-path;
   my $base  = $mount ~ '/' ~ $resource.slug;
@@ -343,13 +397,16 @@ method show {
   my $record   = self!find-record($resource);
 
   return self.head(404) without $record;
+  return self.forbidden unless self!authorize-record('show', $resource, $record);
 
   my $mount = MVC::Keayl::Admin::Config.current.mount-path;
   my $base  = $mount ~ '/' ~ $resource.slug;
   my $title = $resource.singular-name ~ ' #' ~ $record.id;
 
+  my $abilities = self.abilities-for($resource);
+
   self.assign('admin_show_body',    MVC::Keayl::Admin::Show.render($resource, $record, mount-path => $mount));
-  self.assign('admin_show_actions', MVC::Keayl::Admin::Show.actions($resource, $record, mount-path => $mount));
+  self.assign('admin_show_actions', MVC::Keayl::Admin::Show.actions($resource, $record, mount-path => $mount, :$abilities));
 
   self.render-admin(
     'resource/show',
@@ -371,3 +428,5 @@ method filters-panel($resource, %params, Str:D :$base, :$sort, :$dir, :$scope --
   </div>
   HTML
 }
+
+MVC::Keayl::Admin::ResourceController.before-action('authorize-action');

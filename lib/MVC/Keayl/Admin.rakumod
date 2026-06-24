@@ -9,6 +9,7 @@ use MVC::Keayl::Admin::Assets;
 use MVC::Keayl::Admin::Menu;
 use MVC::Keayl::Admin::Dashboard;
 use MVC::Keayl::Admin::Authentication;
+use MVC::Keayl::Admin::Authorization;
 use MVC::Keayl::Admin::DashboardController;
 use MVC::Keayl::Admin::AssetsController;
 use MVC::Keayl::Admin::ResourceController;
@@ -55,6 +56,10 @@ method use-stylesheet(::?CLASS:U: Str:D $url --> Nil) {
 
 method authenticate-with(::?CLASS:U: $strategy --> Nil) {
   MVC::Keayl::Admin::Authentication.use-strategy($strategy);
+}
+
+method authorize-with(::?CLASS:U: $policy --> Nil) {
+  MVC::Keayl::Admin::Authorization.use-policy($policy);
 }
 
 method menu-link(::?CLASS:U: |args --> Nil) {
@@ -136,4 +141,5 @@ method reset(::?CLASS:U: --> Nil) {
   MVC::Keayl::Admin::Menu.reset;
   MVC::Keayl::Admin::Dashboard.reset;
   MVC::Keayl::Admin::Authentication.reset;
+  MVC::Keayl::Admin::Authorization.reset;
 }

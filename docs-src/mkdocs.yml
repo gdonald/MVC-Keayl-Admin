@@ -13,6 +13,7 @@ nav:
   - Forms: forms.md
   - Actions: actions.md
   - Navigation: navigation.md
+  - Authorization: authorization.md
   - Assets: assets.md
   - Authentication: authentication.md
 theme:

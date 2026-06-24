@@ -1,7 +1,7 @@
 use v6.d;
 use Test;
 
-plan 40;
+plan 44;
 
 use-ok 'MVC::Keayl::Admin';
 use-ok 'MVC::Keayl::Admin::Assets';
@@ -11,6 +11,10 @@ use-ok 'MVC::Keayl::Admin::Attribute';
 use-ok 'MVC::Keayl::Admin::Authentication';
 use-ok 'MVC::Keayl::Admin::Authentication::Basic';
 use-ok 'MVC::Keayl::Admin::Authentication::Session';
+use-ok 'MVC::Keayl::Admin::Authorization';
+use-ok 'MVC::Keayl::Admin::Authorization::Policy';
+use-ok 'MVC::Keayl::Admin::Authorization::Abilities';
+use-ok 'MVC::Keayl::Admin::Authorization::Role';
 use-ok 'MVC::Keayl::Admin::BatchAction';
 use-ok 'MVC::Keayl::Admin::Chrome';
 use-ok 'MVC::Keayl::Admin::Column';

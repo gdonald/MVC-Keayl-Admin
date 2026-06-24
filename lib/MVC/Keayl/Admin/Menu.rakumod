@@ -2,6 +2,7 @@ use v6.d;
 use MVC::Keayl::Admin::Formatter;
 use MVC::Keayl::Admin::Inflection;
 use MVC::Keayl::Admin::Registry;
+use MVC::Keayl::Admin::Authorization;
 
 unit class MVC::Keayl::Admin::Menu;
 
@@ -47,7 +48,7 @@ sub group-html(Str:D $name, @items --> Str) {
   HTML
 }
 
-method render(::?CLASS:U: Str:D :$mount, Str:D :$active-slug = '' --> Str) {
+method render(::?CLASS:U: Str:D :$mount, Str:D :$active-slug = '', :$admin --> Str) {
   my @items;
 
   @items.push: %( label => 'Dashboard', url => $mount, icon => 'speedometer2', priority => -1, group => Str, external => False, active => ($active-slug eq '') );
@@ -56,6 +57,7 @@ method render(::?CLASS:U: Str:D :$mount, Str:D :$active-slug = '' --> Str) {
     my $entry = $resource.menu-entry;
 
     next if $entry.defined && $entry.hide;
+    next unless MVC::Keayl::Admin::Authorization.allows('index', :$admin, :$resource);
 
     @items.push: %(
       label    => ($entry.defined && $entry.label.defined) ?? $entry.label !! $resource.plural-name,

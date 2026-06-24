@@ -38,20 +38,23 @@ sub cell-html($column, $record, Str:D $base --> Str) {
   html-escape(format-value($value, $column.format))
 }
 
-sub row-actions(Str:D $base, $id --> Str) {
+sub allowed($abilities, Str:D $action --> Bool) {
+  !$abilities.defined || $abilities.can($action)
+}
+
+sub row-actions(Str:D $base, $id, $abilities --> Str) {
   my $show = html-escape($base ~ '/' ~ $id);
   my $edit = html-escape($base ~ '/' ~ $id ~ '/edit');
 
-  qq:to/HTML/.trim;
-  <div class="btn-group btn-group-sm" role="group">
-    <a class="btn btn-outline-secondary" href="$show">Show</a>
-    <a class="btn btn-outline-secondary" href="$edit">Edit</a>
-    <button type="button" class="btn btn-outline-danger" hx-delete="$show" hx-confirm="Delete this record?" hx-target="closest tr" hx-swap="delete">Delete</button>
-  </div>
-  HTML
+  my $buttons = '';
+  $buttons ~= qq[<a class="btn btn-outline-secondary" href="$show">Show</a>]     if allowed($abilities, 'show');
+  $buttons ~= qq[<a class="btn btn-outline-secondary" href="$edit">Edit</a>]     if allowed($abilities, 'update');
+  $buttons ~= qq[<button type="button" class="btn btn-outline-danger" hx-delete="$show" hx-confirm="Delete this record?" hx-target="closest tr" hx-swap="delete">Delete</button>] if allowed($abilities, 'destroy');
+
+  qq[<div class="btn-group btn-group-sm" role="group">{$buttons}</div>]
 }
 
-method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters, Bool :$batch = False --> Str) {
+method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters, Bool :$batch = False, :$abilities --> Str) {
   my @columns = $resource.columns;
   my $base    = $mount-path ~ '/' ~ $resource.slug;
 
@@ -70,7 +73,7 @@ method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir
         !! '';
       my $cells = @columns.map({ '<td>' ~ cell-html($_, $record, $base) ~ '</td>' }).join;
 
-      qq[<tr>{$select}{$cells}<td class="text-end">{row-actions($base, $record.id)}</td></tr>]
+      qq[<tr>{$select}{$cells}<td class="text-end">{row-actions($base, $record.id, $abilities)}</td></tr>]
     }).join;
   } else {
     my $span = @columns.elems + 1 + ($batch ?? 1 !! 0);

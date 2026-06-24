@@ -76,20 +76,24 @@ sub member-action-form($action, Str:D $base, $record --> Str) {
   qq[<form method="post" action="$url"{$confirm}><button type="submit" class="list-group-item list-group-item-action w-100 text-start">{$label}</button></form>]
 }
 
-method actions(::?CLASS:U: $resource, $record, Str:D :$mount-path --> Str) {
+sub allowed($abilities, Str:D $action --> Bool) {
+  !$abilities.defined || $abilities.can($action)
+}
+
+method actions(::?CLASS:U: $resource, $record, Str:D :$mount-path, :$abilities --> Str) {
   my $base   = $mount-path ~ '/' ~ $resource.slug;
   my $edit   = html-escape($base ~ '/' ~ $record.id ~ '/edit');
   my $delete = html-escape($base ~ '/' ~ $record.id ~ '/delete');
 
-  my $custom = $resource.member-actions.map({ member-action-form($_, $base, $record) }).join;
+  my $items = '';
 
-  qq:to/HTML/.trim;
-  <div class="list-group">
-    <a class="list-group-item list-group-item-action" href="$edit"><i class="bi bi-pencil me-2"></i>Edit</a>
-    {$custom}
-    <form method="post" action="$delete" onsubmit="return confirm('Delete this record?')">
-      <button type="submit" class="list-group-item list-group-item-action text-danger w-100 text-start"><i class="bi bi-trash me-2"></i>Delete</button>
-    </form>
-  </div>
-  HTML
+  $items ~= qq[<a class="list-group-item list-group-item-action" href="$edit"><i class="bi bi-pencil me-2"></i>Edit</a>]
+    if allowed($abilities, 'update');
+
+  $items ~= $resource.member-actions.grep({ allowed($abilities, .name) }).map({ member-action-form($_, $base, $record) }).join;
+
+  $items ~= qq[<form method="post" action="$delete" onsubmit="return confirm('Delete this record?')"><button type="submit" class="list-group-item list-group-item-action text-danger w-100 text-start"><i class="bi bi-trash me-2"></i>Delete</button></form>]
+    if allowed($abilities, 'destroy');
+
+  qq[<div class="list-group">{$items}</div>]
 }
