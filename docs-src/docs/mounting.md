@@ -43,8 +43,7 @@ per-request admin context.
 
 Every admin controller derives from `MVC::Keayl::Admin::Controller`, which runs
 a `before-action` that builds a per-request admin context. The context holds the
-site title and the current request path, and later phases extend it with the
-current resource and action.
+site title, the mount path, and the current request path.
 
 ```raku
 self.admin-context<site-title>;

@@ -27,9 +27,11 @@ page, so a title column can double as the row's primary link.
 ## Rows and actions
 
 Every row ends in an actions column with Show, Edit, and Delete controls. Delete
-is wired for HTMX (the destroy flow lands in a later phase). When a resource has
-no records, the table shows an empty state instead of rows, and the page carries
-a New-record button linking to the new form.
+issues an HTMX destroy with a confirmation and removes the row in place; see
+[Destroy, batch, and custom actions](actions.md). When a resource has no records,
+the table shows an empty state instead of rows, and the page carries a New-record
+button linking to the new form. Row controls are hidden when the authorization
+policy forbids the action, and the export and batch toolbars sit above the table.
 
 ## Sorting
 
@@ -46,7 +48,7 @@ The index applies `LIMIT` and `OFFSET` for the current page. The page size
 defaults to 25 and is configurable per resource:
 
 ```raku
-Keayl::Admin.register(Post, { ... }, per-page => 50);
+MVC::Keayl::Admin.register(Post, { ... }, per-page => 50);
 ```
 
 A pagination control renders below the table with a page summary

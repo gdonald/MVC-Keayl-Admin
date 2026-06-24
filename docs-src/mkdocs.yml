@@ -19,6 +19,7 @@ nav:
   - Assets: assets.md
   - Authentication: authentication.md
   - Worked example: example.md
+  - Configuration reference: reference.md
 theme:
   name: 'material'
 markdown_extensions:

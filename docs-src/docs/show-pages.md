@@ -16,9 +16,10 @@ column and run through the named `:format`.
 
 ## Action panel
 
-A sidebar panel holds the per-record actions: Edit (links to the edit form) and
-Delete (an HTMX destroy with a confirmation). Custom member actions join this
-panel in a later phase.
+A sidebar panel holds the per-record actions: Edit (links to the edit form),
+Delete (a destroying form with a confirmation), and any custom member actions
+declared for the resource. Each control is hidden when the authorization policy
+forbids it. See [Destroy, batch, and custom actions](actions.md).
 
 ## Associations
 

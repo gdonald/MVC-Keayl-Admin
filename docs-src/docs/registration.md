@@ -7,7 +7,7 @@ model is stated explicitly. Nothing is inferred at request time.
 use MVC::Keayl::Admin;
 use MVC::Keayl::Admin::DSL;
 
-Keayl::Admin.register(Post, {
+MVC::Keayl::Admin.register(Post, {
   menu(:group<Content>, :label<Posts>, :priority(10), :icon<file-text>);
 
   scope('All', :default);
@@ -37,15 +37,42 @@ Keayl::Admin.register(Post, {
 The declaration vocabulary comes from `MVC::Keayl::Admin::DSL`. Each call records
 a declaration on the resource config:
 
-| Declaration | Records                                                        |
-| ----------- | ------------------------------------------------------------- |
-| `column`    | an index column (`:sortable`, `:display`, `:format`)          |
-| `attribute` | a show-page row (`:display`, `:format`)                       |
-| `field`     | a form input (`:as`, `:collection`, `:hint`, `:placeholder`)  |
-| `filter`    | a search control (`:as`, `:predicate`, `:collection`)         |
-| `scope`     | a named scope, one markable `:default`                        |
-| `permit`    | the strong-params allowlist                                   |
-| `menu`      | the sidebar entry (`:group`, `:label`, `:priority`, `:icon`)  |
+| Declaration          | Records                                                                   | Detail |
+| -------------------- | ------------------------------------------------------------------------- | ------ |
+| `column`             | an index column (`:sortable`, `:display`, `:format`)                      | [Index pages](index-pages.md) |
+| `attribute`          | a show-page row (`:display`, `:format`)                                   | [Show pages](show-pages.md) |
+| `field`              | a form input (`:as`, `:collection`, `:hint`, `:placeholder`, `:multiple`) | [Forms](forms.md) |
+| `filter`             | a search control (`:as`, `:predicate`, `:collection`)                     | [Filters](filters.md) |
+| `scope`              | a named scope, one markable `:default`                                    | [Scopes](scopes.md) |
+| `permit`             | the strong-params allowlist                                               | [Forms](forms.md) |
+| `nested`             | a nested association form (`:multiple`)                                   | [Forms](forms.md) |
+| `batch-action`       | a bulk operation over selected records                                    | [Actions](actions.md) |
+| `member-action`      | a per-record action (`:confirm`)                                          | [Actions](actions.md) |
+| `collection-action`  | a whole-collection action (`:confirm`)                                    | [Actions](actions.md) |
+| `menu`               | the sidebar entry (`:group`, `:label`, `:priority`, `:icon`, `:hide`)     | [Navigation](navigation.md) |
+
+## Resource options
+
+`register` takes a block of declarations plus named options that tune the
+resource as a whole:
+
+| Option          | Default              | Purpose                                                       |
+| --------------- | -------------------- | ------------------------------------------------------------- |
+| `slug`          | dasherized plural    | The URL segment for the resource.                             |
+| `singular`      | humanized model name | The singular human name.                                      |
+| `plural`        | pluralized singular  | The plural human name.                                        |
+| `per-page`      | `25`                 | Index page size ([Index pages](index-pages.md)).              |
+| `scope-counts`  | `True`               | Whether scope tabs show counts ([Scopes](scopes.md)).         |
+
+```raku
+MVC::Keayl::Admin.register(Post, { ... },
+  slug         => 'articles',
+  singular     => 'Article',
+  plural       => 'Articles',
+  per-page     => 50,
+  scope-counts => False,
+);
+```
 
 ## Validation
 
@@ -58,11 +85,9 @@ rather than failing later on a request.
 Each resource derives a URL slug, a singular human name, and a plural human name
 from the model. The slug is the dasherized plural (`BlogPost` becomes
 `blog-posts`). The human names resolve through I18n, falling back to a humanized
-form of the model name. Override any of them on `register`:
-
-```raku
-Keayl::Admin.register(Post, { ... }, slug => 'articles', singular => 'Article', plural => 'Articles');
-```
+form of the model name, and translation keys localize them (see
+[Customization](customization.md)). Override any of them with the `slug`,
+`singular`, and `plural` options above.
 
 The registry indexes resources by model and by slug, with `by-model`, `by-slug`,
 and an `all` listing in registration order.
@@ -74,8 +99,8 @@ edit, update, destroy) under the engine. `path-for` builds the mount-prefixed UR
 for any resource action, usable from controllers and views:
 
 ```raku
-Keayl::Admin.path-for('posts');           # /admin/posts
-Keayl::Admin.path-for('post', 5);         # /admin/posts/5
-Keayl::Admin.path-for('edit-post', 5);    # /admin/posts/5/edit
-Keayl::Admin.path-for('new-post');        # /admin/posts/new
+MVC::Keayl::Admin.path-for('posts');           # /admin/posts
+MVC::Keayl::Admin.path-for('post', 5);         # /admin/posts/5
+MVC::Keayl::Admin.path-for('edit-post', 5);    # /admin/posts/5/edit
+MVC::Keayl::Admin.path-for('new-post');        # /admin/posts/new
 ```

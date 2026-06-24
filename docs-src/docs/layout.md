@@ -38,4 +38,3 @@ supplied by the layout, so a page template only renders its own content.
 
 The base controller runs a `before-action` that builds a per-request context
 available as `admin-context` (site title, mount path, and the current path).
-Later phases extend it with the current resource and action.

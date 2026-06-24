@@ -33,5 +33,5 @@ current filters) through a count query. For an expensive data set, suppress the
 counts per resource:
 
 ```raku
-Keayl::Admin.register(Post, { ... }, scope-counts => False);
+MVC::Keayl::Admin.register(Post, { ... }, scope-counts => False);
 ```
