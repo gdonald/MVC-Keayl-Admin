@@ -363,6 +363,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#resource-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#validation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -754,6 +765,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -779,6 +817,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#resource-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource options
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#validation" class="md-nav__link">
@@ -866,7 +915,7 @@ model is stated explicitly. Nothing is inferred at request time.</p>
 <span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin</span>;
 <span class="k">use</span> <span class="n">MVC::Keayl::Admin::DSL</span>;
 
-<span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, {
+<span class="n">MVC::Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, {
   <span class="n">menu</span>(:<span class="n">group</span><span class="s">&lt;Content&gt;</span>, :<span class="n">label</span><span class="s">&lt;Posts&gt;</span>, :<span class="n">priority</span>(<span class="mi">10</span>), :<span class="n">icon</span><span class="s">&lt;file-text&gt;</span>);
 
   <span class="nb">scope</span>(<span class="s">&#39;All&#39;</span>, :<span class="n">default</span>);
@@ -899,39 +948,120 @@ a declaration on the resource config:</p>
 <tr>
 <th>Declaration</th>
 <th>Records</th>
+<th>Detail</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>column</code></td>
 <td>an index column (<code>:sortable</code>, <code>:display</code>, <code>:format</code>)</td>
+<td><a href="../index-pages/">Index pages</a></td>
 </tr>
 <tr>
 <td><code>attribute</code></td>
 <td>a show-page row (<code>:display</code>, <code>:format</code>)</td>
+<td><a href="../show-pages/">Show pages</a></td>
 </tr>
 <tr>
 <td><code>field</code></td>
-<td>a form input (<code>:as</code>, <code>:collection</code>, <code>:hint</code>, <code>:placeholder</code>)</td>
+<td>a form input (<code>:as</code>, <code>:collection</code>, <code>:hint</code>, <code>:placeholder</code>, <code>:multiple</code>)</td>
+<td><a href="../forms/">Forms</a></td>
 </tr>
 <tr>
 <td><code>filter</code></td>
 <td>a search control (<code>:as</code>, <code>:predicate</code>, <code>:collection</code>)</td>
+<td><a href="../filters/">Filters</a></td>
 </tr>
 <tr>
 <td><code>scope</code></td>
 <td>a named scope, one markable <code>:default</code></td>
+<td><a href="../scopes/">Scopes</a></td>
 </tr>
 <tr>
 <td><code>permit</code></td>
 <td>the strong-params allowlist</td>
+<td><a href="../forms/">Forms</a></td>
+</tr>
+<tr>
+<td><code>nested</code></td>
+<td>a nested association form (<code>:multiple</code>)</td>
+<td><a href="../forms/">Forms</a></td>
+</tr>
+<tr>
+<td><code>batch-action</code></td>
+<td>a bulk operation over selected records</td>
+<td><a href="../actions/">Actions</a></td>
+</tr>
+<tr>
+<td><code>member-action</code></td>
+<td>a per-record action (<code>:confirm</code>)</td>
+<td><a href="../actions/">Actions</a></td>
+</tr>
+<tr>
+<td><code>collection-action</code></td>
+<td>a whole-collection action (<code>:confirm</code>)</td>
+<td><a href="../actions/">Actions</a></td>
 </tr>
 <tr>
 <td><code>menu</code></td>
-<td>the sidebar entry (<code>:group</code>, <code>:label</code>, <code>:priority</code>, <code>:icon</code>)</td>
+<td>the sidebar entry (<code>:group</code>, <code>:label</code>, <code>:priority</code>, <code>:icon</code>, <code>:hide</code>)</td>
+<td><a href="../navigation/">Navigation</a></td>
 </tr>
 </tbody>
 </table>
+<h2 id="resource-options">Resource options<a class="headerlink" href="#resource-options" title="Permanent link">&para;</a></h2>
+<p><code>register</code> takes a block of declarations plus named options that tune the
+resource as a whole:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>slug</code></td>
+<td>dasherized plural</td>
+<td>The URL segment for the resource.</td>
+</tr>
+<tr>
+<td><code>singular</code></td>
+<td>humanized model name</td>
+<td>The singular human name.</td>
+</tr>
+<tr>
+<td><code>plural</code></td>
+<td>pluralized singular</td>
+<td>The plural human name.</td>
+</tr>
+<tr>
+<td><code>per-page</code></td>
+<td><code>25</code></td>
+<td>Index page size (<a href="../index-pages/">Index pages</a>).</td>
+</tr>
+<tr>
+<td><code>scope-counts</code></td>
+<td><code>True</code></td>
+<td>Whether scope tabs show counts (<a href="../scopes/">Scopes</a>).</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... },
+  <span class="n">slug</span>         =&gt; <span class="s">&#39;articles&#39;</span>,
+  <span class="n">singular</span>     =&gt; <span class="s">&#39;Article&#39;</span>,
+  <span class="n">plural</span>       =&gt; <span class="s">&#39;Articles&#39;</span>,
+  <span class="n">per-page</span>     =&gt; <span class="mi">50</span>,
+  <span class="n">scope-counts</span> =&gt; <span class="nb">False</span>,
+);
+</code></pre></div></td></tr></table></div>
 <h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
 <p>Declarations are validated when <code>register</code> runs. An unknown option, an unknown
 <code>field</code>/<code>filter</code> type, or a malformed declaration raises at registration time
@@ -940,9 +1070,9 @@ rather than failing later on a request.</p>
 <p>Each resource derives a URL slug, a singular human name, and a plural human name
 from the model. The slug is the dasherized plural (<code>BlogPost</code> becomes
 <code>blog-posts</code>). The human names resolve through I18n, falling back to a humanized
-form of the model name. Override any of them on <code>register</code>:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... }, <span class="n">slug</span> =&gt; <span class="s">&#39;articles&#39;</span>, <span class="n">singular</span> =&gt; <span class="s">&#39;Article&#39;</span>, <span class="n">plural</span> =&gt; <span class="s">&#39;Articles&#39;</span>);
-</code></pre></div></td></tr></table></div>
+form of the model name, and translation keys localize them (see
+<a href="../customization/">Customization</a>). Override any of them with the <code>slug</code>,
+<code>singular</code>, and <code>plural</code> options above.</p>
 <p>The registry indexes resources by model and by slug, with <code>by-model</code>, <code>by-slug</code>,
 and an <code>all</code> listing in registration order.</p>
 <h2 id="routes-and-url-helpers">Routes and URL helpers<a class="headerlink" href="#routes-and-url-helpers" title="Permanent link">&para;</a></h2>
@@ -952,10 +1082,10 @@ for any resource action, usable from controllers and views:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;posts&#39;</span>);           <span class="c1"># /admin/posts</span>
-<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;post&#39;</span>, <span class="mi">5</span>);         <span class="c1"># /admin/posts/5</span>
-<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;edit-post&#39;</span>, <span class="mi">5</span>);    <span class="c1"># /admin/posts/5/edit</span>
-<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;new-post&#39;</span>);        <span class="c1"># /admin/posts/new</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;posts&#39;</span>);           <span class="c1"># /admin/posts</span>
+<span class="n">MVC::Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;post&#39;</span>, <span class="mi">5</span>);         <span class="c1"># /admin/posts/5</span>
+<span class="n">MVC::Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;edit-post&#39;</span>, <span class="mi">5</span>);    <span class="c1"># /admin/posts/5/edit</span>
+<span class="n">MVC::Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;new-post&#39;</span>);        <span class="c1"># /admin/posts/new</span>
 </code></pre></div></td></tr></table></div>
 
 

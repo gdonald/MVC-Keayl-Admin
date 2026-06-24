@@ -787,6 +787,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -921,9 +948,11 @@ renders the date portion, and so on.</p>
 page, so a title column can double as the row's primary link.</p>
 <h2 id="rows-and-actions">Rows and actions<a class="headerlink" href="#rows-and-actions" title="Permanent link">&para;</a></h2>
 <p>Every row ends in an actions column with Show, Edit, and Delete controls. Delete
-is wired for HTMX (the destroy flow lands in a later phase). When a resource has
-no records, the table shows an empty state instead of rows, and the page carries
-a New-record button linking to the new form.</p>
+issues an HTMX destroy with a confirmation and removes the row in place; see
+<a href="../actions/">Destroy, batch, and custom actions</a>. When a resource has no records,
+the table shows an empty state instead of rows, and the page carries a New-record
+button linking to the new form. Row controls are hidden when the authorization
+policy forbids the action, and the export and batch toolbars sit above the table.</p>
 <h2 id="sorting">Sorting<a class="headerlink" href="#sorting" title="Permanent link">&para;</a></h2>
 <p>A column declared <code>:sortable</code> renders its header as a link. Clicking it sorts the
 index by that column, adding an <code>ORDER BY</code> to the relation. The sort column and
@@ -934,7 +963,7 @@ from arbitrary input.</p>
 <h2 id="pagination">Pagination<a class="headerlink" href="#pagination" title="Permanent link">&para;</a></h2>
 <p>The index applies <code>LIMIT</code> and <code>OFFSET</code> for the current page. The page size
 defaults to 25 and is configurable per resource:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... }, <span class="n">per-page</span> =&gt; <span class="mi">50</span>);
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... }, <span class="n">per-page</span> =&gt; <span class="mi">50</span>);
 </code></pre></div></td></tr></table></div>
 <p>A pagination control renders below the table with a page summary
 (<code>Showing 1–25 of 218</code>) and page links. The links carry the current sort state

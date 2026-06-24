@@ -743,6 +743,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -867,8 +894,7 @@ per-request admin context.</p>
 <h2 id="the-admin-context">The admin context<a class="headerlink" href="#the-admin-context" title="Permanent link">&para;</a></h2>
 <p>Every admin controller derives from <code>MVC::Keayl::Admin::Controller</code>, which runs
 a <code>before-action</code> that builds a per-request admin context. The context holds the
-site title and the current request path, and later phases extend it with the
-current resource and action.</p>
+site title, the mount path, and the current request path.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">self</span>.<span class="n">admin-context</span><span class="s">&lt;site-title&gt;</span>;
 <span class="nb">self</span>.<span class="n">admin-context</span><span class="s">&lt;path&gt;</span>;

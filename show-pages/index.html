@@ -743,6 +743,33 @@
   
 
     
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -826,9 +853,10 @@ same way in both places.</p>
 <p>A <code>:display</code> block computes the row value; otherwise the value is read from the
 column and run through the named <code>:format</code>.</p>
 <h2 id="action-panel">Action panel<a class="headerlink" href="#action-panel" title="Permanent link">&para;</a></h2>
-<p>A sidebar panel holds the per-record actions: Edit (links to the edit form) and
-Delete (an HTMX destroy with a confirmation). Custom member actions join this
-panel in a later phase.</p>
+<p>A sidebar panel holds the per-record actions: Edit (links to the edit form),
+Delete (a destroying form with a confirmation), and any custom member actions
+declared for the resource. Each control is hidden when the authorization policy
+forbids it. See <a href="../actions/">Destroy, batch, and custom actions</a>.</p>
 <h2 id="associations">Associations<a class="headerlink" href="#associations" title="Permanent link">&para;</a></h2>
 <p>When an attribute names an association, the show page renders it from the
 relationship rather than as a column:</p>
