@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/registration/">
+        <link rel="canonical" href="https://gdonald.github.io/MVC-Keayl-Admin/authorization/">
       
       
-        <link rel="prev" href="../mounting/">
+        <link rel="prev" href="../navigation/">
       
       
-        <link rel="next" href="../index-pages/">
+        <link rel="next" href="../assets/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Registering resources - MVC::Keayl::Admin</title>
+        <title>Authorization - MVC::Keayl::Admin</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#registering-resources" class="md-skip">
+        <a href="#authorization" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Registering resources
+              Authorization
             
           </span>
         </div>
@@ -273,37 +273,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Registering resources
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../registration/" class="md-nav__link">
         
   
   
@@ -319,59 +292,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Validation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#names-and-slug" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Names and slug
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#routes-and-url-helpers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Routes and URL helpers
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -596,10 +516,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../authorization/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authorization
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -615,6 +562,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-policy-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The policy interface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enforcement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enforcement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a policy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#role-based-adapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Role-based adapter
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -700,10 +711,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
+  <a href="#the-policy-interface" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validation
+        The policy interface
       
     </span>
   </a>
@@ -711,10 +722,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#names-and-slug" class="md-nav__link">
+  <a href="#enforcement" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Names and slug
+        Enforcement
       
     </span>
   </a>
@@ -722,10 +733,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#routes-and-url-helpers" class="md-nav__link">
+  <a href="#writing-a-policy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Routes and URL helpers
+        Writing a policy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#role-based-adapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Role-based adapter
       
     </span>
   </a>
@@ -752,9 +774,36 @@
   
 
 
-<h1 id="registering-resources">Registering resources<a class="headerlink" href="#registering-resources" title="Permanent link">&para;</a></h1>
-<p>A resource is declared by hand with <code>register</code>. Everything the admin shows for a
-model is stated explicitly. Nothing is inferred at request time.</p>
+<h1 id="authorization">Authorization<a class="headerlink" href="#authorization" title="Permanent link">&para;</a></h1>
+<p>A policy controls which actions an admin may perform, which records they can see,
+and which menu entries and buttons render. The default policy allows everything,
+so authorization is opt-in.</p>
+<h2 id="the-policy-interface">The policy interface<a class="headerlink" href="#the-policy-interface" title="Permanent link">&para;</a></h2>
+<p>A policy answers two questions:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">method</span> <span class="n">allows</span>(<span class="nb">Str:D</span> <span class="nv">$action</span>, :<span class="nv">$admin</span>, :<span class="nv">$resource</span>, :<span class="nv">$record</span> --&gt; <span class="nb">Bool</span>) { ... }
+<span class="k">method</span> <span class="nb">scope</span>(<span class="nv">$relation</span>, :<span class="nv">$admin</span>, :<span class="nv">$resource</span>) { ... }
+</code></pre></div></td></tr></table></div>
+<p><code>allows</code> authorizes an action. The action is one of <code>index</code>, <code>show</code>, <code>create</code>,
+<code>update</code>, <code>destroy</code>, or the name of a custom member or collection action.
+<code>$admin</code> is the <code>current-admin</code>, <code>$resource</code> is the registered resource, and
+<code>$record</code> is set for record-level checks (show, edit, update, destroy, member
+actions) and absent otherwise.</p>
+<p><code>scope</code> returns a restricted base relation. It is applied to the index listing
+and to record lookups, so records outside the scope are neither listed nor
+reachable (a lookup returns 404).</p>
+<p>Install a policy with:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">authorize-with</span>(<span class="n">MyPolicy</span>.<span class="nb">new</span>);
+</code></pre></div></td></tr></table></div>
+<h2 id="enforcement">Enforcement<a class="headerlink" href="#enforcement" title="Permanent link">&para;</a></h2>
+<p>A forbidden action renders a 403 page. Record-level checks run after the record
+is loaded. The base relation is scoped before listing and before lookups.</p>
+<p>When the policy forbids an action, its controls are hidden: menu entries (when
+<code>index</code> is forbidden), the new button (<code>create</code>), row show, edit, and delete
+actions, custom action buttons, and batch options.</p>
+<h2 id="writing-a-policy">Writing a policy<a class="headerlink" href="#writing-a-policy" title="Permanent link">&para;</a></h2>
+<p>Subclass the base policy and override what you need; the base allows everything
+and scopes nothing.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -766,115 +815,53 @@ model is stated explicitly. Nothing is inferred at request time.</p>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
-<span class="normal">12</span>
-<span class="normal">13</span>
-<span class="normal">14</span>
-<span class="normal">15</span>
-<span class="normal">16</span>
-<span class="normal">17</span>
-<span class="normal">18</span>
-<span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin</span>;
-<span class="k">use</span> <span class="n">MVC::Keayl::Admin::DSL</span>;
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin::Authorization::Policy</span>;
 
-<span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, {
-  <span class="n">menu</span>(:<span class="n">group</span><span class="s">&lt;Content&gt;</span>, :<span class="n">label</span><span class="s">&lt;Posts&gt;</span>, :<span class="n">priority</span>(<span class="mi">10</span>), :<span class="n">icon</span><span class="s">&lt;file-text&gt;</span>);
+<span class="k">class</span> <span class="n">OwnedRecords</span> <span class="k">is</span> <span class="n">MVC::Keayl::Admin::Authorization::Policy</span> {
+  <span class="k">method</span> <span class="nb">scope</span>(<span class="nv">$relation</span>, :<span class="nv">$admin</span>, :<span class="nv">$resource</span>) {
+    <span class="nv">$relation</span>.<span class="n">where</span>({ <span class="n">owner_id</span> =&gt; <span class="nv">$admin</span>.<span class="nb">id</span> })
+  }
 
-  <span class="nb">scope</span>(<span class="s">&#39;All&#39;</span>, :<span class="n">default</span>);
-  <span class="nb">scope</span>(<span class="s">&#39;Published&#39;</span>, { .<span class="n">where</span>(:<span class="n">published</span>(<span class="nb">True</span>)) });
-
-  <span class="nb">column</span>(<span class="s">&#39;title&#39;</span>, :<span class="n">sortable</span>);
-  <span class="nb">column</span>(<span class="s">&#39;author&#39;</span>, :<span class="n">display</span>({ .<span class="n">author</span>.<span class="nb">name</span> }));
-  <span class="nb">column</span>(<span class="s">&#39;published-at&#39;</span>, :<span class="n">format</span><span class="s">&lt;date&gt;</span>);
-
-  <span class="n">filter</span>(<span class="s">&#39;title&#39;</span>,      :<span class="n">as</span><span class="s">&lt;string&gt;</span>,  :<span class="n">predicate</span><span class="s">&lt;cont&gt;</span>);
-  <span class="n">filter</span>(<span class="s">&#39;published&#39;</span>,  :<span class="n">as</span><span class="s">&lt;boolean&gt;</span>);
-  <span class="n">filter</span>(<span class="s">&#39;author-id&#39;</span>,  :<span class="n">as</span><span class="s">&lt;select&gt;</span>, :<span class="n">collection</span>({ <span class="n">Author</span>.<span class="nb">all</span>.<span class="n">map</span>({ .<span class="nb">id</span> =&gt; .<span class="nb">name</span> }) }));
-
-  <span class="n">attribute</span>(<span class="s">&#39;title&#39;</span>);
-  <span class="n">attribute</span>(<span class="s">&#39;body&#39;</span>);
-  <span class="n">attribute</span>(<span class="s">&#39;author&#39;</span>);
-
-  <span class="n">field</span>(<span class="s">&#39;title&#39;</span>,     :<span class="n">as</span><span class="s">&lt;string&gt;</span>);
-  <span class="n">field</span>(<span class="s">&#39;body&#39;</span>,      :<span class="n">as</span><span class="s">&lt;text&gt;</span>);
-  <span class="n">field</span>(<span class="s">&#39;author-id&#39;</span>, :<span class="n">as</span><span class="s">&lt;select&gt;</span>, :<span class="n">collection</span>({ <span class="n">Author</span>.<span class="nb">all</span> }));
-  <span class="n">field</span>(<span class="s">&#39;published&#39;</span>, :<span class="n">as</span><span class="s">&lt;boolean&gt;</span>);
-
-  <span class="n">permit</span>(<span class="s">&lt;title body author-id published&gt;</span>);
-});
+  <span class="k">method</span> <span class="n">allows</span>(<span class="nb">Str:D</span> <span class="nv">$action</span>, :<span class="nv">$admin</span>, :<span class="nv">$resource</span>, :<span class="nv">$record</span> --&gt; <span class="nb">Bool</span>) {
+    <span class="k">return</span> <span class="nb">True</span> <span class="k">without</span> <span class="nv">$record</span>;
+    <span class="nv">$record</span>.<span class="n">read-attribute</span>(<span class="s">&#39;owner_id&#39;</span>) == <span class="nv">$admin</span>.<span class="nb">id</span>
+  }
+}
 </code></pre></div></td></tr></table></div>
-<p>The declaration vocabulary comes from <code>MVC::Keayl::Admin::DSL</code>. Each call records
-a declaration on the resource config:</p>
-<table>
-<thead>
-<tr>
-<th>Declaration</th>
-<th>Records</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>column</code></td>
-<td>an index column (<code>:sortable</code>, <code>:display</code>, <code>:format</code>)</td>
-</tr>
-<tr>
-<td><code>attribute</code></td>
-<td>a show-page row (<code>:display</code>, <code>:format</code>)</td>
-</tr>
-<tr>
-<td><code>field</code></td>
-<td>a form input (<code>:as</code>, <code>:collection</code>, <code>:hint</code>, <code>:placeholder</code>)</td>
-</tr>
-<tr>
-<td><code>filter</code></td>
-<td>a search control (<code>:as</code>, <code>:predicate</code>, <code>:collection</code>)</td>
-</tr>
-<tr>
-<td><code>scope</code></td>
-<td>a named scope, one markable <code>:default</code></td>
-</tr>
-<tr>
-<td><code>permit</code></td>
-<td>the strong-params allowlist</td>
-</tr>
-<tr>
-<td><code>menu</code></td>
-<td>the sidebar entry (<code>:group</code>, <code>:label</code>, <code>:priority</code>, <code>:icon</code>)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
-<p>Declarations are validated when <code>register</code> runs. An unknown option, an unknown
-<code>field</code>/<code>filter</code> type, or a malformed declaration raises at registration time
-rather than failing later on a request.</p>
-<h2 id="names-and-slug">Names and slug<a class="headerlink" href="#names-and-slug" title="Permanent link">&para;</a></h2>
-<p>Each resource derives a URL slug, a singular human name, and a plural human name
-from the model. The slug is the dasherized plural (<code>BlogPost</code> becomes
-<code>blog-posts</code>). The human names resolve through I18n, falling back to a humanized
-form of the model name. Override any of them on <code>register</code>:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, { ... }, <span class="n">slug</span> =&gt; <span class="s">&#39;articles&#39;</span>, <span class="n">singular</span> =&gt; <span class="s">&#39;Article&#39;</span>, <span class="n">plural</span> =&gt; <span class="s">&#39;Articles&#39;</span>);
+<h2 id="role-based-adapter">Role-based adapter<a class="headerlink" href="#role-based-adapter" title="Permanent link">&para;</a></h2>
+<p><code>MVC::Keayl::Admin::Authorization::Role</code> authorizes by the admin's role against a
+permissions map. A <code>*</code> entry permits every action.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">use</span> <span class="n">MVC::Keayl::Admin::Authorization::Role</span>;
+
+<span class="n">MVC::Keayl::Admin</span>.<span class="n">authorize-with</span>(
+  <span class="n">MVC::Keayl::Admin::Authorization::Role</span>.<span class="nb">new</span>(
+    <span class="n">permissions</span> =&gt; {
+      <span class="n">viewer</span> =&gt; <span class="s">&lt;index show&gt;</span>,
+      <span class="n">editor</span> =&gt; <span class="s">&lt;index show create update&gt;</span>,
+      <span class="n">admin</span>  =&gt; &lt;*&gt;,
+    },
+  )
+);
 </code></pre></div></td></tr></table></div>
-<p>The registry indexes resources by model and by slug, with <code>by-model</code>, <code>by-slug</code>,
-and an <code>all</code> listing in registration order.</p>
-<h2 id="routes-and-url-helpers">Routes and URL helpers<a class="headerlink" href="#routes-and-url-helpers" title="Permanent link">&para;</a></h2>
-<p>Registering a resource generates the seven routes (index, show, new, create,
-edit, update, destroy) under the engine. <code>path-for</code> builds the mount-prefixed URL
-for any resource action, usable from controllers and views:</p>
+<p>By default the role is read from <code>$admin.role</code>. Pass <code>role-of</code> to extract it
+differently:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;posts&#39;</span>);           <span class="c1"># /admin/posts</span>
-<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;post&#39;</span>, <span class="mi">5</span>);         <span class="c1"># /admin/posts/5</span>
-<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;edit-post&#39;</span>, <span class="mi">5</span>);    <span class="c1"># /admin/posts/5/edit</span>
-<span class="n">Keayl::Admin</span>.<span class="n">path-for</span>(<span class="s">&#39;new-post&#39;</span>);        <span class="c1"># /admin/posts/new</span>
+<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin::Authorization::Role</span>.<span class="nb">new</span>(
+  <span class="n">permissions</span> =&gt; <span class="nv">%permissions</span>,
+  <span class="n">role-of</span>     =&gt; -&gt; <span class="nv">$admin</span> { <span class="nv">$admin</span>.<span class="n">account</span>.<span class="n">role-name</span> },
+);
 </code></pre></div></td></tr></table></div>
 
 
