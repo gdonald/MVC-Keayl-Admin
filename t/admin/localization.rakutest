@@ -1,0 +1,65 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::I18n;
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::I18n;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub french {
+  my $backend = MVC::Keayl::I18n.new(default-locale => 'fr');
+
+  $backend.store-translations('fr', {
+    activerecord => {
+      models     => { post => 'Article' },
+      attributes => { post => { title => 'Titre' } },
+    },
+    keayl_admin => {
+      chrome  => { dashboard => 'Tableau de bord', actions => 'Operations', new => 'Nouveau' },
+      scopes  => { published => 'Publies' },
+      actions => { approve => 'Approuver' },
+    },
+  });
+
+  MVC::Keayl::Admin::I18n.use-backend($backend);
+}
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+# label helpers resolve through the loaded backend
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+french;
+
+is MVC::Keayl::Admin::I18n.attribute-label(Post, 'title'), 'Titre', 'attribute labels are localized';
+is MVC::Keayl::Admin::I18n.chrome('dashboard', 'Dashboard'), 'Tableau de bord', 'chrome strings are localized';
+is MVC::Keayl::Admin::I18n.scope-label('published'), 'Publies', 'scope names are localized';
+is MVC::Keayl::Admin::I18n.action-label('approve'), 'Approuver', 'action labels are localized';
+
+# the rendered admin reflects the locale
+seed-posts({ title => 'Bonjour' });
+
+my $index = fetch('/admin/posts').body;
+ok $index.contains('Titre'), 'the index column header is localized';
+ok $index.contains('Article'), 'the resource name is localized in the chrome';
+ok $index.contains('Tableau de bord'), 'the menu dashboard entry is localized';
+
+# falling back to the humanized default when no translation exists
+MVC::Keayl::Admin::I18n.reset;
+is MVC::Keayl::Admin::I18n.attribute-label(Post, 'title'), 'Title', 'an untranslated attribute falls back to the humanized name';
+is MVC::Keayl::Admin::I18n.chrome('dashboard', 'Dashboard'), 'Dashboard', 'an untranslated chrome string falls back to its default';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

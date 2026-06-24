@@ -12,10 +12,34 @@ use MVC::Keayl::Admin::Attachments;
 use MVC::Keayl::Admin::Predicate;
 use MVC::Keayl::Admin::Formatter;
 use MVC::Keayl::Admin::Inflection;
+use MVC::Keayl::Admin::I18n;
 use MVC::Keayl::Admin::Authorization;
 use MVC::Keayl::Admin::Authorization::Abilities;
+use JSON::Fast;
 
 unit class MVC::Keayl::Admin::ResourceController is MVC::Keayl::Admin::Controller;
+
+sub export-value($column, $record) {
+  $column.display.defined ?? $column.display.($record) !! $record.read-attribute($column.name)
+}
+
+sub export-cell($column, $record --> Str) {
+  format-value(export-value($column, $record), $column.format)
+}
+
+sub csv-escape(Str:D $value --> Str) {
+  $value ~~ /<[ " , \n \r ]>/ ?? '"' ~ $value.subst('"', '""', :g) ~ '"' !! $value
+}
+
+sub csv-row(@cells --> Str) {
+  @cells.map({ csv-escape(.Str) }).join(',')
+}
+
+sub export-records($resource, $relation --> List) {
+  $relation.all.map(-> $record {
+    %( $resource.columns.map({ .name => export-cell($_, $record) }) )
+  }).List
+}
 
 sub filter-value($filter, %params) {
   if $filter.as eq 'date-range' {
@@ -133,7 +157,7 @@ method current-resource {
 
 method action-ability {
   given self.current-action {
-    when 'index'                                     { 'index' }
+    when 'index' | 'export'                          { 'index' }
     when 'show'                                      { 'show' }
     when 'new-record' | 'create'                     { 'create' }
     when 'edit' | 'update'                           { 'update' }
@@ -187,15 +211,10 @@ method index {
   %carry<scope> = $scope-name if $scope-name.defined;
 
   my $visible  = self.policy-scope($resource, $resource.model.all);
+  my $relation = self!list-relation($resource, %params);
 
-  my $total    = apply-filters($resource, apply-scope($scope, $visible), %params).count;
-  my $relation = apply-filters($resource, apply-scope($scope, $visible), %params);
-
-  if $sort.defined && $resource.columns.first({ .name eq $sort && .sortable }) {
-    $relation = $relation.order($sort ~ ($dir eq 'desc' ?? ' DESC' !! ' ASC'));
-  }
-
-  my @records = $relation.limit($per).offset(($page - 1) * $per).all;
+  my $total    = $relation.count;
+  my @records  = $relation.limit($per).offset(($page - 1) * $per).all;
 
   my %counts;
   if $resource.scope-counts {
@@ -217,18 +236,20 @@ method index {
 
   my $collection-actions = $resource.collection-actions.grep({ $abilities.can(.name) }).map(-> $action {
     my $url     = html-escape($base ~ '/' ~ $action.name);
-    my $label   = html-escape(humanize($action.name));
+    my $label   = html-escape(MVC::Keayl::Admin::I18n.action-label($action.name));
     my $confirm = $action.confirm.defined ?? qq[ onsubmit="return confirm('{html-escape($action.confirm)}')"] !! '';
 
     qq[<form method="post" action="$url"{$confirm} class="d-inline"><button type="submit" class="btn btn-outline-secondary">{$label}</button></form>]
   }).join;
 
+  my $export = qq[<div class="btn-group"><a class="btn btn-outline-secondary" href="{html-escape($base ~ '/export.csv')}">{html-escape(MVC::Keayl::Admin::I18n.chrome('export-csv', 'CSV'))}</a><a class="btn btn-outline-secondary" href="{html-escape($base ~ '/export.json')}">{html-escape(MVC::Keayl::Admin::I18n.chrome('export-json', 'JSON'))}</a></div>];
+
   my $new-link = $abilities.can('create')
-    ?? qq[<a class="btn btn-primary ms-2" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>New {html-escape($resource.singular-name)}</a>]
+    ?? qq[<a class="btn btn-primary ms-2" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('new', 'New') ~ ' ' ~ $resource.singular-name)}</a>]
     !! '';
 
   self.assign('admin_index_body', $body);
-  self.assign('admin_new_link', $collection-actions ~ $new-link);
+  self.assign('admin_new_link', $collection-actions ~ $export ~ $new-link);
   self.assign('admin_filters_panel', self.filters-panel($resource, %params, :$base, :$sort, :$dir, scope => $scope-name));
 
   self.render-admin(
@@ -314,6 +335,46 @@ method !find-record($resource) {
   my $id = (self.params<id> // '').Str;
 
   $id ~~ /^ \d+ $/ ?? self.policy-scope($resource, $resource.model.all).where({ id => $id.Int }).first !! Nil
+}
+
+method !list-relation($resource, %params) {
+  my $visible = self.policy-scope($resource, $resource.model.all);
+  my $scope   = resolve-scope($resource, %params);
+
+  my $relation = apply-filters($resource, apply-scope($scope, $visible), %params);
+
+  my $sort = %params<sort>;
+  my $dir  = (%params<dir> // 'asc') eq 'desc' ?? 'desc' !! 'asc';
+
+  if $sort.defined && $resource.columns.first({ .name eq $sort && .sortable }) {
+    $relation = $relation.order($sort ~ ($dir eq 'desc' ?? ' DESC' !! ' ASC'));
+  }
+
+  $relation
+}
+
+method export {
+  my $resource = self.current-resource;
+  my $relation = self!list-relation($resource, self.params.Hash);
+  my $format   = (self.params<format> // 'csv').Str;
+
+  return self.render(admin-json => export-records($resource, $relation), content-type => 'application/json; charset=utf-8') if $format eq 'json';
+
+  my @columns = $resource.columns;
+
+  my $rows := gather {
+    take csv-row(@columns.map({ MVC::Keayl::Admin::I18n.attribute-label($resource.model, .name) }));
+
+    for $relation.all -> $record {
+      take csv-row(@columns.map({ export-cell($_, $record) }));
+    }
+  };
+
+  self.response.content-type('text/csv; charset=utf-8');
+  self.response.set-header('Content-Disposition', 'attachment; filename="' ~ $resource.slug ~ '.csv"');
+  self.response.stream($rows.map(* ~ "\r\n"));
+
+  self.head(200)
 }
 
 # The route action is `new`, but `new` is the object constructor and a reserved
@@ -421,12 +482,16 @@ method filters-panel($resource, %params, Str:D :$base, :$sort, :$dir, :$scope --
   my $form = MVC::Keayl::Admin::FilterPanel.form($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, :$scope);
 
   qq:to/HTML/.trim;
-  <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#admin-filters"><i class="bi bi-funnel me-1"></i>Filters</button>
+  <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#admin-filters"><i class="bi bi-funnel me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('filters', 'Filters'))}</button>
   <div class="offcanvas offcanvas-end" tabindex="-1" id="admin-filters">
-    <div class="offcanvas-header"><h5 class="offcanvas-title">Filters</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button></div>
+    <div class="offcanvas-header"><h5 class="offcanvas-title">{html-escape(MVC::Keayl::Admin::I18n.chrome('filters', 'Filters'))}</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button></div>
     <div class="offcanvas-body">{$form}</div>
   </div>
   HTML
 }
 
 MVC::Keayl::Admin::ResourceController.before-action('authorize-action');
+
+MVC::Keayl::Admin::ResourceController.add-renderer('admin-json', -> $controller, $data, %opts {
+  to-json($data)
+});

@@ -1,0 +1,53 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Assets;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+
+my $fixtures = $?FILE.IO.parent.parent.add('fixtures/theme').Str;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+# a host view path overrides an engine template
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.view-path($fixtures);
+
+ok fetch('/admin').body.contains('host-themed-dashboard'), 'a host view path overrides the engine template';
+
+# without the override, the engine template renders
+MVC::Keayl::Admin.reset;
+
+my $default = fetch('/admin').body;
+ok $default.contains('Welcome to'), 'the engine template renders when no override is registered';
+nok $default.contains('host-themed-dashboard'), 'the override does not leak across configurations';
+
+# the theme exposes CSS variables layered over the bundle
+ok MVC::Keayl::Admin::Assets.theme-tag.contains('--keayl-admin-sidebar-bg'), 'the theme defines documented CSS variables';
+ok MVC::Keayl::Admin::Assets.stylesheet-tags.contains('--keayl-admin-accent'), 'the theme is included in the stylesheet tags';
+
+# the bundle comes before the theme so variables layer over Bootstrap defaults
+my $tags = MVC::Keayl::Admin::Assets.stylesheet-tags;
+ok $tags.index('bootstrap/bootstrap.min.css') < $tags.index('--keayl-admin-sidebar-bg'), 'the theme is layered after the Bootstrap bundle';
+
+# a host stylesheet is the documented override point and loads after the theme
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.use-stylesheet('/custom/admin-theme.css');
+
+my $with-override = MVC::Keayl::Admin::Assets.stylesheet-tags;
+ok $with-override.contains('/custom/admin-theme.css'), 'a host stylesheet is included';
+ok $with-override.index('--keayl-admin-sidebar-bg') < $with-override.index('/custom/admin-theme.css'),
+  'the host stylesheet loads after the theme so its values win';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

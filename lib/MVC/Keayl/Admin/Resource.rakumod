@@ -2,6 +2,7 @@ use v6.d;
 use MVC::Keayl::I18n;
 use MVC::Keayl::Routing::Resources;
 use MVC::Keayl::Admin::Inflection;
+use MVC::Keayl::Admin::I18n;
 use MVC::Keayl::Admin::Column;
 use MVC::Keayl::Admin::Attribute;
 use MVC::Keayl::Admin::Field;
@@ -36,10 +37,8 @@ has MVC::Keayl::Admin::MenuEntry    $.menu-entry is rw;
 constant FIELD-TYPES  = set <string text select boolean date time datetime number password hidden file>;
 constant FILTER-TYPES = set <string numeric boolean date date-range select>;
 
-my $default-i18n;
-
 sub default-i18n(--> MVC::Keayl::I18n) {
-  $default-i18n //= MVC::Keayl::I18n.new(default-locale => 'en')
+  MVC::Keayl::Admin::I18n.backend
 }
 
 method model-name(--> Str) {

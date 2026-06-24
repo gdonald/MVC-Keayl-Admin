@@ -40,12 +40,33 @@ method override-stylesheet(::?CLASS:U: --> Str) {
   $override-stylesheet
 }
 
+method theme-tag(::?CLASS:U: --> Str) {
+  q:to/CSS/.trim;
+  <style>
+  :root {
+    --keayl-admin-sidebar-bg: #f8f9fa;
+    --keayl-admin-sidebar-width: 16rem;
+    --keayl-admin-navbar-bg: #212529;
+    --keayl-admin-accent: #0d6efd;
+    --keayl-admin-body-bg: #ffffff;
+  }
+  body { background-color: var(--keayl-admin-body-bg); }
+  .navbar.bg-dark { background-color: var(--keayl-admin-navbar-bg) !important; }
+  #admin-sidebar { background-color: var(--keayl-admin-sidebar-bg); }
+  @media (min-width: 992px) { #admin-sidebar { width: var(--keayl-admin-sidebar-width); } }
+  .nav-pills .nav-link.active { background-color: var(--keayl-admin-accent); }
+  </style>
+  CSS
+}
+
 method stylesheet-tags(::?CLASS:U: --> Str) {
-  my @hrefs = @bundle-styles.map({ self.asset-url($_) });
+  my @tags = @bundle-styles.map({ tag('link', %( rel => 'stylesheet', href => self.asset-url($_) )).Str });
 
-  @hrefs.push($override-stylesheet) if $override-stylesheet.defined;
+  @tags.push(self.theme-tag);
 
-  @hrefs.map({ tag('link', %( rel => 'stylesheet', href => $_ )).Str }).join("\n")
+  @tags.push(tag('link', %( rel => 'stylesheet', href => $override-stylesheet )).Str) if $override-stylesheet.defined;
+
+  @tags.join("\n")
 }
 
 method script-tags(::?CLASS:U: --> Str) {

@@ -2,13 +2,12 @@ use v6.d;
 use MVC::Keayl::I18n;
 use MVC::Keayl::Admin::Inflection;
 use MVC::Keayl::Admin::Formatter;
+use MVC::Keayl::Admin::I18n;
 
 unit class MVC::Keayl::Admin::Form;
 
-my $default-i18n;
-
 sub i18n(--> MVC::Keayl::I18n) {
-  $default-i18n //= MVC::Keayl::I18n.new(default-locale => 'en')
+  MVC::Keayl::Admin::I18n.backend
 }
 
 sub column-of($field --> Str) {

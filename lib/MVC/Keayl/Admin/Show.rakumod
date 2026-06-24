@@ -2,6 +2,7 @@ use v6.d;
 use MVC::Keayl::Admin::Inflection;
 use MVC::Keayl::Admin::Formatter;
 use MVC::Keayl::Admin::Registry;
+use MVC::Keayl::Admin::I18n;
 
 unit class MVC::Keayl::Admin::Show;
 
@@ -62,7 +63,7 @@ method render(::?CLASS:U: $resource, $record, Str:D :$mount-path --> Str) {
       }
     };
 
-    qq[<tr><th class="text-nowrap" style="width: 12rem">{html-escape(humanize($attribute.name))}</th><td>{$cell}</td></tr>]
+    qq[<tr><th class="text-nowrap" style="width: 12rem">{html-escape(MVC::Keayl::Admin::I18n.attribute-label($resource.model, $attribute.name))}</th><td>{$cell}</td></tr>]
   });
 
   qq[<table class="table"><tbody>{@rows.join}</tbody></table>]
@@ -70,7 +71,7 @@ method render(::?CLASS:U: $resource, $record, Str:D :$mount-path --> Str) {
 
 sub member-action-form($action, Str:D $base, $record --> Str) {
   my $url     = html-escape($base ~ '/' ~ $record.id ~ '/' ~ $action.name);
-  my $label   = html-escape(humanize($action.name));
+  my $label   = html-escape(MVC::Keayl::Admin::I18n.action-label($action.name));
   my $confirm = $action.confirm.defined ?? qq[ onsubmit="return confirm('{html-escape($action.confirm)}')"] !! '';
 
   qq[<form method="post" action="$url"{$confirm}><button type="submit" class="list-group-item list-group-item-action w-100 text-start">{$label}</button></form>]
@@ -87,12 +88,12 @@ method actions(::?CLASS:U: $resource, $record, Str:D :$mount-path, :$abilities -
 
   my $items = '';
 
-  $items ~= qq[<a class="list-group-item list-group-item-action" href="$edit"><i class="bi bi-pencil me-2"></i>Edit</a>]
+  $items ~= qq[<a class="list-group-item list-group-item-action" href="$edit"><i class="bi bi-pencil me-2"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('edit', 'Edit'))}</a>]
     if allowed($abilities, 'update');
 
   $items ~= $resource.member-actions.grep({ allowed($abilities, .name) }).map({ member-action-form($_, $base, $record) }).join;
 
-  $items ~= qq[<form method="post" action="$delete" onsubmit="return confirm('Delete this record?')"><button type="submit" class="list-group-item list-group-item-action text-danger w-100 text-start"><i class="bi bi-trash me-2"></i>Delete</button></form>]
+  $items ~= qq[<form method="post" action="$delete" onsubmit="return confirm('{html-escape(MVC::Keayl::Admin::I18n.chrome('confirm-delete', 'Delete this record?'))}')"><button type="submit" class="list-group-item list-group-item-action text-danger w-100 text-start"><i class="bi bi-trash me-2"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('delete', 'Delete'))}</button></form>]
     if allowed($abilities, 'destroy');
 
   qq[<div class="list-group">{$items}</div>]

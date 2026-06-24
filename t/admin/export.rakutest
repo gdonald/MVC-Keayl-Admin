@@ -1,0 +1,64 @@
+use v6.d;
+use Test;
+use JSON::Fast;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+sub streamed-body($response --> Str) {
+  $response.is-streaming
+    ?? $response.stream-chunks.map({ $_ ~~ Blob ?? .decode('utf-8') !! $_.Str }).join
+    !! $response.body
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'Alpha' }, { title => 'Beta' });
+
+# CSV export streams a header row and one row per record
+my $csv-response = fetch('/admin/posts/export.csv');
+my $csv = streamed-body($csv-response);
+
+ok $csv-response.header('Content-Type').contains('text/csv'), 'the CSV export sets a text/csv content type';
+ok $csv-response.header('Content-Disposition').contains('attachment'), 'the CSV export is sent as an attachment';
+ok $csv.contains('Title'), 'the CSV export has a header row of column labels';
+ok $csv.contains('Alpha') && $csv.contains('Beta'), 'the CSV export has a row per record';
+
+# CSV escaping of values that contain a comma
+seed-posts({ title => 'Has, comma' });
+ok fetch('/admin/posts/export.csv').&streamed-body.contains('"Has, comma"'), 'the CSV export quotes values containing a comma';
+
+# JSON export of the same view through the renderer registry
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'One' }, { title => 'Two' });
+
+my $json-response = fetch('/admin/posts/export.json');
+
+ok $json-response.header('Content-Type').contains('application/json'), 'the JSON export sets an application/json content type';
+
+my @records = from-json($json-response.body).list;
+is @records.elems, 2, 'the JSON export has one object per record';
+is @records[0]<title>, 'One', 'each JSON object carries the column values';
+
+# export reflects the current filter
+ok fetch('/admin/posts/export.json?title=One').&streamed-body, 'the filtered export still responds';
+is from-json(fetch('/admin/posts/export.json?title=One').body).list.elems, 1, 'the export honours the active filter';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

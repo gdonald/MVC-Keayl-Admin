@@ -10,9 +10,13 @@ use MVC::Keayl::Admin::Menu;
 use MVC::Keayl::Admin::Dashboard;
 use MVC::Keayl::Admin::Authentication;
 use MVC::Keayl::Admin::Authorization;
+use MVC::Keayl::Admin::I18n;
 use MVC::Keayl::Admin::DashboardController;
 use MVC::Keayl::Admin::AssetsController;
 use MVC::Keayl::Admin::ResourceController;
+use MVC::Keayl::Admin::PageController;
+use MVC::Keayl::Admin::Page;
+use MVC::Keayl::Admin::Pages;
 
 unit class MVC::Keayl::Admin;
 
@@ -62,6 +66,25 @@ method authorize-with(::?CLASS:U: $policy --> Nil) {
   MVC::Keayl::Admin::Authorization.use-policy($policy);
 }
 
+method page(::?CLASS:U: Str:D $slug, &block, Str :$title, Str :$group, Str :$label, Int :$priority = 0, Str :$icon, Bool :$hide = False --> Nil) {
+  MVC::Keayl::Admin::Pages.add(
+    MVC::Keayl::Admin::Page.new(
+      :$slug,
+      title => $title // $slug.tc,
+      :&block,
+      :$group, :$label, :$priority, :$icon, :$hide,
+    )
+  );
+}
+
+method load-locales(::?CLASS:U: $dir --> Nil) {
+  MVC::Keayl::Admin::I18n.load-locales($dir);
+}
+
+method locale(::?CLASS:U: Str:D $locale --> Nil) {
+  MVC::Keayl::Admin::I18n.set-locale($locale);
+}
+
 method menu-link(::?CLASS:U: |args --> Nil) {
   MVC::Keayl::Admin::Menu.add-link(|args);
 }
@@ -78,17 +101,24 @@ sub admin-routes {
   my $dashboard      = MVC::Keayl::Admin::DashboardController.controller-path ~ '#index';
   my $assets         = MVC::Keayl::Admin::AssetsController.controller-path ~ '#show';
   my $resource-ctrl  = MVC::Keayl::Admin::ResourceController.controller-path;
+  my $page-ctrl      = MVC::Keayl::Admin::PageController.controller-path ~ '#show';
   my @resources      = MVC::Keayl::Admin::Registry.current.all;
+  my @pages          = MVC::Keayl::Admin::Pages.all;
 
   my &block = {
     get '/admin-assets/*path', to => $assets;
+
+    for @pages -> $page {
+      get '/' ~ $page.slug, to => $page-ctrl;
+    }
 
     for @resources -> $res {
       my $slug = $res.slug;
 
       # Literal paths are registered before `resources` so they win over the
       # member `:id` route.
-      post '/' ~ $slug ~ '/batch', to => $resource-ctrl ~ '#apply-batch';
+      post '/' ~ $slug ~ '/batch',  to => $resource-ctrl ~ '#apply-batch';
+      get  '/' ~ $slug ~ '/export', to => $resource-ctrl ~ '#export', :format;
 
       for $res.collection-actions -> $action {
         post '/' ~ $slug ~ '/' ~ $action.name, to => $resource-ctrl ~ '#run-collection-action';
@@ -125,13 +155,18 @@ method engine(::?CLASS:U: --> MVC::Keayl::Admin::Engine) {
       MVC::Keayl::Admin::DashboardController,
       MVC::Keayl::Admin::AssetsController,
       MVC::Keayl::Admin::ResourceController,
+      MVC::Keayl::Admin::PageController,
     ],
     routes-block => admin-routes(),
   )
 }
 
+method view-path(::?CLASS:U: Str:D $path --> Nil) {
+  MVC::Keayl::Admin::Config.current.add-view-override($path);
+}
+
 method endpoint(::?CLASS:U:) {
-  self.engine.endpoint
+  self.engine.endpoint(view-path-overrides => MVC::Keayl::Admin::Config.current.view-overrides)
 }
 
 method reset(::?CLASS:U: --> Nil) {
@@ -142,4 +177,6 @@ method reset(::?CLASS:U: --> Nil) {
   MVC::Keayl::Admin::Dashboard.reset;
   MVC::Keayl::Admin::Authentication.reset;
   MVC::Keayl::Admin::Authorization.reset;
+  MVC::Keayl::Admin::I18n.reset;
+  MVC::Keayl::Admin::Pages.reset;
 }

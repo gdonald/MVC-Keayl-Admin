@@ -4,6 +4,11 @@ unit class MVC::Keayl::Admin::Config;
 
 has Str $.mount-path is rw = '/admin';
 has Str $.site-title is rw = 'Admin';
+has     @.view-overrides;
+
+method add-view-override(Str:D $path --> Nil) {
+  @!view-overrides.push: $path;
+}
 
 my MVC::Keayl::Admin::Config $instance .= new;
 

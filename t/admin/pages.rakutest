@@ -1,0 +1,48 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Menu;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.page('reports', -> $controller {
+  '<div class="report">Sales summary</div>'
+}, title => 'Reports', group => 'Tools', icon => 'graph-up');
+
+# a standalone page renders its block inside the admin layout
+my $response = fetch('/admin/reports');
+
+is $response.status, 200, 'a standalone page responds at its mount path';
+ok $response.body.contains('Sales summary'), 'the page renders its block content';
+ok $response.body.contains('<title>Reports</title>'), 'the page uses its title';
+ok $response.body.contains('navbar-brand'), 'the page renders inside the admin layout';
+
+# the page appears in the menu
+my $menu = MVC::Keayl::Admin::Menu.render(mount => '/admin', active-slug => 'reports');
+ok $menu.contains('/admin/reports'), 'the page is linked from the menu';
+ok $menu.contains('>Reports') || $menu.contains('Reports<'), 'the page menu entry shows its label';
+ok $menu.contains('bi-graph-up'), 'the page menu entry uses its icon';
+ok $menu.contains('menu-group-tools'), 'the page is grouped in the menu';
+
+# a hidden page is routable but not in the menu
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.page('secret', -> $c { '<p>hush</p>' }, title => 'Secret', :hide);
+
+ok fetch('/admin/secret').body.contains('hush'), 'a hidden page is still routable';
+nok MVC::Keayl::Admin::Menu.render(mount => '/admin').contains('/admin/secret'), 'a hidden page is left out of the menu';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

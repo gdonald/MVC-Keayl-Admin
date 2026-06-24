@@ -1,6 +1,7 @@
 use v6.d;
 use MVC::Keayl::Admin::Formatter;
 use MVC::Keayl::Admin::Url;
+use MVC::Keayl::Admin::I18n;
 
 unit class MVC::Keayl::Admin::Scopes;
 
@@ -18,7 +19,7 @@ method render(::?CLASS:U: $resource, :$active, Str:D :$base, Str:D :$target = '#
       ?? qq[ <span class="badge text-bg-secondary">{%counts{$scope.name}}</span>]
       !! '';
 
-    qq[<li class="nav-item"><a class="$class" hx-get="$url" hx-target="{$target}" hx-swap="innerHTML" href="$url">{html-escape($scope.name)}{$count}</a></li>]
+    qq[<li class="nav-item"><a class="$class" hx-get="$url" hx-target="{$target}" hx-swap="innerHTML" href="$url">{html-escape(MVC::Keayl::Admin::I18n.scope-label($scope.name))}{$count}</a></li>]
   });
 
   qq[<ul class="nav nav-tabs mb-3">{@tabs.join}</ul>]

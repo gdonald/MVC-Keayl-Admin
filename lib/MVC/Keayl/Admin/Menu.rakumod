@@ -2,7 +2,9 @@ use v6.d;
 use MVC::Keayl::Admin::Formatter;
 use MVC::Keayl::Admin::Inflection;
 use MVC::Keayl::Admin::Registry;
+use MVC::Keayl::Admin::Pages;
 use MVC::Keayl::Admin::Authorization;
+use MVC::Keayl::Admin::I18n;
 
 unit class MVC::Keayl::Admin::Menu;
 
@@ -51,7 +53,7 @@ sub group-html(Str:D $name, @items --> Str) {
 method render(::?CLASS:U: Str:D :$mount, Str:D :$active-slug = '', :$admin --> Str) {
   my @items;
 
-  @items.push: %( label => 'Dashboard', url => $mount, icon => 'speedometer2', priority => -1, group => Str, external => False, active => ($active-slug eq '') );
+  @items.push: %( label => MVC::Keayl::Admin::I18n.chrome('dashboard', 'Dashboard'), url => $mount, icon => 'speedometer2', priority => -1, group => Str, external => False, active => ($active-slug eq '') );
 
   for MVC::Keayl::Admin::Registry.current.all -> $resource {
     my $entry = $resource.menu-entry;
@@ -67,6 +69,20 @@ method render(::?CLASS:U: Str:D :$mount, Str:D :$active-slug = '', :$admin --> S
       group    => ($entry.defined ?? $entry.group !! Str),
       external => False,
       active   => ($resource.slug eq $active-slug),
+    );
+  }
+
+  for MVC::Keayl::Admin::Pages.all -> $page {
+    next if $page.hide;
+
+    @items.push: %(
+      label    => $page.menu-label,
+      url      => $mount ~ '/' ~ $page.slug,
+      icon     => $page.icon // 'file-earmark-text',
+      priority => $page.priority,
+      group    => $page.group,
+      external => False,
+      active   => ($page.slug eq $active-slug),
     );
   }
 

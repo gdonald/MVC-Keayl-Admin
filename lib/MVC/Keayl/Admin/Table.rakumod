@@ -2,15 +2,12 @@ use v6.d;
 use MVC::Keayl::Admin::Inflection;
 use MVC::Keayl::Admin::Formatter;
 use MVC::Keayl::Admin::Url;
+use MVC::Keayl::Admin::I18n;
 
 unit class MVC::Keayl::Admin::Table;
 
-sub column-label($column --> Str) {
-  humanize($column.name)
-}
-
-sub header-cell($column, Str:D $base, $sort, $dir, Str:D $target, %filters --> Str) {
-  my $label = html-escape(column-label($column));
+sub header-cell($column, $model, Str:D $base, $sort, $dir, Str:D $target, %filters --> Str) {
+  my $label = html-escape(MVC::Keayl::Admin::I18n.attribute-label($model, $column.name));
 
   return '<th>' ~ $label ~ '</th>' unless $column.sortable;
 
@@ -47,9 +44,9 @@ sub row-actions(Str:D $base, $id, $abilities --> Str) {
   my $edit = html-escape($base ~ '/' ~ $id ~ '/edit');
 
   my $buttons = '';
-  $buttons ~= qq[<a class="btn btn-outline-secondary" href="$show">Show</a>]     if allowed($abilities, 'show');
-  $buttons ~= qq[<a class="btn btn-outline-secondary" href="$edit">Edit</a>]     if allowed($abilities, 'update');
-  $buttons ~= qq[<button type="button" class="btn btn-outline-danger" hx-delete="$show" hx-confirm="Delete this record?" hx-target="closest tr" hx-swap="delete">Delete</button>] if allowed($abilities, 'destroy');
+  $buttons ~= qq[<a class="btn btn-outline-secondary" href="$show">{html-escape(MVC::Keayl::Admin::I18n.chrome('show', 'Show'))}</a>]     if allowed($abilities, 'show');
+  $buttons ~= qq[<a class="btn btn-outline-secondary" href="$edit">{html-escape(MVC::Keayl::Admin::I18n.chrome('edit', 'Edit'))}</a>]     if allowed($abilities, 'update');
+  $buttons ~= qq[<button type="button" class="btn btn-outline-danger" hx-delete="$show" hx-confirm="{html-escape(MVC::Keayl::Admin::I18n.chrome('confirm-delete', 'Delete this record?'))}" hx-target="closest tr" hx-swap="delete">{html-escape(MVC::Keayl::Admin::I18n.chrome('delete', 'Delete'))}</button>] if allowed($abilities, 'destroy');
 
   qq[<div class="btn-group btn-group-sm" role="group">{$buttons}</div>]
 }
@@ -61,8 +58,8 @@ method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir
   my $select-head = $batch ?? '<th style="width: 1rem"><input class="form-check-input" type="checkbox" data-batch-all></th>' !! '';
 
   my $head = $select-head
-    ~ @columns.map({ header-cell($_, $base, $sort, $dir, $target, %filters) }).join
-    ~ '<th class="text-end">Actions</th>';
+    ~ @columns.map({ header-cell($_, $resource.model, $base, $sort, $dir, $target, %filters) }).join
+    ~ qq[<th class="text-end">{html-escape(MVC::Keayl::Admin::I18n.chrome('actions', 'Actions'))}</th>];
 
   my $body;
 
@@ -78,7 +75,7 @@ method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir
   } else {
     my $span = @columns.elems + 1 + ($batch ?? 1 !! 0);
 
-    $body = qq[<tr><td colspan="$span" class="text-center text-muted py-4">No records yet.</td></tr>];
+    $body = qq[<tr><td colspan="$span" class="text-center text-muted py-4">{html-escape(MVC::Keayl::Admin::I18n.chrome('no-records', 'No records yet.'))}</td></tr>];
   }
 
   qq[<table class="table table-striped table-hover align-middle"><thead><tr>{$head}</tr></thead><tbody>{$body}</tbody></table>]
