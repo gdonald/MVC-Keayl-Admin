@@ -637,6 +637,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../actions-availability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Action availability and toolbar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../navigation/" class="md-nav__link">
         
   
@@ -985,6 +1012,21 @@ a declaration on the resource config:</p>
 <td><a href="../presentations/">Index presentations and panels</a></td>
 </tr>
 <tr>
+<td><code>actions</code></td>
+<td>which default actions the resource exposes (<code>:except</code>)</td>
+<td><a href="../actions-availability/">Action availability and toolbar</a></td>
+</tr>
+<tr>
+<td><code>sort-order</code></td>
+<td>the default ordering (<code>:dir</code>)</td>
+<td><a href="../actions-availability/">Action availability and toolbar</a></td>
+</tr>
+<tr>
+<td><code>action-item</code></td>
+<td>a page-toolbar button (<code>:only</code>, <code>:except</code>, <code>:if-can</code>)</td>
+<td><a href="../actions-availability/">Action availability and toolbar</a></td>
+</tr>
+<tr>
 <td><code>column</code></td>
 <td>an index column (<code>:sortable</code>, <code>:display</code>, <code>:format</code>)</td>
 <td><a href="../index-pages/">Index pages</a></td>
@@ -1092,6 +1134,16 @@ resource as a whole:</p>
 <td><code>scope-counts</code></td>
 <td><code>True</code></td>
 <td>Whether scope tabs show counts (<a href="../scopes/">Scopes</a>).</td>
+</tr>
+<tr>
+<td><code>filters</code></td>
+<td><code>True</code></td>
+<td>Whether the filter UI renders (<a href="../actions-availability/">Action availability</a>).</td>
+</tr>
+<tr>
+<td><code>batch-actions</code></td>
+<td><code>True</code></td>
+<td>Whether batch selection renders (<a href="../actions-availability/">Action availability</a>).</td>
 </tr>
 </tbody>
 </table>
