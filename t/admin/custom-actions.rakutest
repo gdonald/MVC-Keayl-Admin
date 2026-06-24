@@ -1,0 +1,56 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+sub send(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'POST', target => $path))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'One', published => False }, { title => 'Two', published => False });
+
+my @posts = Post.all.all;
+
+# member action: a button on the show page with a confirmation
+my $show = fetch('/admin/posts/' ~ @posts[0].id).body;
+ok $show.contains('action="/admin/posts/' ~ @posts[0].id ~ '/approve"'), 'a member action renders a button on the show page';
+ok $show.contains('Approve this post?'), 'a member action carries its confirmation';
+ok $show.contains('>Approve<'), 'the member action button is labelled from its name';
+
+# the member action runs over the record and returns a redirect
+my $approved = send('/admin/posts/' ~ @posts[0].id ~ '/approve');
+is $approved.status, 302, 'a member action returns the handler response';
+ok Post.where({ id => @posts[0].id }).first.read-attribute('published'), 'the member action handler ran over the record';
+nok Post.where({ id => @posts[1].id }).first.read-attribute('published'), 'the member action only touched its record';
+
+# collection action: a button on the index over the whole relation
+my $index = fetch('/admin/posts').body;
+ok $index.contains('action="/admin/posts/publish-all"'), 'a collection action renders a button on the index';
+ok $index.contains('>Publish all<'), 'the collection action button is labelled from its name';
+
+my $published = send('/admin/posts/publish-all');
+is $published.status, 302, 'a collection action returns the handler response';
+ok Post.all.all.map(*.read-attribute('published')).all, 'the collection action handler ran over the whole relation';
+
+# an unknown member action is a 404
+is send('/admin/posts/' ~ @posts[0].id ~ '/nope').status, 404, 'an unknown member action is a 404';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

@@ -59,17 +59,33 @@ sub admin-routes {
   my $dashboard      = MVC::Keayl::Admin::DashboardController.controller-path ~ '#index';
   my $assets         = MVC::Keayl::Admin::AssetsController.controller-path ~ '#show';
   my $resource-ctrl  = MVC::Keayl::Admin::ResourceController.controller-path;
-  my @slugs          = MVC::Keayl::Admin::Registry.current.all.map(*.slug);
+  my @resources      = MVC::Keayl::Admin::Registry.current.all;
 
   my &block = {
     get '/admin-assets/*path', to => $assets;
 
-    for @slugs -> $slug {
+    for @resources -> $res {
+      my $slug = $res.slug;
+
+      # Literal paths are registered before `resources` so they win over the
+      # member `:id` route.
+      post '/' ~ $slug ~ '/batch', to => $resource-ctrl ~ '#apply-batch';
+
+      for $res.collection-actions -> $action {
+        post '/' ~ $slug ~ '/' ~ $action.name, to => $resource-ctrl ~ '#run-collection-action';
+      }
+
+      for $res.member-actions -> $action {
+        post '/' ~ $slug ~ '/:id/' ~ $action.name, to => $resource-ctrl ~ '#run-member-action';
+      }
+
       resources $slug, :controller($resource-ctrl);
 
-      # HTML forms cannot issue PATCH, so accept a plain POST to the member path
-      # for the update action too, keeping the edit form usable without JavaScript.
-      post '/' ~ $slug ~ '/:id', to => $resource-ctrl ~ '#update';
+      # HTML forms cannot issue PATCH or DELETE, so accept a plain POST to the
+      # member path for update, and to a delete sub-path for destroy, keeping
+      # both usable without JavaScript.
+      post '/' ~ $slug ~ '/:id',         to => $resource-ctrl ~ '#update';
+      post '/' ~ $slug ~ '/:id/delete',  to => $resource-ctrl ~ '#destroy';
     }
 
     get '/', to => $dashboard;

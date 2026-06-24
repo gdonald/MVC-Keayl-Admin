@@ -89,6 +89,18 @@ sub register-posts(Int :$per-page, Bool :$scope-counts --> Nil) is export {
     filter('title', :as<string>);
     filter('published', :as<boolean>);
 
+    batch-action('Publish', -> @records { .update({ published => True }) for @records });
+
+    member-action('approve', -> $controller, $record {
+      $record.update({ published => True });
+      $controller.redirect-to('/admin/posts/' ~ $record.id);
+    }, :confirm('Approve this post?'));
+
+    collection-action('publish-all', -> $controller, $relation {
+      .update({ published => True }) for $relation.all;
+      $controller.redirect-to('/admin/posts');
+    });
+
     attribute('title');
     attribute('body');
     attribute('published', :format<boolean>);

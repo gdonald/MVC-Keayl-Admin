@@ -9,6 +9,8 @@ use MVC::Keayl::Admin::Filter;
 use MVC::Keayl::Admin::Scope;
 use MVC::Keayl::Admin::MenuEntry;
 use MVC::Keayl::Admin::Nested;
+use MVC::Keayl::Admin::BatchAction;
+use MVC::Keayl::Admin::CustomAction;
 
 unit class MVC::Keayl::Admin::Resource;
 
@@ -25,8 +27,11 @@ has MVC::Keayl::Admin::Field     @.fields;
 has MVC::Keayl::Admin::Filter    @.filters;
 has MVC::Keayl::Admin::Scope     @.scopes;
 has Str                          @.permitted;
-has MVC::Keayl::Admin::Nested    @.nested-attributes;
-has MVC::Keayl::Admin::MenuEntry $.menu-entry is rw;
+has MVC::Keayl::Admin::Nested       @.nested-attributes;
+has MVC::Keayl::Admin::BatchAction  @.batch-actions;
+has MVC::Keayl::Admin::CustomAction @.member-actions;
+has MVC::Keayl::Admin::CustomAction @.collection-actions;
+has MVC::Keayl::Admin::MenuEntry    $.menu-entry is rw;
 
 constant FIELD-TYPES  = set <string text select boolean date time datetime number password hidden file>;
 constant FILTER-TYPES = set <string numeric boolean date date-range select>;
@@ -139,6 +144,30 @@ method nested(Str:D $name, &block, Bool :$multiple = False --> ::?CLASS) {
   }
 
   @!nested-attributes.push: $nested;
+
+  self
+}
+
+method batch-action(Str:D $name, &block --> ::?CLASS) {
+  reject-unknown(%_, "batch-action '$name'");
+
+  @!batch-actions.push: MVC::Keayl::Admin::BatchAction.new(:$name, :&block);
+
+  self
+}
+
+method member-action(Str:D $name, &block, Str :$confirm --> ::?CLASS) {
+  reject-unknown(%_, "member-action '$name'");
+
+  @!member-actions.push: MVC::Keayl::Admin::CustomAction.new(:$name, scope => 'member', :&block, :$confirm);
+
+  self
+}
+
+method collection-action(Str:D $name, &block, Str :$confirm --> ::?CLASS) {
+  reject-unknown(%_, "collection-action '$name'");
+
+  @!collection-actions.push: MVC::Keayl::Admin::CustomAction.new(:$name, scope => 'collection', :&block, :$confirm);
 
   self
 }

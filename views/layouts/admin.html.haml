@@ -29,3 +29,17 @@
           != $content
     != $admin_importmap
     != $admin_scripts
+    :javascript
+      document.addEventListener('change', function (event) {
+        var target = event.target;
+        if (!target.matches) return;
+        var form = target.closest('form');
+        if (!form) return;
+        if (target.matches('[data-batch-all]')) {
+          form.querySelectorAll('[data-batch-select]').forEach(function (box) { box.checked = target.checked; });
+        }
+        if (target.matches('[data-batch-select], [data-batch-all]')) {
+          var count = form.querySelectorAll('[data-batch-select]:checked').length;
+          form.querySelectorAll('[data-batch-count]').forEach(function (el) { el.textContent = count; });
+        }
+      });

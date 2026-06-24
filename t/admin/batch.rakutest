@@ -1,0 +1,66 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+sub batch(Str:D $action, *@ids) {
+  my $body = (@ids.map({ 'ids[]=' ~ $_ }).Slip, 'batch-action=' ~ $action).join('&');
+
+  host.call(MVC::Keayl::Request.new(
+    method  => 'POST',
+    target  => '/admin/posts/batch',
+    headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
+    body    => $body,
+  ))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'One' }, { title => 'Two' }, { title => 'Three' });
+
+# selection controls
+my $index = fetch('/admin/posts').body;
+ok $index.contains('data-batch-all'), 'the index has a select-all-on-page control';
+ok $index.contains('data-batch-select') && $index.contains('name="ids[]"'), 'each row has a selection checkbox';
+ok $index.contains('data-batch-count'), 'the index shows a selected-count indicator';
+ok $index.contains('action="/admin/posts/batch"'), 'the rows are wrapped in a batch form';
+ok $index.contains('>Destroy<'), 'batch destroy is offered';
+ok $index.contains('>Publish<'), 'a custom batch action is offered';
+
+# batch destroy over the selected ids
+my @posts = Post.all.all;
+my $deleted = batch('Destroy', @posts[0].id, @posts[1].id);
+is $deleted.status, 302, 'a batch action redirects to the index';
+is Post.all.count, 1, 'batch destroy removes the selected records';
+ok Post.where({ id => @posts[2].id }).first.defined, 'unselected records are kept';
+
+# a custom batch action runs its block over the selected records
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'A', published => False }, { title => 'B', published => False }, { title => 'C', published => False });
+
+my @all = Post.all.all;
+batch('Publish', @all[0].id, @all[1].id);
+
+ok Post.where({ id => @all[0].id }).first.read-attribute('published'), 'the custom batch action updated the first selected record';
+ok Post.where({ id => @all[1].id }).first.read-attribute('published'), 'the custom batch action updated the second selected record';
+nok Post.where({ id => @all[2].id }).first.read-attribute('published'), 'an unselected record is untouched';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

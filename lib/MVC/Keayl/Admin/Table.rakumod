@@ -46,28 +46,34 @@ sub row-actions(Str:D $base, $id --> Str) {
   <div class="btn-group btn-group-sm" role="group">
     <a class="btn btn-outline-secondary" href="$show">Show</a>
     <a class="btn btn-outline-secondary" href="$edit">Edit</a>
-    <button type="button" class="btn btn-outline-danger" hx-delete="$show" hx-confirm="Delete this record?">Delete</button>
+    <button type="button" class="btn btn-outline-danger" hx-delete="$show" hx-confirm="Delete this record?" hx-target="closest tr" hx-swap="delete">Delete</button>
   </div>
   HTML
 }
 
-method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters --> Str) {
+method render(::?CLASS:U: $resource, @records, Str:D :$mount-path, :$sort, :$dir, Str:D :$target = '#admin-index', :%filters, Bool :$batch = False --> Str) {
   my @columns = $resource.columns;
   my $base    = $mount-path ~ '/' ~ $resource.slug;
 
-  my $head = @columns.map({ header-cell($_, $base, $sort, $dir, $target, %filters) }).join
+  my $select-head = $batch ?? '<th style="width: 1rem"><input class="form-check-input" type="checkbox" data-batch-all></th>' !! '';
+
+  my $head = $select-head
+    ~ @columns.map({ header-cell($_, $base, $sort, $dir, $target, %filters) }).join
     ~ '<th class="text-end">Actions</th>';
 
   my $body;
 
   if @records {
     $body = @records.map(-> $record {
+      my $select = $batch
+        ?? qq[<td><input class="form-check-input" type="checkbox" data-batch-select name="ids[]" value="{$record.id}"></td>]
+        !! '';
       my $cells = @columns.map({ '<td>' ~ cell-html($_, $record, $base) ~ '</td>' }).join;
 
-      qq[<tr>{$cells}<td class="text-end">{row-actions($base, $record.id)}</td></tr>]
+      qq[<tr>{$select}{$cells}<td class="text-end">{row-actions($base, $record.id)}</td></tr>]
     }).join;
   } else {
-    my $span = @columns.elems + 1;
+    my $span = @columns.elems + 1 + ($batch ?? 1 !! 0);
 
     $body = qq[<tr><td colspan="$span" class="text-center text-muted py-4">No records yet.</td></tr>];
   }

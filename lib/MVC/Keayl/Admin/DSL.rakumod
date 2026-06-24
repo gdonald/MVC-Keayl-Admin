@@ -37,3 +37,15 @@ sub menu(|args) is export {
 sub nested(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.nested(|args)
 }
+
+sub batch-action(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.batch-action(|args)
+}
+
+sub member-action(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.member-action(|args)
+}
+
+sub collection-action(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.collection-action(|args)
+}

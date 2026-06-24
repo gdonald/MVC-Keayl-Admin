@@ -37,7 +37,7 @@ describe 'MVC::Keayl::Admin show page', {
   it 'has a destroy control', {
     seed-posts({ title => 'P', body => 'b' });
     my $post = Post.where({ title => 'P' }).first;
-    expect(fetch('/admin/posts/' ~ $post.id).body.contains('hx-delete="/admin/posts/' ~ $post.id ~ '"')).to.be-truthy;
+    expect(fetch('/admin/posts/' ~ $post.id).body.contains('action="/admin/posts/' ~ $post.id ~ '/delete"')).to.be-truthy;
   }
 
   it 'links a belongs-to attribute to the associated record', {

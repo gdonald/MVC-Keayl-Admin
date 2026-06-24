@@ -1,0 +1,53 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub request(Str:D $method, Str:D $path) {
+  host.call(MVC::Keayl::Request.new(:$method, target => $path))
+}
+
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts;
+seed-posts({ title => 'Doomed', body => 'b' }, { title => 'Survivor', body => 'b' });
+
+my $doomed = Post.where({ title => 'Doomed' }).first;
+
+# the index delete button removes the row in place over htmx
+my $index = request('GET', '/admin/posts').body;
+ok $index.contains('hx-delete="/admin/posts/' ~ $doomed.id ~ '"'), 'each row has an htmx delete control';
+ok $index.contains('hx-swap="delete"'), 'the delete control removes the row in place';
+ok $index.contains('hx-confirm'), 'the delete control asks for confirmation';
+
+# an htmx DELETE destroys the record and returns an empty fragment
+my $deleted = request('DELETE', '/admin/posts/' ~ $doomed.id);
+is $deleted.status, 200, 'an htmx delete succeeds';
+is $deleted.body, '', 'an htmx delete returns an empty body so the row is removed';
+nok Post.where({ id => $doomed.id }).first.defined, 'the record is destroyed';
+
+# the show page deletes via a plain form that redirects to the index
+my $survivor = Post.where({ title => 'Survivor' }).first;
+my $show = request('GET', '/admin/posts/' ~ $survivor.id).body;
+ok $show.contains('action="/admin/posts/' ~ $survivor.id ~ '/delete"'), 'the show page deletes via a form';
+
+my $redirect = request('POST', '/admin/posts/' ~ $survivor.id ~ '/delete');
+is $redirect.status, 302, 'a form delete redirects';
+is $redirect.header('Location'), '/admin/posts', 'the delete redirects back to the index';
+nok Post.where({ id => $survivor.id }).first.defined, 'the record is destroyed via the form';
+
+# deleting an unknown record is a 404
+is request('DELETE', '/admin/posts/999999').status, 404, 'deleting an unknown record is a 404';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

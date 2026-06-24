@@ -68,15 +68,28 @@ method render(::?CLASS:U: $resource, $record, Str:D :$mount-path --> Str) {
   qq[<table class="table"><tbody>{@rows.join}</tbody></table>]
 }
 
+sub member-action-form($action, Str:D $base, $record --> Str) {
+  my $url     = html-escape($base ~ '/' ~ $record.id ~ '/' ~ $action.name);
+  my $label   = html-escape(humanize($action.name));
+  my $confirm = $action.confirm.defined ?? qq[ onsubmit="return confirm('{html-escape($action.confirm)}')"] !! '';
+
+  qq[<form method="post" action="$url"{$confirm}><button type="submit" class="list-group-item list-group-item-action w-100 text-start">{$label}</button></form>]
+}
+
 method actions(::?CLASS:U: $resource, $record, Str:D :$mount-path --> Str) {
-  my $base = $mount-path ~ '/' ~ $resource.slug;
-  my $edit = html-escape($base ~ '/' ~ $record.id ~ '/edit');
-  my $show = html-escape($base ~ '/' ~ $record.id);
+  my $base   = $mount-path ~ '/' ~ $resource.slug;
+  my $edit   = html-escape($base ~ '/' ~ $record.id ~ '/edit');
+  my $delete = html-escape($base ~ '/' ~ $record.id ~ '/delete');
+
+  my $custom = $resource.member-actions.map({ member-action-form($_, $base, $record) }).join;
 
   qq:to/HTML/.trim;
   <div class="list-group">
     <a class="list-group-item list-group-item-action" href="$edit"><i class="bi bi-pencil me-2"></i>Edit</a>
-    <button type="button" class="list-group-item list-group-item-action text-danger" hx-delete="$show" hx-confirm="Delete this record?"><i class="bi bi-trash me-2"></i>Delete</button>
+    {$custom}
+    <form method="post" action="$delete" onsubmit="return confirm('Delete this record?')">
+      <button type="submit" class="list-group-item list-group-item-action text-danger w-100 text-start"><i class="bi bi-trash me-2"></i>Delete</button>
+    </form>
   </div>
   HTML
 }

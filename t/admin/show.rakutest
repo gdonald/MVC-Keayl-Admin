@@ -36,7 +36,7 @@ ok $body.contains('hello'), 'the show page renders the body attribute';
 # action panel
 ok $body.contains('Edit') && $body.contains('/admin/posts/' ~ $post.id ~ '/edit'),
   'the action panel has an edit link';
-ok $body.contains('hx-delete="/admin/posts/' ~ $post.id ~ '"'),
+ok $body.contains('action="/admin/posts/' ~ $post.id ~ '/delete"'),
   'the action panel has a destroy control';
 
 # belongs-to rendered as a link to the associated show page

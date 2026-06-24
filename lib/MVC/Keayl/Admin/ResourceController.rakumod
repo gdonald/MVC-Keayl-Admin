@@ -11,6 +11,7 @@ use MVC::Keayl::Admin::Form;
 use MVC::Keayl::Admin::Attachments;
 use MVC::Keayl::Admin::Predicate;
 use MVC::Keayl::Admin::Formatter;
+use MVC::Keayl::Admin::Inflection;
 
 unit class MVC::Keayl::Admin::ResourceController is MVC::Keayl::Admin::Controller;
 
@@ -64,6 +65,17 @@ sub strong-params($resource, %params) {
   }
 
   %attrs
+}
+
+sub batch-toolbar($base, $resource --> Str) {
+  my @names   = ('Destroy', |$resource.batch-actions.map(*.name));
+  my $options = @names.map({ qq[<option value="{html-escape($_)}">{html-escape($_)}</option>] }).join;
+
+  qq[<div class="d-flex gap-2 mb-2 align-items-center"><select class="form-select form-select-sm w-auto" name="batch-action">{$options}</select><button type="submit" class="btn btn-outline-secondary btn-sm">Apply to <span data-batch-count>0</span> selected</button></div>]
+}
+
+sub batch-form($base, $resource, Str:D $table, Str:D $pager --> Str) {
+  qq[<form method="post" action="{html-escape($base ~ '/batch')}">{batch-toolbar($base, $resource)}{$table}{$pager}</form>]
 }
 
 sub resolve-scope($resource, %params) {
@@ -149,16 +161,24 @@ method index {
 
   my $tabs  = MVC::Keayl::Admin::Scopes.render($resource, :active($scope), :$base, :%filters, :$sort, :$dir, :%counts);
   my $chips = MVC::Keayl::Admin::FilterPanel.chips($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, scope => $scope-name);
-  my $table = MVC::Keayl::Admin::Table.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry);
+  my $table = MVC::Keayl::Admin::Table.render($resource, @records, mount-path => $mount, :$sort, :$dir, filters => %carry, :batch);
   my $pager = MVC::Keayl::Admin::Pagination.render(:$base, :$page, :$per, :$total, :$sort, :$dir, filters => %carry);
 
-  my $body = $tabs ~ $chips ~ $table ~ $pager;
+  my $body = $tabs ~ $chips ~ batch-form($base, $resource, $table, $pager);
 
   return self.render(:html($body)) if self.request.header('HX-Request');
 
+  my $collection-actions = $resource.collection-actions.map(-> $action {
+    my $url     = html-escape($base ~ '/' ~ $action.name);
+    my $label   = html-escape(humanize($action.name));
+    my $confirm = $action.confirm.defined ?? qq[ onsubmit="return confirm('{html-escape($action.confirm)}')"] !! '';
+
+    qq[<form method="post" action="$url"{$confirm} class="d-inline"><button type="submit" class="btn btn-outline-secondary">{$label}</button></form>]
+  }).join;
+
   self.assign('admin_index_body', $body);
   self.assign('admin_new_link',
-    qq[<a class="btn btn-primary" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>New {html-escape($resource.singular-name)}</a>]);
+    $collection-actions ~ qq[<a class="btn btn-primary ms-2" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>New {html-escape($resource.singular-name)}</a>]);
   self.assign('admin_filters_panel', self.filters-panel($resource, %params, :$base, :$sort, :$dir, scope => $scope-name));
 
   self.render-admin(
@@ -166,6 +186,76 @@ method index {
     page-title  => $resource.plural-name,
     breadcrumbs => [ $resource.plural-name => Nil ],
   )
+}
+
+method apply-batch {
+  my $resource = self.current-resource;
+  my $base     = MVC::Keayl::Admin::Config.current.mount-path ~ '/' ~ $resource.slug;
+
+  my @ids  = (self.params<ids> // ()).list.map(*.Int);
+  my $name = (self.params<batch-action> // '').Str;
+
+  my @records = @ids ?? $resource.model.where({ id => @ids }).all !! ();
+
+  if @records {
+    if $name eq 'Destroy' {
+      .destroy for @records;
+
+      self.flash<notice> = @records.elems ~ ' ' ~ $resource.plural-name ~ ' deleted.';
+    } else {
+      with $resource.batch-actions.first({ .name eq $name }) -> $action {
+        $action.block.(@records);
+
+        self.flash<notice> = $name ~ ' applied to ' ~ @records.elems ~ ' ' ~ $resource.plural-name ~ '.';
+      }
+    }
+  }
+
+  self.redirect-to($base);
+}
+
+method run-member-action {
+  my $resource = self.current-resource;
+  my $name     = self.request.path.split('/').grep(*.chars).tail;
+  my $record   = self!find-record($resource);
+
+  return self.head(404) without $record;
+
+  with $resource.member-actions.first({ .name eq $name }) -> $action {
+    return $action.block.(self, $record);
+  }
+
+  self.head(404)
+}
+
+method run-collection-action {
+  my $resource = self.current-resource;
+  my $name     = self.request.path.split('/').grep(*.chars).tail;
+
+  with $resource.collection-actions.first({ .name eq $name }) -> $action {
+    return $action.block.(self, $resource.model.all);
+  }
+
+  self.head(404)
+}
+
+method destroy {
+  my $resource = self.current-resource;
+  my $record   = self!find-record($resource);
+
+  return self.head(404) without $record;
+
+  my $index = MVC::Keayl::Admin::Config.current.mount-path ~ '/' ~ $resource.slug;
+
+  $record.destroy;
+
+  self.flash<notice> = $resource.singular-name ~ ' deleted.';
+
+  # An htmx DELETE from the index removes the row in place; a plain POST from the
+  # show page (or a no-JavaScript client) falls back to a full-page redirect.
+  return self.render(:html('')) if self.request.method eq 'DELETE';
+
+  self.redirect-to($index);
 }
 
 method !find-record($resource) {
