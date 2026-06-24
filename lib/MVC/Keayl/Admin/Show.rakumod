@@ -46,6 +46,8 @@ sub has-many-cell($attribute, $record, $reflection, Str:D $mount --> Str) {
 sub value-cell($attribute, $record --> Str) {
   my $value = $attribute.display.defined ?? $attribute.display.($record) !! $record.read-attribute($attribute.name);
 
+  return status-tag-html($value) if ($attribute.format // '') eq 'status-tag' && $value.defined;
+
   html-escape(format-value($value, $attribute.format))
 }
 

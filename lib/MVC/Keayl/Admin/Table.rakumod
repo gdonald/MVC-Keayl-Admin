@@ -26,6 +26,8 @@ sub cell-value($column, $record) {
 sub cell-html($column, $record, Str:D $base --> Str) {
   my $value = cell-value($column, $record);
 
+  return status-tag-html($value) if ($column.format // '') eq 'status-tag' && $value.defined;
+
   if ($column.format // '') eq 'link-to-show' {
     my $href = html-escape($base ~ '/' ~ $record.id);
 

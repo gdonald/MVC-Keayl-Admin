@@ -39,7 +39,7 @@ sub csv-row(@cells --> Str) {
 
 sub export-records($resource, $relation --> List) {
   $relation.all.map(-> $record {
-    %( $resource.columns.map({ .name => export-cell($_, $record) }) )
+    %( $resource.export-columns.map({ .name => export-cell($_, $record) }) )
   }).List
 }
 
@@ -315,7 +315,10 @@ method index {
     qq[<form method="post" action="$url"{$confirm} class="d-inline"><button type="submit" class="btn btn-outline-secondary">{$label}</button></form>]
   }).join;
 
-  my $export = qq[<div class="btn-group"><a class="btn btn-outline-secondary" href="{html-escape($base ~ '/export.csv')}">{html-escape(MVC::Keayl::Admin::I18n.chrome('export-csv', 'CSV'))}</a><a class="btn btn-outline-secondary" href="{html-escape($base ~ '/export.json')}">{html-escape(MVC::Keayl::Admin::I18n.chrome('export-json', 'JSON'))}</a></div>];
+  my $export-links = $resource.export-formats.map(-> $format {
+    qq[<a class="btn btn-outline-secondary" href="{html-escape($base ~ '/export.' ~ $format)}">{html-escape(MVC::Keayl::Admin::I18n.chrome('export-' ~ $format, $format.uc))}</a>]
+  }).join;
+  my $export = $export-links ?? qq[<div class="btn-group">{$export-links}</div>] !! '';
 
   my $new-link = $abilities.can('create')
     ?? qq[<a class="btn btn-primary ms-2" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('new', 'New') ~ ' ' ~ $resource.singular-name)}</a>]
@@ -442,12 +445,16 @@ method action-items-html($resource, Str:D $action, $abilities, $record = Nil -->
 
 method export {
   my $resource = self.current-resource;
-  my $relation = self!list-relation($resource, self.params.Hash);
   my $format   = (self.params<format> // 'csv').Str;
 
-  return self.render(admin-json => export-records($resource, $relation), content-type => 'application/json; charset=utf-8') if $format eq 'json';
+  return self.head(404) unless $format eq any($resource.export-formats);
 
-  my @columns = $resource.columns;
+  my $relation = self!list-relation($resource, self.params.Hash);
+
+  return self.render(admin-json => export-records($resource, $relation), content-type => 'application/json; charset=utf-8') if $format eq 'json';
+  return self.render(admin-xml  => export-records($resource, $relation), content-type => 'application/xml; charset=utf-8')  if $format eq 'xml';
+
+  my @columns = $resource.export-columns;
 
   my $rows := gather {
     take csv-row(@columns.map({ MVC::Keayl::Admin::I18n.attribute-label($resource.model, .name) }));
@@ -595,4 +602,18 @@ MVC::Keayl::Admin::ResourceController.before-action('authorize-action');
 
 MVC::Keayl::Admin::ResourceController.add-renderer('admin-json', -> $controller, $data, %opts {
   to-json($data)
+});
+
+sub xml-escape(Str() $text --> Str) {
+  $text.trans(['&', '<', '>'] => ['&amp;', '&lt;', '&gt;'])
+}
+
+MVC::Keayl::Admin::ResourceController.add-renderer('admin-xml', -> $controller, $data, %opts {
+  my $records = $data.map(-> %record {
+    '<record>' ~ %record.sort(*.key).map(-> $pair {
+      '<' ~ $pair.key ~ '>' ~ xml-escape($pair.value.Str) ~ '</' ~ $pair.key ~ '>'
+    }).join ~ '</record>'
+  }).join;
+
+  '<?xml version="1.0" encoding="UTF-8"?>' ~ "\n" ~ '<records>' ~ $records ~ '</records>'
 });

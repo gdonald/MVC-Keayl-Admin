@@ -42,6 +42,7 @@ a declaration on the resource config:
 | `index`              | the index presentation (`:as` table/grid/blog, a per-record block)        | [Index presentations and panels](presentations.md) |
 | `belongs-to`         | nests the resource under a parent association                             | [Nested resources](nested-resources.md) |
 | `includes`           | associations to eager-load on the index                                   | [Nested resources](nested-resources.md) |
+| `csv`                | explicit export columns, overriding the index columns                     | [Customization](customization.md) |
 | `actions`            | which default actions the resource exposes (`:except`)                    | [Action availability and toolbar](actions-availability.md) |
 | `sort-order`         | the default ordering (`:dir`)                                             | [Action availability and toolbar](actions-availability.md) |
 | `action-item`        | a page-toolbar button (`:only`, `:except`, `:if-can`)                     | [Action availability and toolbar](actions-availability.md) |
@@ -74,6 +75,7 @@ resource as a whole:
 | `scope-counts`  | `True`               | Whether scope tabs show counts ([Scopes](scopes.md)).         |
 | `filters`       | `True`               | Whether the filter UI renders ([Action availability](actions-availability.md)). |
 | `batch-actions` | `True`               | Whether batch selection renders ([Action availability](actions-availability.md)). |
+| `export`        | all formats          | Export formats offered, or `False` to disable ([Customization](customization.md)). |
 
 ```raku
 MVC::Keayl::Admin.register(Post, { ... },

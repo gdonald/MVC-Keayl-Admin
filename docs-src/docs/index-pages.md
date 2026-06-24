@@ -24,6 +24,17 @@ renders the date portion, and so on.
 `:format<link-to-show>` is special: it links the value to the record's show
 page, so a title column can double as the row's primary link.
 
+`:format<status-tag>` renders the value as a colored Bootstrap badge, reused on
+the show page. A boolean renders as a green Yes or a grey No; a string maps known
+states to colors (`active`/`published`/`approved` green, `pending` amber,
+`draft`/`inactive` grey, `rejected`/`failed` red) and humanizes the label,
+defaulting to grey for an unknown value. Pair it with a `display` block to derive
+the state from the record:
+
+```raku
+column('state', :format<status-tag>, :display({ .published ?? 'active' !! 'draft' }));
+```
+
 ## Rows and actions
 
 Every row ends in an actions column with Show, Edit, and Delete controls. Delete

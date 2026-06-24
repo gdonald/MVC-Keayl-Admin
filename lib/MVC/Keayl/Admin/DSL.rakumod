@@ -26,6 +26,10 @@ sub includes(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.includes(|args)
 }
 
+sub csv(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.csv(|args)
+}
+
 sub action-item(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.action-item(|args)
 }

@@ -37,7 +37,7 @@ method configure(::?CLASS:U: Str :$mount-path, Str :$site-title --> MVC::Keayl::
   $config
 }
 
-method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str :$plural, Int :$per-page, Bool :$scope-counts, Bool :$filters, Bool :$batch-actions --> MVC::Keayl::Admin::Resource) {
+method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str :$plural, Int :$per-page, Bool :$scope-counts, Bool :$filters, Bool :$batch-actions, :$export --> MVC::Keayl::Admin::Resource) {
   my $resource = MVC::Keayl::Admin::Resource.new(
     :$model,
     slug-override         => $slug,
@@ -47,6 +47,7 @@ method register(::?CLASS:U: Mu:U $model, &block, Str :$slug, Str :$singular, Str
     scope-counts-override => $scope-counts,
     filters-override      => $filters,
     batch-override        => $batch-actions,
+    export-override       => $export,
   );
 
   $resource.parse(&block);
@@ -120,7 +121,7 @@ sub admin-routes {
       # Literal paths are registered before `resources` so they win over the
       # member `:id` route.
       post '/' ~ $slug ~ '/batch',  to => $resource-ctrl ~ '#apply-batch' if $res.batch-enabled;
-      get  '/' ~ $slug ~ '/export', to => $resource-ctrl ~ '#export', :format if $res.allows-action('index');
+      get  '/' ~ $slug ~ '/export', to => $resource-ctrl ~ '#export', :format if $res.allows-action('index') && $res.export-enabled;
 
       for $res.collection-actions -> $action {
         post '/' ~ $slug ~ '/' ~ $action.name, to => $resource-ctrl ~ '#run-collection-action';

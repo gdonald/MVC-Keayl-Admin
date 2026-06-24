@@ -1,7 +1,7 @@
 use v6.d;
 use Test;
 
-plan 53;
+plan 54;
 
 use-ok 'MVC::Keayl::Admin';
 use-ok 'MVC::Keayl::Admin::ActionItem';
@@ -26,6 +26,7 @@ use-ok 'MVC::Keayl::Admin::Dashboard';
 use-ok 'MVC::Keayl::Admin::DashboardController';
 use-ok 'MVC::Keayl::Admin::DSL';
 use-ok 'MVC::Keayl::Admin::Engine';
+use-ok 'MVC::Keayl::Admin::ExportSpec';
 use-ok 'MVC::Keayl::Admin::Field';
 use-ok 'MVC::Keayl::Admin::Filter';
 use-ok 'MVC::Keayl::Admin::FilterPanel';

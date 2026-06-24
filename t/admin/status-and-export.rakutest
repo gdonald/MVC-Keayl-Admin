@@ -1,0 +1,83 @@
+use v6.d;
+use Test;
+use JSON::Fast;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub host {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+}
+
+sub fetch(Str:D $path) {
+  host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+sub streamed-body($response --> Str) {
+  $response.is-streaming
+    ?? $response.stream-chunks.map({ $_ ~~ Blob ?? .decode('utf-8') !! $_.Str }).join
+    !! $response.body
+}
+
+# status-tag formatter on the index and show
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-status;
+seed-posts({ title => 'Live', published => True });
+
+my $sid = Post.all.all[0].id;
+my $index = fetch('/admin/posts').body;
+ok $index.contains('badge text-bg-success'), 'a status-tag column renders a colored badge';
+ok $index.contains('>Active</span>'), 'the status-tag label is humanized from the value';
+
+my $show = fetch('/admin/posts/' ~ $sid).body;
+ok $show.contains('badge text-bg-success') && $show.contains('>Yes</span>'), 'a boolean status-tag renders on the show page';
+
+# a csv block overrides the export columns
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-csv;
+seed-posts({ title => 'Alpha', body => 'Body text' });
+
+my $csv = streamed-body(fetch('/admin/posts/export.csv'));
+ok $csv.contains('Title') && $csv.contains('Alpha'), 'the CSV export uses the declared export column';
+nok $csv.contains('Body text'), 'the CSV export omits index columns not in the csv block';
+
+my @json = from-json(fetch('/admin/posts/export.json').body).list;
+ok @json[0]<title>:exists, 'the JSON export carries the declared column';
+nok @json[0]<body>:exists, 'the JSON export omits columns not in the csv block';
+
+# XML export through the renderer registry
+my $xml-response = fetch('/admin/posts/export.xml');
+ok $xml-response.header('Content-Type').contains('application/xml'), 'the XML export sets an application/xml content type';
+my $xml = $xml-response.body;
+ok $xml.contains('<records>') && $xml.contains('<record>') && $xml.contains('<title>Alpha</title>'), 'the XML export wraps each record';
+
+# export can be disabled per resource
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-no-export;
+seed-posts({ title => 'X' });
+
+is fetch('/admin/posts/export.csv').status, 404, 'export is unrouted when disabled';
+nok fetch('/admin/posts').body.contains('export.csv'), 'no export links when disabled';
+
+# the offered formats can be limited per resource
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-csv-only;
+seed-posts({ title => 'X' });
+
+is fetch('/admin/posts/export.csv').status, 200, 'an allowed format is served';
+is fetch('/admin/posts/export.json').status, 404, 'a disallowed format is a 404';
+my $limited = fetch('/admin/posts').body;
+ok $limited.contains('export.csv'), 'the allowed format has an export link';
+nok $limited.contains('export.json'), 'a disallowed format has no export link';
+
+MVC::Keayl::Admin.reset;
+
+done-testing;

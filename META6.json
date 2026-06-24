@@ -43,6 +43,7 @@
     "MVC::Keayl::Admin::DashboardController": "lib/MVC/Keayl/Admin/DashboardController.rakumod",
     "MVC::Keayl::Admin::DSL": "lib/MVC/Keayl/Admin/DSL.rakumod",
     "MVC::Keayl::Admin::Engine": "lib/MVC/Keayl/Admin/Engine.rakumod",
+    "MVC::Keayl::Admin::ExportSpec": "lib/MVC/Keayl/Admin/ExportSpec.rakumod",
     "MVC::Keayl::Admin::Field": "lib/MVC/Keayl/Admin/Field.rakumod",
     "MVC::Keayl::Admin::Filter": "lib/MVC/Keayl/Admin/Filter.rakumod",
     "MVC::Keayl::Admin::FilterPanel": "lib/MVC/Keayl/Admin/FilterPanel.rakumod",

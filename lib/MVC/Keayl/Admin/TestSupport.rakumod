@@ -143,6 +143,39 @@ sub register-posts-grid(--> Nil) is export {
   });
 }
 
+sub register-posts-status(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title');
+    column('state', :format<status-tag>, :display({ .read-attribute('published') ?? 'active' !! 'draft' }));
+
+    attribute('title');
+    attribute('flag', :format<status-tag>, :display({ True }));
+  });
+}
+
+sub register-posts-csv(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title');
+    column('body');
+
+    csv({
+      column('title');
+    });
+  });
+}
+
+sub register-posts-no-export(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title');
+  }, export => False);
+}
+
+sub register-posts-csv-only(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title');
+  }, export => <csv>);
+}
+
 sub register-posts-nested(--> Nil) is export {
   MVC::Keayl::Admin.register(Post, {
     belongs-to('author');

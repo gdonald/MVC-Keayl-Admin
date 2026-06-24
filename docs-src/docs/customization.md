@@ -2,8 +2,8 @@
 
 ## Export
 
-Each index exports its current scoped-and-filtered view. The toolbar offers CSV
-and JSON, and the export honours the active scope, filters, and sort.
+Each index exports its current scoped-and-filtered view. The toolbar offers the
+enabled formats, and the export honours the active scope, filters, and sort.
 
 - `GET /admin/<resource>/export.csv` streams a CSV: a header row of column labels
   followed by one row per record, with values quoted when they contain a comma,
@@ -12,6 +12,33 @@ and JSON, and the export honours the active scope, filters, and sort.
 - `GET /admin/<resource>/export.json` returns the same view as JSON, rendered
   through the controller's custom-renderer registry. Each object carries the
   column values.
+- `GET /admin/<resource>/export.xml` returns the same view as XML through the
+  renderer registry, one `<record>` per row.
+
+### Export columns
+
+By default the export uses the index columns. A `csv` block declares an explicit
+set of export columns instead, applied to CSV, JSON, and XML alike:
+
+```raku
+csv({
+  column('title');
+  column('author', :display({ .author.name }));
+});
+```
+
+### Limiting the formats
+
+The export is on by default with all three formats. Restrict or disable it per
+resource with the `export` option:
+
+```raku
+MVC::Keayl::Admin.register(Post, { ... }, export => <csv json>);   # only CSV and JSON
+MVC::Keayl::Admin.register(Log,  { ... }, export => False);        # no export
+```
+
+Only the offered formats get a route and a toolbar link; a disabled format is a
+404.
 
 ## Standalone pages
 

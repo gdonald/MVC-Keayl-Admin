@@ -14,6 +14,7 @@ use MVC::Keayl::Admin::BatchAction;
 use MVC::Keayl::Admin::CustomAction;
 use MVC::Keayl::Admin::Panel;
 use MVC::Keayl::Admin::ActionItem;
+use MVC::Keayl::Admin::ExportSpec;
 
 unit class MVC::Keayl::Admin::Resource;
 
@@ -48,6 +49,8 @@ has Str                             $.sort-column;
 has Str                             $.sort-dir = 'asc';
 has Str                             $.parent-association;
 has Str                             @.eager-loads;
+has MVC::Keayl::Admin::Column       @!csv-columns;
+has                                 $.export-override;
 
 constant FIELD-TYPES  = set <string text select boolean date time datetime number password hidden file>;
 constant FILTER-TYPES = set <string numeric boolean date date-range select>;
@@ -158,6 +161,39 @@ method includes(*@names --> ::?CLASS) {
   @!eager-loads = @names>>.Str;
 
   self
+}
+
+method csv(&block --> ::?CLASS) {
+  reject-unknown(%_, 'csv');
+
+  my $spec = MVC::Keayl::Admin::ExportSpec.new;
+
+  {
+    my $*KEAYL-ADMIN-RESOURCE = $spec;
+    block();
+  }
+
+  @!csv-columns = $spec.columns;
+
+  self
+}
+
+method export-columns(--> List) {
+  (@!csv-columns ?? @!csv-columns !! @!columns).List
+}
+
+method export-formats(--> List) {
+  with $!export-override {
+    return <csv json xml> if $_ ~~ Bool && $_;
+    return ()             if $_ ~~ Bool;
+    return .list>>.Str;
+  }
+
+  <csv json xml>
+}
+
+method export-enabled(--> Bool) {
+  so self.export-formats.elems
 }
 
 method parent-reflection {
