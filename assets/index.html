@@ -993,8 +993,9 @@ it works with no external requests and no CDN dependency.</p>
 </tr>
 </tbody>
 </table>
-<p>The files live under <code>assets/</code> and ship with the distribution. They are pinned
-in <code>tools/vendored-assets.json</code> (versions, source URLs, and checksums); run
+<p>The files ship as distribution resources, so they resolve whether the admin runs
+from a source checkout or an install. They are pinned in
+<code>tools/vendored-assets.json</code> (versions, source URLs, and checksums); run
 <code>raku tools/vendor-assets.raku</code> to refetch or upgrade them.</p>
 <h2 id="serving-and-fingerprinting">Serving and fingerprinting<a class="headerlink" href="#serving-and-fingerprinting" title="Permanent link">&para;</a></h2>
 <p>The engine serves the bundle under <code>&lt;mount&gt;/admin-assets/&lt;path&gt;</code>. Each URL

@@ -961,12 +961,15 @@ brings the vendored Bootstrap and HTMX assets with it.</p>
 <h2 id="generate-an-admin-for-a-model">Generate an admin for a model<a class="headerlink" href="#generate-an-admin-for-a-model" title="Permanent link">&para;</a></h2>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>keayl-admin generate admin Post
 </code></pre></div></td></tr></table></div>
-<p>The generator introspects the model's schema at generate time and emits an
-explicit registration at <code>app/admin/post.raku</code> with a <code>column</code>, <code>field</code>, and
-<code>filter</code> for each column, and a <code>permit</code> of the editable attributes (the primary
-key and timestamps are left out of the editable set). Field and filter types
-follow the column types. Because the file is explicit, edit it freely afterward.
-Parallel <code>t/</code> and <code>specs/</code> coverage is generated alongside it.</p>
+<p>The generator loads the named model from the conventional <code>app/models</code> directory
+(with <code>app/models/concerns</code> on the search path for its dependencies), introspects
+its schema at generate time, and emits an explicit registration at
+<code>app/admin/post.raku</code> with a <code>column</code>, <code>field</code>, and <code>filter</code> for each column, and
+a <code>permit</code> of the editable attributes (the primary key and timestamps are left
+out of the editable set). Field and filter types follow the column types. If the
+model cannot be loaded, the generator reports the error and exits non-zero without
+writing anything. Because the file is explicit, edit it freely afterward. Parallel
+<code>t/</code> and <code>specs/</code> coverage is generated alongside it.</p>
 <h2 id="mounting-by-hand">Mounting by hand<a class="headerlink" href="#mounting-by-hand" title="Permanent link">&para;</a></h2>
 <p>If you prefer to wire things up yourself, mounting is a single line in your
 routes. See <a href="../mounting/">Mounting</a> and <a href="../registration/">Registering resources</a>.</p>
