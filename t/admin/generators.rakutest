@@ -43,6 +43,7 @@ setup-admin-db;
 
   my $source = $file.slurp;
   like $source, /'MVC::Keayl::Admin.register(Post'/, 'the registration registers the model';
+  like $source, /'use MVC::Keayl::Admin::DSL'/,     'the registration imports the DSL used by its block';
   like $source, /"column('title')"/,                'a column is emitted from the schema';
   like $source, /"field('title'"/,                   'a field is emitted from the schema';
   like $source, /"filter('"/,                        'a filter is emitted from the schema';
@@ -51,6 +52,40 @@ setup-admin-db;
 
   ok $root.add('t/admin/post.rakutest').e,     'a parallel t/ test is generated';
   ok $root.add('specs/admin/post-spec.raku').e, 'a parallel spec is generated';
+
+  my $test-source = $root.add('t/admin/post.rakutest').slurp;
+  like $test-source, /"use lib 'app/models'"/,          'the generated test puts the models directory on the search path';
+  like $test-source, /"use lib 'app/models/concerns'"/, 'the generated test puts the model concerns directory on the search path';
+
+  my $spec-source = $root.add('specs/admin/post-spec.raku').slurp;
+  like $spec-source, /"use lib 'app/models'"/,          'the generated spec puts the models directory on the search path';
+  like $spec-source, /"use lib 'app/models/concerns'"/, 'the generated spec puts the model concerns directory on the search path';
+}
+
+# without an explicit model the generator loads it from the conventional app/models directory
+{
+  my $root = scratch('load-model');
+  $root.add('app/models').mkdir;
+  $root.add('app/models/Widget.rakumod').spurt(q:to/RAKU/);
+  unit class Widget;
+
+  method columns {
+    (
+      { name => 'id',    type => 'integer' },
+      { name => 'name',  type => 'string'  },
+      { name => 'notes', type => 'text'    },
+    )
+  }
+  RAKU
+
+  my $err = StringSink.new;
+
+  is generate-admin('Widget', root => $root, out => StringSink.new, err => $err), 0,
+    'the generator loads a model from app/models and succeeds';
+
+  my $source = $root.add('app/admin/widget.raku').slurp;
+  like $source, /"column('name')"/,        'a column is emitted from the disk-loaded schema';
+  like $source, /"field('notes', :as<text>)"/, 'a text column from the disk-loaded schema becomes a text field';
 }
 
 # the field type follows the column type
@@ -60,6 +95,16 @@ setup-admin-db;
 
   my $source = $root.add('app/admin/post.raku').slurp;
   like $source, /"field('body', :as<text>)"/, 'a text column becomes a text field';
+}
+
+# a model that cannot be loaded reports a clean error rather than crashing
+{
+  my $root = scratch('unloadable');
+  my $err  = StringSink.new;
+
+  is generate-admin('NoSuchModel12345', root => $root, out => StringSink.new, err => $err), 1,
+    'the generator returns non-zero for a model it cannot load';
+  like $err.text, /'cannot load model'/, 'the unloadable model is reported on the error stream';
 }
 
 # generate admin:install mounts the engine and writes the scaffolding

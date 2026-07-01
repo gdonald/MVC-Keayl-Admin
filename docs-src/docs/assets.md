@@ -11,8 +11,9 @@ it works with no external requests and no CDN dependency.
 | Bootstrap Icons | 1.11.3  | `bootstrap-icons/bootstrap-icons.min.css`                          |
 | htmx            | 2.0.4   | `htmx/htmx.min.js`                                                 |
 
-The files live under `assets/` and ship with the distribution. They are pinned
-in `tools/vendored-assets.json` (versions, source URLs, and checksums); run
+The files ship as distribution resources, so they resolve whether the admin runs
+from a source checkout or an install. They are pinned in
+`tools/vendored-assets.json` (versions, source URLs, and checksums); run
 `raku tools/vendor-assets.raku` to refetch or upgrade them.
 
 ## Serving and fingerprinting

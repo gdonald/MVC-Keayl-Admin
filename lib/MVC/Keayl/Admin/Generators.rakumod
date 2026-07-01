@@ -94,6 +94,7 @@ sub registration-source(Str:D $class, @columns --> Str) {
 
   fill(Q:to/RAKU/, %( '__CLASS__' => $class, '__COLUMNS__' => $columns, '__FIELDS__' => $fields, '__FILTERS__' => $filters, '__PERMIT__' => $permit ));
     use MVC::Keayl::Admin;
+    use MVC::Keayl::Admin::DSL;
     use __CLASS__;
 
     MVC::Keayl::Admin.register(__CLASS__, {
@@ -111,6 +112,8 @@ sub registration-source(Str:D $class, @columns --> Str) {
 sub registration-test(Str:D $class, Str:D $under --> Str) {
   fill(Q:to/RAKU/, %( '__CLASS__' => $class, '__UNDER__' => $under ));
     use v6.d;
+    use lib 'app/models';
+    use lib 'app/models/concerns';
     use Test;
 
     use MVC::Keayl::Admin;
@@ -129,6 +132,8 @@ sub registration-test(Str:D $class, Str:D $under --> Str) {
 
 sub registration-spec(Str:D $class, Str:D $under --> Str) {
   fill(Q:to/RAKU/, %( '__CLASS__' => $class, '__UNDER__' => $under ));
+    use lib 'app/models';
+    use lib 'app/models/concerns';
     use BDD::Behave;
     use MVC::Keayl::Admin;
 
@@ -145,15 +150,32 @@ sub registration-spec(Str:D $class, Str:D $under --> Str) {
     RAKU
 }
 
+# Put the conventional model directories on the repository chain so a model
+# named on the command line (and its dependencies) can be loaded and
+# introspected. `use lib` would bind at the bin's compile time; this resolves
+# against the directory the generator is actually run from.
+sub add-model-paths(IO() $root) {
+  for <app/models app/models/concerns> -> $relative {
+    my $dir = $root.add($relative);
+    next unless $dir.d;
+    CompUnit::RepositoryRegistry.use-repository(
+      CompUnit::RepositoryRegistry.repository-for-spec($dir.absolute));
+  }
+}
+
 sub generate-admin(Str:D $model-name, :$model, IO() :$root = '.'.IO, :$out = $*OUT, :$err = $*ERR --> Int) is export {
   my $class = $model-name;
   my $under = underscore($model-name);
 
   my $resolved = $model;
-  $resolved = (try ::($class)) unless $resolved.^can('columns');
+  unless $resolved.^can('columns') {
+    add-model-paths($root);
+    try require ::($class);
+    $resolved = (try ::($class));
+  }
 
   unless $resolved.^can('columns') {
-    $err.note("keayl-admin: cannot load model '$class'");
+    $err.say("keayl-admin: cannot load model '$class'");
     return 1;
   }
 

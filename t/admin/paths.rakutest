@@ -1,0 +1,29 @@
+use v6.d;
+use lib 'lib';
+use Test;
+use JSON::Fast;
+use MVC::Keayl::Admin::Paths;
+
+# The bundled templates and assets must be declared as dist resources (so they
+# are installed) and reachable through Paths whether run from source or an
+# install. Without the resources declaration the installed admin cannot find
+# its own views.
+
+my %meta = from-json($*PROGRAM.IO.parent(3).add('META6.json').slurp);
+
+ok %meta<resources>.elems > 0, 'the dist declares resources';
+ok %meta<resources>.grep('views/resource/index.html.haml'),
+  'the resource index template is a declared resource';
+ok %meta<resources>.grep('views/layouts/admin.html.haml'),
+  'the admin layout is a declared resource';
+ok %meta<resources>.grep(*.starts-with('assets/')),
+  'the vendored assets are declared resources';
+
+ok views-path().IO.d, 'the views path resolves to a directory';
+ok views-path().IO.add('resource/index.html.haml').e,
+  'the resource index template is reachable through the views path';
+ok assets-path().IO.d, 'the assets path resolves to a directory';
+ok assets-path().IO.add('bootstrap/bootstrap.min.css').e,
+  'a vendored asset is reachable through the assets path';
+
+done-testing;

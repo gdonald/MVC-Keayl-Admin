@@ -28,12 +28,15 @@ The mount is idempotent: running install again does not duplicate it.
 keayl-admin generate admin Post
 ```
 
-The generator introspects the model's schema at generate time and emits an
-explicit registration at `app/admin/post.raku` with a `column`, `field`, and
-`filter` for each column, and a `permit` of the editable attributes (the primary
-key and timestamps are left out of the editable set). Field and filter types
-follow the column types. Because the file is explicit, edit it freely afterward.
-Parallel `t/` and `specs/` coverage is generated alongside it.
+The generator loads the named model from the conventional `app/models` directory
+(with `app/models/concerns` on the search path for its dependencies), introspects
+its schema at generate time, and emits an explicit registration at
+`app/admin/post.raku` with a `column`, `field`, and `filter` for each column, and
+a `permit` of the editable attributes (the primary key and timestamps are left
+out of the editable set). Field and filter types follow the column types. If the
+model cannot be loaded, the generator reports the error and exits non-zero without
+writing anything. Because the file is explicit, edit it freely afterward. Parallel
+`t/` and `specs/` coverage is generated alongside it.
 
 ## Mounting by hand
 

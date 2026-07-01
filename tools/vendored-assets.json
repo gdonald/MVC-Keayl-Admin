@@ -74,5 +74,5 @@
     }
   ],
   "description": "Pinned manifest of the vendored frontend bundle. To upgrade a component, change its version, run tools/vendor-assets.raku to refetch and refresh the sha1 checksums, review the diff, and run the test suite.",
-  "destination": "assets"
+  "destination": "resources/assets"
 }
