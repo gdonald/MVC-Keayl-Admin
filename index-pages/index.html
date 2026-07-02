@@ -412,6 +412,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#raw-markup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raw markup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rows-and-actions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -944,6 +955,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#raw-markup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raw markup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#rows-and-actions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1035,6 +1057,16 @@ defaulting to grey for an unknown value. Pair it with a <code>display</code> blo
 the state from the record:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">column</span>(<span class="s">&#39;state&#39;</span>, :<span class="n">format</span><span class="s">&lt;status-tag&gt;</span>, :<span class="n">display</span>({ .<span class="n">published</span> ?? <span class="s">&#39;active&#39;</span> !! <span class="s">&#39;draft&#39;</span> }));
 </code></pre></div></td></tr></table></div>
+<h2 id="raw-markup">Raw markup<a class="headerlink" href="#raw-markup" title="Permanent link">&para;</a></h2>
+<p>Column values are HTML-escaped by default, so a <code>display</code> block that returns a
+string with angle brackets renders as literal text. Declare a column <code>:html</code> when
+the value is trusted markup that should render as-is:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nb">column</span>(<span class="s">&#39;preview&#39;</span>, :<span class="n">html</span>, :<span class="n">display</span>({ <span class="s">&#39;&lt;a href=&quot;&#39;</span> ~ .<span class="n">url</span> ~ <span class="s">&#39;&quot;&gt;open&lt;/a&gt;&#39;</span> }));
+</code></pre></div></td></tr></table></div>
+<p>An <code>:html</code> column emits its value verbatim, bypassing escaping and any <code>:format</code>.
+You own the safety of the markup, so escape untrusted parts yourself. The same
+flag works on the table, grid, and blog presentations, and on show-page
+attributes.</p>
 <h2 id="rows-and-actions">Rows and actions<a class="headerlink" href="#rows-and-actions" title="Permanent link">&para;</a></h2>
 <p>Every row ends in an actions column with Show, Edit, and Delete controls. Delete
 issues an HTMX destroy with a confirmation and removes the row in place; see

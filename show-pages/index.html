@@ -933,6 +933,11 @@ same way in both places.</p>
 </code></pre></div></td></tr></table></div>
 <p>A <code>:display</code> block computes the row value; otherwise the value is read from the
 column and run through the named <code>:format</code>.</p>
+<p>An attribute value is HTML-escaped by default. Declare an attribute <code>:html</code> to
+render its value as trusted markup instead, bypassing escaping and any <code>:format</code>
+(see <a href="../index-pages/#raw-markup">raw markup</a>):</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">attribute</span>(<span class="s">&#39;preview&#39;</span>, :<span class="n">html</span>, :<span class="n">display</span>({ .<span class="n">rendered-html</span> }));
+</code></pre></div></td></tr></table></div>
 <h2 id="action-panel">Action panel<a class="headerlink" href="#action-panel" title="Permanent link">&para;</a></h2>
 <p>A sidebar panel holds the per-record actions: Edit (links to the edit form),
 Delete (a destroying form with a confirmation), and any custom member actions
