@@ -64,6 +64,29 @@ register-posts-grid;
 
 ok fetch('/admin/posts').body.contains('No records yet'), 'an empty grid shows the empty state';
 
+# an :html column emits raw markup; an ordinary display column is still escaped
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-html;
+seed-posts({ title => 'Raw' });
+
+my $index = fetch('/admin/posts').body;
+ok $index.contains('<a href="/x">link</a>'), 'an :html column emits raw markup';
+ok $index.contains('&lt;b&gt;bold'),          'an ordinary display column is still HTML-escaped';
+
+my $id = MVC::Keayl::Admin.registry.all.first(*.model-name eq 'Post').model.all.all.first.id;
+ok fetch("/admin/posts/$id").body.contains('<img src="/y">'), 'an :html show attribute emits raw markup';
+
+# an :html column is honored in a presentation without a per-record block
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-posts-html-grid;
+seed-posts({ title => 'Raw' });
+
+my $grid-html = fetch('/admin/posts').body;
+ok $grid-html.contains('<a href="/x">link</a>'), 'an :html column emits raw markup in the default grid body';
+ok $grid-html.contains('&lt;b&gt;bold'),          'an ordinary display column is still escaped in the default grid body';
+
 MVC::Keayl::Admin.reset;
 
 done-testing;

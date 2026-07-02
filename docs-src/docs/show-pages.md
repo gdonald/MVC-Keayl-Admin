@@ -14,6 +14,14 @@ attribute('author');     # an association
 A `:display` block computes the row value; otherwise the value is read from the
 column and run through the named `:format`.
 
+An attribute value is HTML-escaped by default. Declare an attribute `:html` to
+render its value as trusted markup instead, bypassing escaping and any `:format`
+(see [raw markup](index-pages.md#raw-markup)):
+
+```raku
+attribute('preview', :html, :display({ .rendered-html }));
+```
+
 ## Action panel
 
 A sidebar panel holds the per-record actions: Edit (links to the edit form),

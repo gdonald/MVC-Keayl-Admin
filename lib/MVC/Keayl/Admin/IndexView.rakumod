@@ -13,6 +13,8 @@ sub allowed($abilities, Str:D $action --> Bool) {
 sub column-value($column, $record --> Str) {
   my $value = $column.display.defined ?? $column.display.($record) !! $record.read-attribute($column.name);
 
+  return $value.Str if $column.html;
+
   html-escape(format-value($value, $column.format))
 }
 

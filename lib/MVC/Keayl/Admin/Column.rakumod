@@ -6,3 +6,4 @@ has Str  $.name is required;
 has Bool $.sortable = False;
 has      &.display;
 has Str  $.format;
+has Bool $.html = False;

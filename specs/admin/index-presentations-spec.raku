@@ -75,3 +75,41 @@ describe 'MVC::Keayl::Admin blog presentation', {
     expect(body.contains('Filters')).to.be-truthy;
   }
 }
+
+describe 'html-safe columns and attributes', {
+  before-each {
+    MVC::Keayl::Admin.reset;
+    setup-admin-db;
+    register-posts-html;
+    seed-posts({ title => 'Raw' });
+  }
+
+  it 'emits raw markup from an :html column and escapes an ordinary one', {
+    my $body = fetch('/admin/posts').body;
+    expect($body.contains('<a href="/x">link</a>') && $body.contains('&lt;b&gt;bold')).to.be-truthy;
+  }
+
+  it 'emits raw markup from an :html show attribute', {
+    my $id = MVC::Keayl::Admin.registry.all.first(*.model-name eq 'Post').model.all.all.first.id;
+    expect(fetch("/admin/posts/$id").body.contains('<img src="/y">')).to.be-truthy;
+  }
+}
+
+describe 'html-safe columns in a presentation without a per-record block', {
+  before-each {
+    MVC::Keayl::Admin.reset;
+    setup-admin-db;
+    register-posts-html-grid;
+    seed-posts({ title => 'Raw' });
+  }
+
+  let(:body, { fetch('/admin/posts').body });
+
+  it 'emits raw markup from an :html column in the default grid body', {
+    expect(body.contains('<a href="/x">link</a>')).to.be-truthy;
+  }
+
+  it 'escapes an ordinary display column in the default grid body', {
+    expect(body.contains('&lt;b&gt;bold')).to.be-truthy;
+  }
+}

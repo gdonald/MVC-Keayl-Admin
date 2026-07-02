@@ -220,18 +220,18 @@ method visible-action-items(Str:D $action, $abilities --> List) {
     .List
 }
 
-method column(Str:D $name, Bool :$sortable = False, :&display, Str :$format --> ::?CLASS) {
+method column(Str:D $name, Bool :$sortable = False, :&display, Str :$format, Bool :$html = False --> ::?CLASS) {
   reject-unknown(%_, "column '$name'");
 
-  @!columns.push: MVC::Keayl::Admin::Column.new(:$name, :$sortable, :&display, :$format);
+  @!columns.push: MVC::Keayl::Admin::Column.new(:$name, :$sortable, :&display, :$format, :$html);
 
   self
 }
 
-method attribute(Str:D $name, :&display, Str :$format --> ::?CLASS) {
+method attribute(Str:D $name, :&display, Str :$format, Bool :$html = False --> ::?CLASS) {
   reject-unknown(%_, "attribute '$name'");
 
-  @!attributes.push: MVC::Keayl::Admin::Attribute.new(:$name, :&display, :$format);
+  @!attributes.push: MVC::Keayl::Admin::Attribute.new(:$name, :&display, :$format, :$html);
 
   self
 }

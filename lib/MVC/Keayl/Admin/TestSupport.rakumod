@@ -143,6 +143,23 @@ sub register-posts-grid(--> Nil) is export {
   });
 }
 
+sub register-posts-html(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title', :display({ '<b>bold</b>' }));
+    column('preview', :html, :display({ '<a href="/x">link</a>' }));
+    attribute('preview', :html, :display({ '<img src="/y">' }));
+  });
+}
+
+sub register-posts-html-grid(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    index(as => 'grid');
+
+    column('title', :display({ '<b>bold</b>' }));
+    column('preview', :html, :display({ '<a href="/x">link</a>' }));
+  });
+}
+
 sub register-posts-status(--> Nil) is export {
   MVC::Keayl::Admin.register(Post, {
     column('title');

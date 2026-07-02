@@ -35,6 +35,21 @@ the state from the record:
 column('state', :format<status-tag>, :display({ .published ?? 'active' !! 'draft' }));
 ```
 
+## Raw markup
+
+Column values are HTML-escaped by default, so a `display` block that returns a
+string with angle brackets renders as literal text. Declare a column `:html` when
+the value is trusted markup that should render as-is:
+
+```raku
+column('preview', :html, :display({ '<a href="' ~ .url ~ '">open</a>' }));
+```
+
+An `:html` column emits its value verbatim, bypassing escaping and any `:format`.
+You own the safety of the markup, so escape untrusted parts yourself. The same
+flag works on the table, grid, and blog presentations, and on show-page
+attributes.
+
 ## Rows and actions
 
 Every row ends in an actions column with Show, Edit, and Delete controls. Delete
