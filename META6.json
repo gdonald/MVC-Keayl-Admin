@@ -1,24 +1,20 @@
 {
-  "name": "MVC::Keayl::Admin",
-  "description": "Generated administration interface for MVC::Keayl applications",
-  "version": "0.0.1",
   "api": "1",
-  "perl": "6.d",
-  "authors": ["Greg Donald"],
   "auth": "zef:gdonald",
+  "authors": [
+    "Greg Donald"
+  ],
+  "build-depends": [
+  ],
   "depends": [
     "MVC::Keayl:auth<zef:gdonald>",
     "ORM::ActiveRecord:auth<zef:gdonald>",
     "Template::HAML:auth<zef:gdonald>"
   ],
-  "build-depends": [],
-  "test-depends": [
-    "Test",
-    "Test::META",
-    "JSON::Fast",
-    "BDD::Behave:auth<zef:gdonald>",
-    "ORM::Factory:auth<zef:gdonald>"
-  ],
+  "description": "Generated administration interface for MVC::Keayl applications",
+  "license": "Artistic-2.0",
+  "name": "MVC::Keayl::Admin",
+  "perl": "6.d",
   "provides": {
     "MVC::Keayl::Admin": "lib/MVC/Keayl/Admin.rakumod",
     "MVC::Keayl::Admin::ActionItem": "lib/MVC/Keayl/Admin/ActionItem.rakumod",
@@ -39,9 +35,9 @@
     "MVC::Keayl::Admin::Config": "lib/MVC/Keayl/Admin/Config.rakumod",
     "MVC::Keayl::Admin::Controller": "lib/MVC/Keayl/Admin/Controller.rakumod",
     "MVC::Keayl::Admin::CustomAction": "lib/MVC/Keayl/Admin/CustomAction.rakumod",
+    "MVC::Keayl::Admin::DSL": "lib/MVC/Keayl/Admin/DSL.rakumod",
     "MVC::Keayl::Admin::Dashboard": "lib/MVC/Keayl/Admin/Dashboard.rakumod",
     "MVC::Keayl::Admin::DashboardController": "lib/MVC/Keayl/Admin/DashboardController.rakumod",
-    "MVC::Keayl::Admin::DSL": "lib/MVC/Keayl/Admin/DSL.rakumod",
     "MVC::Keayl::Admin::Engine": "lib/MVC/Keayl/Admin/Engine.rakumod",
     "MVC::Keayl::Admin::ExportSpec": "lib/MVC/Keayl/Admin/ExportSpec.rakumod",
     "MVC::Keayl::Admin::Field": "lib/MVC/Keayl/Admin/Field.rakumod",
@@ -57,13 +53,13 @@
     "MVC::Keayl::Admin::MenuEntry": "lib/MVC/Keayl/Admin/MenuEntry.rakumod",
     "MVC::Keayl::Admin::Nested": "lib/MVC/Keayl/Admin/Nested.rakumod",
     "MVC::Keayl::Admin::Page": "lib/MVC/Keayl/Admin/Page.rakumod",
+    "MVC::Keayl::Admin::PageController": "lib/MVC/Keayl/Admin/PageController.rakumod",
+    "MVC::Keayl::Admin::Pages": "lib/MVC/Keayl/Admin/Pages.rakumod",
+    "MVC::Keayl::Admin::Pagination": "lib/MVC/Keayl/Admin/Pagination.rakumod",
     "MVC::Keayl::Admin::Panel": "lib/MVC/Keayl/Admin/Panel.rakumod",
     "MVC::Keayl::Admin::Panels": "lib/MVC/Keayl/Admin/Panels.rakumod",
-    "MVC::Keayl::Admin::Pages": "lib/MVC/Keayl/Admin/Pages.rakumod",
-    "MVC::Keayl::Admin::PageController": "lib/MVC/Keayl/Admin/PageController.rakumod",
-    "MVC::Keayl::Admin::Predicate": "lib/MVC/Keayl/Admin/Predicate.rakumod",
-    "MVC::Keayl::Admin::Pagination": "lib/MVC/Keayl/Admin/Pagination.rakumod",
     "MVC::Keayl::Admin::Paths": "lib/MVC/Keayl/Admin/Paths.rakumod",
+    "MVC::Keayl::Admin::Predicate": "lib/MVC/Keayl/Admin/Predicate.rakumod",
     "MVC::Keayl::Admin::Registry": "lib/MVC/Keayl/Admin/Registry.rakumod",
     "MVC::Keayl::Admin::Resource": "lib/MVC/Keayl/Admin/Resource.rakumod",
     "MVC::Keayl::Admin::ResourceController": "lib/MVC/Keayl/Admin/ResourceController.rakumod",
@@ -71,16 +67,46 @@
     "MVC::Keayl::Admin::Scopes": "lib/MVC/Keayl/Admin/Scopes.rakumod",
     "MVC::Keayl::Admin::Show": "lib/MVC/Keayl/Admin/Show.rakumod",
     "MVC::Keayl::Admin::Table": "lib/MVC/Keayl/Admin/Table.rakumod",
-    "MVC::Keayl::Admin::Url": "lib/MVC/Keayl/Admin/Url.rakumod",
     "MVC::Keayl::Admin::TestSupport": "lib/MVC/Keayl/Admin/TestSupport.rakumod",
+    "MVC::Keayl::Admin::Url": "lib/MVC/Keayl/Admin/Url.rakumod",
     "MVC::Keayl::Admin::View": "lib/MVC/Keayl/Admin/View.rakumod"
   },
-  "resources": [],
+  "resources": [
+    "assets/bootstrap-icons/LICENSE",
+    "assets/bootstrap-icons/bootstrap-icons.min.css",
+    "assets/bootstrap-icons/fonts/bootstrap-icons.woff",
+    "assets/bootstrap-icons/fonts/bootstrap-icons.woff2",
+    "assets/bootstrap/LICENSE",
+    "assets/bootstrap/bootstrap.bundle.min.js",
+    "assets/bootstrap/bootstrap.min.css",
+    "assets/htmx/LICENSE",
+    "assets/htmx/htmx.min.js",
+    "views/dashboard/index.html.haml",
+    "views/errors/forbidden.html.haml",
+    "views/layouts/admin.html.haml",
+    "views/page/show.html.haml",
+    "views/resource/form.html.haml",
+    "views/resource/index.html.haml",
+    "views/resource/show.html.haml"
+  ],
+  "source-url": "git://github.com/gdonald/MVC-Keayl-Admin.git",
   "support": {
-    "source": "https://github.com/gdonald/MVC-Keayl-Admin.git",
-    "bugtracker": "https://github.com/gdonald/MVC-Keayl-Admin/issues"
+    "bugtracker": "https://github.com/gdonald/MVC-Keayl-Admin/issues",
+    "source": "https://github.com/gdonald/MVC-Keayl-Admin.git"
   },
-  "license": "Artistic-2.0",
-  "tags": ["MVC", "Web", "Admin", "Administration", "MVC::Keayl"],
-  "source-url": "git://github.com/gdonald/MVC-Keayl-Admin.git"
+  "tags": [
+    "MVC",
+    "Web",
+    "Admin",
+    "Administration",
+    "MVC::Keayl"
+  ],
+  "test-depends": [
+    "Test",
+    "Test::META",
+    "JSON::Fast",
+    "BDD::Behave:auth<zef:gdonald>",
+    "ORM::Factory:auth<zef:gdonald>"
+  ],
+  "version": "0.9.0"
 }
