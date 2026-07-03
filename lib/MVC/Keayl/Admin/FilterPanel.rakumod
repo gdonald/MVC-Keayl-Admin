@@ -113,7 +113,7 @@ method form(::?CLASS:U: $resource, %params, Str:D :$base, Str:D :$target, :$sort
     {$hidden}{$fields}
     <div class="d-flex gap-2">
       <button type="submit" class="btn btn-primary">Apply</button>
-      <a class="btn btn-outline-secondary" hx-get="{$clear}" hx-target="{$target}" hx-swap="innerHTML" href="{$clear}">Clear</a>
+      <a class="btn btn-secondary" hx-get="{$clear}" hx-target="{$target}" hx-swap="innerHTML" href="{$clear}">Clear</a>
     </div>
   </form>
   HTML

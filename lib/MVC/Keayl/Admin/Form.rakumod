@@ -130,7 +130,7 @@ method render(::?CLASS:U: $resource, $record, Str:D :$action, Str:D :$submit, St
     {$fields}{$nested}
     <div class="d-flex gap-2">
       <button type="submit" class="btn btn-primary">{html-escape($submit)}</button>
-      <a class="btn btn-outline-secondary" href="{html-escape($cancel)}">Cancel</a>
+      <a class="btn btn-secondary" href="{html-escape($cancel)}">Cancel</a>
     </div>
   </form>
   HTML

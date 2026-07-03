@@ -40,6 +40,12 @@ ok $body.contains('navbar-brand') && $body.contains('Admin'), 'the brand shows t
 ok $body.contains('offcanvas') && $body.contains('data-bs-target') && $body.contains('#admin-sidebar'),
   'the sidebar is a responsive offcanvas with a toggle target';
 
+ok $body.contains('navbar-toggler') && $body.contains('d-lg-none'),
+  'the narrow layout exposes a hamburger toggler that hides at the large breakpoint';
+
+ok $body.contains(q{data-bs-theme='dark'}),
+  'the dark navbar carries the dark theme so the toggler icon stays visible';
+
 ok $body.contains('breadcrumb'), 'breadcrumbs are rendered';
 
 ok $body.contains('<main'), 'a main content region is present';

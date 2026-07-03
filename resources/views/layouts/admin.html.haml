@@ -6,7 +6,7 @@
     %title= $page_title
     != $admin_styles
   %body
-    %nav.navbar.navbar-expand-lg.bg-dark.border-bottom.sticky-top.px-3
+    %nav.navbar.navbar-expand-lg.bg-dark.border-bottom.sticky-top.px-3(data-bs-theme='dark')
       .container-fluid
         %button.navbar-toggler.d-lg-none(type='button' data-bs-toggle='offcanvas' data-bs-target='#admin-sidebar' aria-controls='admin-sidebar' aria-label='Toggle navigation')
           %span.navbar-toggler-icon
@@ -21,7 +21,7 @@
             %button.btn-close(type='button' data-bs-dismiss='offcanvas' data-bs-target='#admin-sidebar' aria-label='Close')
           .offcanvas-body.flex-column.align-items-stretch.p-3
             != $admin_menu
-        %main.col-lg-10.ms-sm-auto.px-md-4.py-3
+        %main.col-lg-10.px-md-4.py-3
           != $admin_breadcrumbs
           - if $flash_notice
             .alert.alert-success(role='alert')= $flash_notice

@@ -33,4 +33,4 @@ jobs:
       - name: Install DBIish
         run: zef install --/test DBIish
       - name: Run ${{ matrix.stage }}
-        run: ./test.raku ${{ matrix.stage }}
+        run: ./bin/test ${{ matrix.stage }}

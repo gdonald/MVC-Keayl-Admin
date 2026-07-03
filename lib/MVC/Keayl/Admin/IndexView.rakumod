@@ -29,9 +29,9 @@ sub record-actions(Str:D $base, $id, $abilities, Str:D $remove-target --> Str) {
   my $edit = html-escape($base ~ '/' ~ $id ~ '/edit');
 
   my $buttons = '';
-  $buttons ~= qq[<a class="btn btn-sm btn-outline-secondary" href="$show">{html-escape(MVC::Keayl::Admin::I18n.chrome('show', 'Show'))}</a>] if allowed($abilities, 'show');
-  $buttons ~= qq[<a class="btn btn-sm btn-outline-secondary" href="$edit">{html-escape(MVC::Keayl::Admin::I18n.chrome('edit', 'Edit'))}</a>] if allowed($abilities, 'update');
-  $buttons ~= qq[<button type="button" class="btn btn-sm btn-outline-danger" hx-delete="$show" hx-confirm="{html-escape(MVC::Keayl::Admin::I18n.chrome('confirm-delete', 'Delete this record?'))}" hx-target="closest {$remove-target}" hx-swap="delete">{html-escape(MVC::Keayl::Admin::I18n.chrome('delete', 'Delete'))}</button>] if allowed($abilities, 'destroy');
+  $buttons ~= qq[<a class="btn btn-sm btn-secondary" href="$show">{html-escape(MVC::Keayl::Admin::I18n.chrome('show', 'Show'))}</a>] if allowed($abilities, 'show');
+  $buttons ~= qq[<a class="btn btn-sm btn-secondary" href="$edit">{html-escape(MVC::Keayl::Admin::I18n.chrome('edit', 'Edit'))}</a>] if allowed($abilities, 'update');
+  $buttons ~= qq[<button type="button" class="btn btn-sm btn-danger" hx-delete="$show" hx-confirm="{html-escape(MVC::Keayl::Admin::I18n.chrome('confirm-delete', 'Delete this record?'))}" hx-target="closest {$remove-target}" hx-swap="delete">{html-escape(MVC::Keayl::Admin::I18n.chrome('delete', 'Delete'))}</button>] if allowed($abilities, 'destroy');
 
   qq[<div class="btn-group" role="group">{$buttons}</div>]
 }
@@ -42,7 +42,7 @@ sub empty-state(--> Str) {
 
 sub default-body($resource, $record --> Str) {
   $resource.columns.map(-> $column {
-    qq[<div><span class="text-muted small">{html-escape(MVC::Keayl::Admin::I18n.attribute-label($resource.model, $column.name))}</span><div>{column-value($column, $record)}</div></div>]
+    qq[<div><span class="text-muted small">{html-escape($column.label // MVC::Keayl::Admin::I18n.attribute-label($resource.model, $column.name))}</span><div>{column-value($column, $record)}</div></div>]
   }).join
 }
 

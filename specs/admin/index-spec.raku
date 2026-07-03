@@ -56,6 +56,41 @@ describe 'MVC::Keayl::Admin index table', {
   it 'has a new-record button', {
     expect(body.contains('New Post')).to.be-truthy;
   }
+
+  it 'styles row action buttons solid rather than outlined', {
+    expect(body.contains('btn-secondary') && !body.contains('btn-outline')).to.be-truthy;
+  }
+
+  it 'places the filters button to the right of the new button', {
+    expect(body.index('New Post') < body.index('bi-funnel')).to.be-truthy;
+  }
+
+  it 'places the export buttons below the table', {
+    expect(body.index('</table>') < body.index('export.csv')).to.be-truthy;
+  }
+
+  it 'renders the export buttons at a small size', {
+    expect(body.contains('btn-group-sm') && body.contains('btn btn-secondary btn-sm')).to.be-truthy;
+  }
+}
+
+describe 'MVC::Keayl::Admin column label override', {
+  before-each {
+    MVC::Keayl::Admin.reset;
+    setup-admin-db;
+
+    register-posts-labeled;
+
+    seed-posts({ title => 'First post' });
+  }
+
+  it 'uses the declared label as the column header', {
+    expect(index-body.contains('Custom Heading')).to.be-truthy;
+  }
+
+  it 'suppresses the humanized column name when a label is given', {
+    expect(index-body.contains('>Title<')).to.be-falsy;
+  }
 }
 
 describe 'MVC::Keayl::Admin empty index', {

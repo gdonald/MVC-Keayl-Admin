@@ -51,6 +51,14 @@ describe 'MVC::Keayl::Admin layout', {
     expect(body.contains('offcanvas') && body.contains('data-bs-target') && body.contains('#admin-sidebar')).to.be-truthy;
   }
 
+  it 'exposes a hamburger toggler that hides at the large breakpoint', {
+    expect(body.contains('navbar-toggler') && body.contains('d-lg-none')).to.be-truthy;
+  }
+
+  it 'carries the dark theme on the navbar so the toggler icon stays visible', {
+    expect(body.contains(q{data-bs-theme='dark'})).to.be-truthy;
+  }
+
   it 'renders breadcrumbs', {
     expect(body.contains('breadcrumb')).to.be-truthy;
   }

@@ -116,6 +116,12 @@ sub register-posts(Int :$per-page, Bool :$scope-counts --> Nil) is export {
   });
 }
 
+sub register-posts-labeled(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('title', label => 'Custom Heading');
+  });
+}
+
 sub register-authors-nested(--> Nil) is export {
   MVC::Keayl::Admin.register(Author, {
     field('name', :as<string>);

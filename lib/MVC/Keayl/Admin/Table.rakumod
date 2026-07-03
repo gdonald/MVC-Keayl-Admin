@@ -7,7 +7,7 @@ use MVC::Keayl::Admin::I18n;
 unit class MVC::Keayl::Admin::Table;
 
 sub header-cell($column, $model, Str:D $base, $sort, $dir, Str:D $target, %filters --> Str) {
-  my $label = html-escape(MVC::Keayl::Admin::I18n.attribute-label($model, $column.name));
+  my $label = html-escape($column.label // MVC::Keayl::Admin::I18n.attribute-label($model, $column.name));
 
   return '<th>' ~ $label ~ '</th>' unless $column.sortable;
 
@@ -48,9 +48,9 @@ sub row-actions(Str:D $base, $id, $abilities --> Str) {
   my $edit = html-escape($base ~ '/' ~ $id ~ '/edit');
 
   my $buttons = '';
-  $buttons ~= qq[<a class="btn btn-outline-secondary" href="$show">{html-escape(MVC::Keayl::Admin::I18n.chrome('show', 'Show'))}</a>]     if allowed($abilities, 'show');
-  $buttons ~= qq[<a class="btn btn-outline-secondary" href="$edit">{html-escape(MVC::Keayl::Admin::I18n.chrome('edit', 'Edit'))}</a>]     if allowed($abilities, 'update');
-  $buttons ~= qq[<button type="button" class="btn btn-outline-danger" hx-delete="$show" hx-confirm="{html-escape(MVC::Keayl::Admin::I18n.chrome('confirm-delete', 'Delete this record?'))}" hx-target="closest tr" hx-swap="delete">{html-escape(MVC::Keayl::Admin::I18n.chrome('delete', 'Delete'))}</button>] if allowed($abilities, 'destroy');
+  $buttons ~= qq[<a class="btn btn-secondary" href="$show">{html-escape(MVC::Keayl::Admin::I18n.chrome('show', 'Show'))}</a>]     if allowed($abilities, 'show');
+  $buttons ~= qq[<a class="btn btn-secondary" href="$edit">{html-escape(MVC::Keayl::Admin::I18n.chrome('edit', 'Edit'))}</a>]     if allowed($abilities, 'update');
+  $buttons ~= qq[<button type="button" class="btn btn-danger" hx-delete="$show" hx-confirm="{html-escape(MVC::Keayl::Admin::I18n.chrome('confirm-delete', 'Delete this record?'))}" hx-target="closest tr" hx-swap="delete">{html-escape(MVC::Keayl::Admin::I18n.chrome('delete', 'Delete'))}</button>] if allowed($abilities, 'destroy');
 
   qq[<div class="btn-group btn-group-sm" role="group">{$buttons}</div>]
 }

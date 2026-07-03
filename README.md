@@ -28,7 +28,7 @@ separate from this distribution's Artistic-2.0 license. See
 Run the prove6 and behave suites:
 
 ```
-./test.raku
+./bin/test
 ```
 
 ## License

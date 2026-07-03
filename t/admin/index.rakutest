@@ -38,10 +38,35 @@ ok $body.contains('href="/admin/posts/1"'), 'a link-to-show column links to the 
 
 ok $body.contains('New Post'), 'the index has a new-record button';
 
+ok $body.contains('btn-secondary') && !$body.contains('btn-outline'),
+  'row action buttons are solid rather than outlined';
+
+ok $body.index('New Post') < $body.index('bi-funnel'),
+  'the filters button sits to the right of the new button';
+
+ok $body.index('</table>') < $body.index('export.csv'),
+  'the export buttons sit below the table';
+
+ok $body.contains('btn-group-sm') && $body.contains('btn btn-secondary btn-sm'),
+  'the export buttons render at a small size';
+
 # empty state
 seed-posts();
 
 ok index-body.contains('No records yet'), 'an empty resource shows an empty state';
+
+MVC::Keayl::Admin.reset;
+
+# column label override
+setup-admin-db;
+register-posts-labeled;
+seed-posts({ title => 'First post' });
+
+my $labeled = index-body;
+
+ok $labeled.contains('Custom Heading'), 'a declared column label becomes the header';
+
+ok !$labeled.contains('>Title<'), 'the humanized column name is suppressed when a label is given';
 
 MVC::Keayl::Admin.reset;
 
