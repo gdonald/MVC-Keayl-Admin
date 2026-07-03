@@ -6,7 +6,7 @@ $*OUT.out-buffer = False;
 
 %*ENV<AUTHOR_TESTING> = 1;
 
-chdir $*PROGRAM.parent.parent;
+chdir $*PROGRAM.parent;
 
 my $jobs = max(2, ($*KERNEL.cpu-cores // 2) - 2);
 
