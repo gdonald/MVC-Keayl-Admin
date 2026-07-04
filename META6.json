@@ -1,15 +1,20 @@
 {
   "api": "1",
   "auth": "zef:gdonald",
-  "authors": [
-    "Greg Donald"
-  ],
-  "build-depends": [
-  ],
+  "authors": ["Greg Donald"],
+  "version": "0.9.0",
+  "build-depends": [],
   "depends": [
     "MVC::Keayl:auth<zef:gdonald>",
     "ORM::ActiveRecord:auth<zef:gdonald>",
     "Template::HAML:auth<zef:gdonald>"
+  ],
+  "test-depends": [
+    "Test",
+    "Test::META",
+    "JSON::Fast",
+    "BDD::Behave:auth<zef:gdonald>",
+    "ORM::Factory:auth<zef:gdonald>"
   ],
   "description": "Generated administration interface for MVC::Keayl applications",
   "license": "Artistic-2.0",
@@ -94,19 +99,5 @@
     "bugtracker": "https://github.com/gdonald/MVC-Keayl-Admin/issues",
     "source": "https://github.com/gdonald/MVC-Keayl-Admin.git"
   },
-  "tags": [
-    "MVC",
-    "Web",
-    "Admin",
-    "Administration",
-    "MVC::Keayl"
-  ],
-  "test-depends": [
-    "Test",
-    "Test::META",
-    "JSON::Fast",
-    "BDD::Behave:auth<zef:gdonald>",
-    "ORM::Factory:auth<zef:gdonald>"
-  ],
-  "version": "0.9.0"
+  "tags": ["MVC", "Web", "Admin", "Administration", "MVC::Keayl"]
 }
