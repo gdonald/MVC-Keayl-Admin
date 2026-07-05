@@ -26,4 +26,19 @@ ok assets-path().IO.d, 'the assets path resolves to a directory';
 ok assets-path().IO.add('bootstrap/bootstrap.min.css').e,
   'a vendored asset is reachable through the assets path';
 
+# Materializing resources must refresh an existing file, not skip it: an install
+# reuses the same version-keyed directory, so a skip would serve stale content
+# after a template or asset edit.
+my $work = $*TMPDIR.add("mvc-keayl-admin-paths-test-$*PID");
+$work.mkdir;
+LEAVE { .unlink for $work.dir; $work.rmdir if $work.e }
+
+materialize-resources($work, [ 'admin.html.haml' => 'stale'.encode('utf-8') ]);
+is $work.add('admin.html.haml').slurp, 'stale',
+  'materialize-resources writes a resource on first pass';
+
+materialize-resources($work, [ 'admin.html.haml' => 'fresh'.encode('utf-8') ]);
+is $work.add('admin.html.haml').slurp, 'fresh',
+  'materialize-resources overwrites an existing resource rather than skipping it';
+
 done-testing;

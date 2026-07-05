@@ -81,5 +81,5 @@ method render(::?CLASS:U: $resource, @records, Str:D :$base, :$sort, :$dir, Str:
     $body = qq[<tr><td colspan="$span" class="text-center text-muted py-4">{html-escape(MVC::Keayl::Admin::I18n.chrome('no-records', 'No records yet.'))}</td></tr>];
   }
 
-  qq[<table class="table table-striped table-hover align-middle"><thead><tr>{$head}</tr></thead><tbody>{$body}</tbody></table>]
+  qq[<div class="table-responsive"><table class="table table-striped table-hover align-middle"><thead><tr>{$head}</tr></thead><tbody>{$body}</tbody></table></div>]
 }

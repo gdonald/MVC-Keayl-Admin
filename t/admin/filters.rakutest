@@ -58,6 +58,20 @@ ok $cont.contains('title=post') && $cont.contains('sort=title'),
 ok $cont.contains('name="title"') && $cont.contains('name="published"'),
   'the filter form renders an input per declared filter';
 
+# the offcanvas panel is rendered once at the template level, outside the htmx
+# swappable index body, so a swap never tears down an open panel
+my $full     = fetch('/admin/posts').body;
+my $fragment = fetch('/admin/posts', headers => { 'HX-Request' => 'true' }).body;
+
+ok $full.contains('class="offcanvas offcanvas-end"') && $full.contains('id="admin-filters"'),
+  'the full page renders the filters offcanvas panel once';
+
+ok $fragment.contains('data-bs-target="#admin-filters"'),
+  'the filters toggle button sits inside the swappable index body';
+
+nok $fragment.contains('class="offcanvas offcanvas-end"'),
+  'the offcanvas panel stays out of the swappable index body so an htmx swap does not tear it down';
+
 MVC::Keayl::Admin.reset;
 
 done-testing;

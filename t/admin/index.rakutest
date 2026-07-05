@@ -22,6 +22,9 @@ my $body = index-body;
 
 ok $body.contains('<table'), 'the index renders a table';
 
+ok $body.contains('<div class="table-responsive">'),
+  'the table is wrapped in a horizontal-scroll container so a wide table does not push the content column below the sidebar';
+
 ok $body.contains('First post') && $body.contains('Second post'), 'the table lists the records';
 
 ok $body.contains('Headline'), 'a column header is humanized from the column name';
@@ -38,17 +41,41 @@ ok $body.contains('href="/admin/posts/1"'), 'a link-to-show column links to the 
 
 ok $body.contains('New Post'), 'the index has a new-record button';
 
+ok $body.contains('btn btn-primary btn-sm'), 'the new-record button renders at a small size';
+
+ok $body.contains('btn btn-secondary btn-sm') && $body.contains('bi-funnel'),
+  'the filters button renders at a small size';
+
 ok $body.contains('btn-secondary') && !$body.contains('btn-outline'),
   'row action buttons are solid rather than outlined';
 
 ok $body.index('New Post') < $body.index('bi-funnel'),
   'the filters button sits to the right of the new button';
 
+ok $body.index('data-batch-all') < $body.index('New Post')
+  && $body.index('New Post') < $body.index('<table')
+  && $body.index('bi-funnel') < $body.index('<table'),
+  'the new and filters buttons sit on the batch row above the table';
+
+ok $body.index('data-batch-all') < $body.index('ms-auto'),
+  'the toolbar buttons are pushed to the right of the batch controls';
+
 ok $body.index('</table>') < $body.index('export.csv'),
   'the export buttons sit below the table';
 
+ok $body.index('Showing') < $body.index('export.csv'),
+  'the export buttons sit after the record summary in the footer';
+
 ok $body.contains('btn-group-sm') && $body.contains('btn btn-secondary btn-sm'),
   'the export buttons render at a small size';
+
+ok $body.contains('Showing 1&ndash;2 of 2') && !$body.contains('class="pagination'),
+  'a single page shows the record summary without pagination controls';
+
+ok $body.contains(q{<h1 class='h3 mb-3'>Posts}), 'a top-level index is named in a heading';
+
+nok $body.contains('aria-label="breadcrumb"'),
+  'a top-level index omits the breadcrumb, since the heading already names it';
 
 # empty state
 seed-posts();

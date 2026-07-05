@@ -46,6 +46,9 @@ nok $index.contains('Bob One'), 'the nested index excludes other parents records
 # nested breadcrumbs reflect the parent chain
 ok $index.contains('Authors') && $index.contains('Alice'), 'the breadcrumbs show the parent chain';
 
+ok $index.contains('aria-label="breadcrumb"'),
+  'a nested index keeps its breadcrumb, so the ancestor trail survives dropping the current-page crumb';
+
 # nested links carry the parent in the path
 ok $index.contains('href="' ~ $abase ~ '/new"'), 'the new button links into the parent path';
 

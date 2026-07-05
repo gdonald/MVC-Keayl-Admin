@@ -51,6 +51,11 @@ ok $page1.contains('Showing 1&ndash;2 of 5'), 'the page summary reports the rang
 
 ok $page1.contains('pagination'), 'a pagination control is rendered';
 
+ok $page1.contains('pagination pagination-sm'), 'the pagination control renders at a small size';
+
+ok $page1.index('class="pagination') < $page1.index('Showing 1'),
+  'the record summary sits to the right of the pagination buttons';
+
 my $page3 = fetch('/admin/posts?page=3').body;
 ok $page3.contains('P5') && !$page3.contains('P1'), 'a later page shows its own slice';
 

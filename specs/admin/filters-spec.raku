@@ -91,4 +91,21 @@ describe 'MVC::Keayl::Admin index filtering', {
   it 'renders an input per declared filter', {
     expect(cont.contains('name="title"') && cont.contains('name="published"')).to.be-truthy;
   }
+
+  context 'the filters offcanvas panel', {
+    let(:full,     { fetch('/admin/posts').body });
+    let(:fragment, { fetch('/admin/posts', headers => { 'HX-Request' => 'true' }).body });
+
+    it 'renders the offcanvas panel once on the full page', {
+      expect(full.contains('class="offcanvas offcanvas-end"') && full.contains('id="admin-filters"')).to.be-truthy;
+    }
+
+    it 'is toggled by a button inside the swappable index body', {
+      expect(fragment.contains('data-bs-target="#admin-filters"')).to.be-truthy;
+    }
+
+    it 'keeps the offcanvas panel out of the swappable index body so an htmx swap does not tear it down', {
+      expect(fragment.contains('class="offcanvas offcanvas-end"')).to.be-falsy;
+    }
+  }
 }

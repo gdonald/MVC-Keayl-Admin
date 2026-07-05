@@ -50,6 +50,10 @@ describe 'MVC::Keayl::Admin nested resources', {
     expect($body.contains('Authors') && $body.contains('Alice')).to.be-truthy;
   }
 
+  it 'keeps the breadcrumb on a nested index, so the ancestor trail survives dropping the current-page crumb', {
+    expect(call('GET', abase()).body.contains('aria-label="breadcrumb"')).to.be-truthy;
+  }
+
   it 'links the new button into the parent path', {
     expect(call('GET', abase()).body.contains('href="' ~ abase() ~ '/new"')).to.be-truthy;
   }

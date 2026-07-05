@@ -46,6 +46,8 @@ ok $new.contains('<select') && $new.contains('Ann'), 'a select field renders opt
 ok $new.contains('placeholder="Headline"'), 'a field renders its placeholder';
 ok $new.contains('Keep it short.'),     'a field renders its hint';
 ok $new.contains('action="/admin/posts"'), 'the new form posts to the collection path';
+ok $new.contains('<li class="breadcrumb-item"><a href="/admin/posts">') && !$new.contains('aria-current="page"'),
+  'the breadcrumb links to the parent without repeating the current page as a crumb';
 
 # create success: redirect to show with a flash
 my $created = submit('/admin/posts', { title => 'My first post', body => 'Hello', published => '1', 'author-id' => $ann.id });

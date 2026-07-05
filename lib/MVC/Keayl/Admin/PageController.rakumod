@@ -14,7 +14,6 @@ method show {
 
   self.render-admin(
     'page/show',
-    page-title  => $page.title,
-    breadcrumbs => [ $page.title => Nil ],
+    page-title => $page.title,
   )
 }

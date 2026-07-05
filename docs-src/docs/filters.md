@@ -49,8 +49,11 @@ search predicate is rejected at registration time.
 
 ## The filter UI
 
-A **Filters** button opens an offcanvas panel holding the form. Applying it
-issues an `hx-get` that swaps the index body in place, preserving the current
-sort. Active filters appear above the table as removable chips, with a
-**Clear all** control. The filter values live in the query string, so a filtered
-view is a shareable URL, and sort and pagination links carry the active filters.
+A **Filters** button in the index toolbar opens an offcanvas panel holding the
+form. The button rides in the swappable index body while the panel itself is
+rendered once outside it, so an `hx-get` swap never tears down an open panel.
+Applying the form issues an `hx-get` that swaps the index body in place,
+preserving the current sort. Active filters appear above the table as removable
+chips, with a **Clear all** control. The filter values live in the query string,
+so a filtered view is a shareable URL, and sort and pagination links carry the
+active filters.

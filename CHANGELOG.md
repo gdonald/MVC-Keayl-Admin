@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as raw markup instead of being HTML-escaped. Honored on the table, grid, and
   blog index presentations and on show-page attributes.
 
+### Changed
+
+- The page heading names the current page, so a page no longer repeats itself as
+  a trailing breadcrumb. Top-level pages omit the breadcrumb entirely and a
+  nested resource keeps only its ancestor trail.
+- The index toolbar now groups the batch controls on the left with the
+  collection actions, New-record button, and Filters button on the right, and a
+  footer row places the pagination and record summary opposite the export links.
+- The Filters offcanvas panel renders once outside the htmx-swapped index body,
+  so sorting, paging, or filtering never tears down an open panel.
+
 ## [0.9.0] - 2026-06-25
 
 Initial public release. A generated administration interface for

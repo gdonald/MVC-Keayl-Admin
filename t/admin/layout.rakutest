@@ -46,9 +46,21 @@ ok $body.contains('navbar-toggler') && $body.contains('d-lg-none'),
 ok $body.contains(q{data-bs-theme='dark'}),
   'the dark navbar carries the dark theme so the toggler icon stays visible';
 
-ok $body.contains('breadcrumb'), 'breadcrumbs are rendered';
+ok $body.contains(q{<h1 class='h3 mb-3'>Dashboard}), 'the page is named in a heading';
+
+nok $body.contains('aria-label="breadcrumb"'),
+  'a top-level page omits the breadcrumb, since the heading already names it';
 
 ok $body.contains('<main'), 'a main content region is present';
+
+ok $body.contains(q{<main id='admin-main' class='col }),
+  'the main region is a flex-fill column so it sits beside the fixed-width sidebar';
+
+ok $body.contains('flex-nowrap'),
+  'the shell row never wraps, so the content column cannot drop below the sidebar';
+
+nok $body.contains('col-lg-10'),
+  'the main region is not pinned to a fixed column width that overflows the sidebar and wraps below it';
 
 ok $body.contains('Welcome to Admin'), 'the dashboard content renders inside the layout';
 

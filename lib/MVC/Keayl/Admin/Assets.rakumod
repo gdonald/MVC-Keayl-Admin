@@ -53,7 +53,8 @@ method theme-tag(::?CLASS:U: --> Str) {
   body { background-color: var(--keayl-admin-body-bg); }
   .navbar.bg-dark { background-color: var(--keayl-admin-navbar-bg) !important; }
   #admin-sidebar { background-color: var(--keayl-admin-sidebar-bg); }
-  @media (min-width: 992px) { #admin-sidebar { width: var(--keayl-admin-sidebar-width); } }
+  @media (min-width: 992px) { #admin-sidebar { width: var(--keayl-admin-sidebar-width); flex: 0 0 var(--keayl-admin-sidebar-width); } }
+  #admin-main { min-width: 0; }
   .nav-pills .nav-link.active { background-color: var(--keayl-admin-accent); }
   </style>
   CSS

@@ -59,12 +59,28 @@ describe 'MVC::Keayl::Admin layout', {
     expect(body.contains(q{data-bs-theme='dark'})).to.be-truthy;
   }
 
-  it 'renders breadcrumbs', {
-    expect(body.contains('breadcrumb')).to.be-truthy;
+  it 'names the page in a heading', {
+    expect(body.contains(q{<h1 class='h3 mb-3'>Dashboard})).to.be-truthy;
+  }
+
+  it 'omits the breadcrumb on a top-level page, since the heading already names it', {
+    expect(body.contains('aria-label="breadcrumb"')).to.be-falsy;
   }
 
   it 'renders a main content region', {
     expect(body.contains('<main')).to.be-truthy;
+  }
+
+  it 'gives the main region a flex-fill column so it sits beside the fixed-width sidebar', {
+    expect(body.contains(q{<main id='admin-main' class='col })).to.be-truthy;
+  }
+
+  it 'does not pin the main region to a fixed column width that overflows the sidebar and wraps below it', {
+    expect(body.contains('col-lg-10')).to.be-falsy;
+  }
+
+  it 'keeps the shell row from wrapping so the content column cannot drop below the sidebar', {
+    expect(body.contains('flex-nowrap')).to.be-truthy;
   }
 
   it 'renders the dashboard content inside the layout', {

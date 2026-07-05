@@ -19,16 +19,18 @@ unit class MyAdmin::PostsController is MVC::Keayl::Admin::Controller;
 method index {
   self.render-admin(
     'posts/index',
-    page-title  => 'Posts',
-    breadcrumbs => [ 'Posts' => Nil ],
+    page-title => 'Posts',
   )
 }
 ```
 
 - `page-title` sets the document title and the page heading. It defaults to the
-  configured site title.
-- `breadcrumbs` is a list of `label => url` pairs. A pair whose url is `Nil`
-  (or empty) renders as the current, unlinked page. Typically the last crumb.
+  configured site title. The heading names the current page, so a top-level page
+  needs no breadcrumb.
+- `breadcrumbs` is a list of `label => url` pairs that render as the ancestor
+  trail leading to the current page. Since the heading already names the current
+  page, pass only the ancestors and leave the current page out. A nested resource
+  supplies its parent chain here; a top-level page omits `breadcrumbs` entirely.
 
 The template named in the first argument renders into the main content region.
 The vendored asset bundle, import map, brand, sidebar menu, and breadcrumbs are

@@ -25,6 +25,10 @@ describe 'MVC::Keayl::Admin index table', {
     expect(body.contains('<table')).to.be-truthy;
   }
 
+  it 'wraps the table in a horizontal-scroll container so a wide table does not push the content column below the sidebar', {
+    expect(body.contains('<div class="table-responsive">')).to.be-truthy;
+  }
+
   it 'lists the records', {
     expect(body.contains('First post') && body.contains('Second post')).to.be-truthy;
   }
@@ -55,6 +59,40 @@ describe 'MVC::Keayl::Admin index table', {
 
   it 'has a new-record button', {
     expect(body.contains('New Post')).to.be-truthy;
+  }
+
+  it 'renders the new-record button at a small size', {
+    expect(body.contains('btn btn-primary btn-sm')).to.be-truthy;
+  }
+
+  it 'renders the filters button at a small size', {
+    expect(body.contains('btn btn-secondary btn-sm') && body.contains('bi-funnel')).to.be-truthy;
+  }
+
+  it 'puts the new and filters buttons on the batch row above the table', {
+    expect(body.index('data-batch-all') < body.index('New Post')
+      && body.index('New Post') < body.index('<table')
+      && body.index('bi-funnel') < body.index('<table')).to.be-truthy;
+  }
+
+  it 'pushes the toolbar buttons to the right of the batch controls', {
+    expect(body.index('data-batch-all') < body.index('ms-auto')).to.be-truthy;
+  }
+
+  it 'places the export buttons after the record summary in the footer', {
+    expect(body.index('Showing') < body.index('export.csv')).to.be-truthy;
+  }
+
+  it 'shows the record summary without pagination controls when everything fits on one page', {
+    expect(body.contains('Showing 1&ndash;2 of 2') && !body.contains('class="pagination')).to.be-truthy;
+  }
+
+  it 'names a top-level index in a heading', {
+    expect(body.contains(q{<h1 class='h3 mb-3'>Posts})).to.be-truthy;
+  }
+
+  it 'omits the breadcrumb on a top-level index, since the heading already names it', {
+    expect(body.contains('aria-label="breadcrumb"')).to.be-falsy;
   }
 
   it 'styles row action buttons solid rather than outlined', {

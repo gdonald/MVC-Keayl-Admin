@@ -95,7 +95,9 @@ sub strong-params($resource, %params) {
   %attrs
 }
 
-sub batch-toolbar($base, $resource, $abilities --> Str) {
+# The batch select-all / action / apply controls, without a row wrapper so they
+# can share the toolbar row with the new-record and filters buttons.
+sub batch-controls($resource, $abilities --> Str) {
   my @names = ();
   @names.push('Destroy') if $abilities.can('destroy');
   @names.append: $resource.batch-actions.map(*.name).grep({ $abilities.can($_) });
@@ -106,11 +108,25 @@ sub batch-toolbar($base, $resource, $abilities --> Str) {
 
   my $select-all = qq[<div class="form-check me-1"><input class="form-check-input" type="checkbox" id="admin-batch-all" data-batch-all><label class="form-check-label" for="admin-batch-all">All</label></div>];
 
-  qq[<div class="d-flex gap-2 mb-2 align-items-center">{$select-all}<select class="form-select form-select-sm w-auto" name="batch-action">{$options}</select><button type="submit" class="btn btn-secondary btn-sm">Apply to <span data-batch-count>0</span> selected</button></div>]
+  qq[{$select-all}<select class="form-select form-select-sm w-auto" name="batch-action">{$options}</select><button type="submit" class="btn btn-secondary btn-sm">Apply to <span data-batch-count>0</span> selected</button>]
 }
 
-sub batch-form($base, $resource, Str:D $table, Str:D $pager, :$abilities --> Str) {
-  qq[<form method="post" action="{html-escape($base ~ '/batch')}">{batch-toolbar($base, $resource, $abilities)}{$table}{$pager}</form>]
+# The index body: a toolbar row (batch controls on the left, new / filters on the
+# right), the table, then a footer row (pagination and record summary on the
+# left, export links on the right). When batch actions are enabled the whole
+# thing is wrapped in the batch form so the checkboxes and Apply submit together.
+sub index-body-html($base, $resource, $abilities, Str:D :$tabs, Str:D :$chips,
+                    Bool:D :$batch, Str:D :$table, Str:D :$pager,
+                    Str:D :$toolbar-right, Str:D :$export --> Str) {
+  my $controls = $batch ?? batch-controls($resource, $abilities) !! '';
+
+  my $toolbar = qq[<div class="d-flex flex-wrap gap-2 mb-3 align-items-center">{$controls}<div class="ms-auto d-flex flex-wrap gap-2">{$toolbar-right}</div></div>];
+  my $footer  = qq[<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">{$pager}{$export}</div>];
+
+  my $inner = $toolbar ~ $table ~ $footer;
+  my $core  = $batch ?? qq[<form method="post" action="{html-escape($base ~ '/batch')}">{$inner}</form>] !! $inner;
+
+  $tabs ~ $chips ~ $core
 }
 
 sub resolve-scope($resource, %params) {
@@ -221,6 +237,10 @@ method resource-breadcrumbs($resource, *@tail) {
 
   @crumbs.append: @tail;
 
+  # Drop the trailing current-page crumb: the page heading already names the
+  # current page, so the breadcrumb carries only the ancestor trail.
+  @crumbs.pop if @crumbs && (@crumbs.tail.value // '') eq '';
+
   @crumbs
 }
 
@@ -301,10 +321,8 @@ method index {
   my $table = MVC::Keayl::Admin::IndexView.render($resource, @records, :$base, :$sort, :$dir, filters => %carry, :$batch, :$abilities);
   my $pager = MVC::Keayl::Admin::Pagination.render(:$base, :$page, :$per, :$total, :$sort, :$dir, filters => %carry);
 
-  my $body = $tabs ~ $chips ~ ($batch ?? batch-form($base, $resource, $table, $pager, :$abilities) !! ($table ~ $pager));
-
-  return self.render(:html($body)) if self.request.header('HX-Request');
-
+  # Toolbar and footer chrome, built before the htmx branch so a pagination,
+  # sort, or filter swap re-renders the same buttons in the same places.
   my $items = self.action-items-html($resource, 'index', $abilities);
 
   my $collection-actions = $resource.collection-actions.grep({ $abilities.can(.name) }).map(-> $action {
@@ -312,25 +330,30 @@ method index {
     my $label   = html-escape(MVC::Keayl::Admin::I18n.action-label($action.name));
     my $confirm = $action.confirm.defined ?? qq[ onsubmit="return confirm('{html-escape($action.confirm)}')"] !! '';
 
-    qq[<form method="post" action="$url"{$confirm} class="d-inline"><button type="submit" class="btn btn-secondary">{$label}</button></form>]
+    qq[<form method="post" action="$url"{$confirm} class="d-inline"><button type="submit" class="btn btn-secondary btn-sm">{$label}</button></form>]
   }).join;
+
+  my $new-link = $abilities.can('create')
+    ?? qq[<a class="btn btn-primary btn-sm" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('new', 'New') ~ ' ' ~ $resource.singular-name)}</a>]
+    !! '';
 
   my $export-links = $resource.export-formats.map(-> $format {
     qq[<a class="btn btn-secondary btn-sm" href="{html-escape($base ~ '/export.' ~ $format)}">{html-escape(MVC::Keayl::Admin::I18n.chrome('export-' ~ $format, $format.uc))}</a>]
   }).join;
   my $export = $export-links ?? qq[<div class="btn-group btn-group-sm">{$export-links}</div>] !! '';
 
-  my $new-link = $abilities.can('create')
-    ?? qq[<a class="btn btn-primary" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('new', 'New') ~ ' ' ~ $resource.singular-name)}</a>]
-    !! '';
+  my $toolbar-right = $items ~ $collection-actions ~ $new-link ~ self.filters-button($resource);
+
+  my $body = index-body-html($base, $resource, $abilities, :$tabs, :$chips, :$batch,
+                             :$table, :$pager, :$toolbar-right, :$export);
+
+  return self.render(:html($body)) if self.request.header('HX-Request');
 
   my $sidebars = MVC::Keayl::Admin::Panels.sidebars($resource.sidebars, $relation, $abilities, placement => 'index');
 
   self.assign('admin_index_body', $body);
   self.assign('admin_index_sidebar', $sidebars ?? qq[<div class="col-lg-3">{$sidebars}</div>] !! '');
-  self.assign('admin_new_link', $items ~ $collection-actions ~ $new-link);
-  self.assign('admin_export_links', $export);
-  self.assign('admin_filters_panel', self.filters-panel($resource, %params, :$base, :$sort, :$dir, scope => $scope-name));
+  self.assign('admin_filters_offcanvas', self.filters-offcanvas($resource, %params, :$base, :$sort, :$dir, scope => $scope-name));
 
   self.render-admin(
     'resource/index',
@@ -585,13 +608,22 @@ method show {
   )
 }
 
-method filters-panel($resource, %params, Str:D :$base, :$sort, :$dir, :$scope --> Str) {
+# The filters live in an offcanvas panel. The toggle button rides in the index
+# toolbar (inside the htmx-swapped region) while the panel itself is rendered
+# once at the template level, outside that region, so a swap never tears down an
+# open panel and leaves its backdrop behind.
+method filters-button($resource --> Str) {
+  return '' unless $resource.filters-enabled && MVC::Keayl::Admin::FilterPanel.has-filters($resource);
+
+  qq[<button class="btn btn-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#admin-filters"><i class="bi bi-funnel me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('filters', 'Filters'))}</button>]
+}
+
+method filters-offcanvas($resource, %params, Str:D :$base, :$sort, :$dir, :$scope --> Str) {
   return '' unless $resource.filters-enabled && MVC::Keayl::Admin::FilterPanel.has-filters($resource);
 
   my $form = MVC::Keayl::Admin::FilterPanel.form($resource, %params, :$base, :target<#admin-index>, :$sort, :$dir, :$scope);
 
   qq:to/HTML/.trim;
-  <button class="btn btn-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#admin-filters"><i class="bi bi-funnel me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('filters', 'Filters'))}</button>
   <div class="offcanvas offcanvas-end" tabindex="-1" id="admin-filters">
     <div class="offcanvas-header"><h5 class="offcanvas-title">{html-escape(MVC::Keayl::Admin::I18n.chrome('filters', 'Filters'))}</h5><button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button></div>
     <div class="offcanvas-body">{$form}</div>

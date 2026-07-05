@@ -22,14 +22,26 @@ sub materialized-root(--> IO::Path) {
   my $version = (try $?DISTRIBUTION.meta<version>) // 'dev';
   my $target  = $*TMPDIR.add("mvc-keayl-admin-resources-$version");
 
-  for ($?DISTRIBUTION.meta<resources> // ()).list -> $name {
-    my $dest = $target.add($name);
-    next if $dest.e;
-    $dest.parent.mkdir;
-    $dest.spurt(%?RESOURCES{$name}.slurp(:bin), :bin);
-  }
+  my @names = ($?DISTRIBUTION.meta<resources> // ()).list;
+  materialize-resources($target, @names.map({ $_ => %?RESOURCES{$_}.slurp(:bin) }));
 
   $root = $target;
+}
+
+# Write each resource into the target directory, overwriting any existing copy.
+# Refreshing every process start rather than skipping files that already exist
+# matters because the version-keyed directory name does not change between
+# reinstalls of the same release, so a skip would serve stale templates and
+# assets after any resource edit. Each file is written to a per-process temp
+# path and renamed so a concurrent worker never reads a half-written file.
+sub materialize-resources(IO::Path:D $target, @entries) is export {
+  for @entries -> $entry {
+    my $dest = $target.add($entry.key);
+    $dest.parent.mkdir;
+    my $tmp = $dest.sibling($dest.basename ~ ".tmp-$*PID");
+    $tmp.spurt($entry.value, :bin);
+    $tmp.rename($dest);
+  }
 }
 
 sub dist-root(--> IO::Path) is export {

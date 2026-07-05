@@ -52,8 +52,7 @@ class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
 
     my $response = self.render-admin(
       'errors/forbidden',
-      page-title  => 'Forbidden',
-      breadcrumbs => [ 'Forbidden' => Nil ],
+      page-title => 'Forbidden',
     );
 
     self.response.status = 403;

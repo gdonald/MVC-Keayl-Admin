@@ -12,7 +12,6 @@ method index {
 
   self.render-admin(
     'dashboard/index',
-    page-title  => 'Dashboard',
-    breadcrumbs => [ 'Dashboard' => Nil ],
+    page-title => 'Dashboard',
   )
 }

@@ -57,7 +57,12 @@ issues an HTMX destroy with a confirmation and removes the row in place; see
 [Destroy, batch, and custom actions](actions.md). When a resource has no records,
 the table shows an empty state instead of rows, and the page carries a New-record
 button linking to the new form. Row controls are hidden when the authorization
-policy forbids the action, and the export and batch toolbars sit above the table.
+policy forbids the action.
+
+A toolbar row sits above the table: batch controls on the left, and the
+collection actions, New-record button, and Filters button on the right. Below the
+table, a footer row holds the pagination and record summary on the left and the
+export links on the right.
 
 ## Sorting
 
@@ -77,9 +82,10 @@ defaults to 25 and is configurable per resource:
 MVC::Keayl::Admin.register(Post, { ... }, per-page => 50);
 ```
 
-A pagination control renders below the table with a page summary
-(`Showing 1–25 of 218`) and page links. The links carry the current sort state
-so it survives navigation.
+A pagination control renders in the footer below the table, next to a page
+summary (`Showing 1–25 of 218`). The links carry the current sort state so it
+survives navigation. When every record fits on one page the control collapses to
+just the summary.
 
 ## HTMX
 

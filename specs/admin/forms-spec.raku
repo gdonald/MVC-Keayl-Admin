@@ -59,6 +59,11 @@ describe 'MVC::Keayl::Admin form rendering', {
   it 'renders a placeholder and a hint', {
     expect(new-form.contains('placeholder="Headline"') && new-form.contains('Keep it short.')).to.be-truthy;
   }
+
+  it 'shows the parent as a breadcrumb link without repeating the current page as a crumb', {
+    expect(new-form.contains('<li class="breadcrumb-item"><a href="/admin/posts">')
+      && !new-form.contains('aria-current="page"')).to.be-truthy;
+  }
 }
 
 describe 'MVC::Keayl::Admin create', {

@@ -23,7 +23,9 @@ method render(::?CLASS:U: Str:D :$base, Int:D :$page, Int:D :$per, Int:D :$total
 
   my $summary = qq[<div class="text-muted small">Showing {$from}&ndash;{$to} of {$total}</div>];
 
-  return qq[<div class="mt-3">{$summary}</div>] if $pages <= 1;
+  # Return the left-hand group: the page controls with the record summary sitting
+  # to their right. The index footer places this group opposite the export links.
+  return $summary if $pages <= 1;
 
   my @items;
 
@@ -35,5 +37,5 @@ method render(::?CLASS:U: Str:D :$base, Int:D :$page, Int:D :$per, Int:D :$total
 
   @items.push: page-item('Next', $page + 1, $page < $pages, $base, $sort, $dir, $target, %filters);
 
-  qq[<nav class="d-flex justify-content-between align-items-center mt-3"><ul class="pagination mb-0">{@items.join}</ul>{$summary}</nav>]
+  qq[<div class="d-flex align-items-center gap-3"><ul class="pagination pagination-sm mb-0">{@items.join}</ul>{$summary}</div>]
 }

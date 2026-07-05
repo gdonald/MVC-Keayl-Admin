@@ -19,4 +19,19 @@ describe 'admin resource paths', {
   it 'resolves the assets path to the bundled vendored files', {
     expect(assets-path().IO.d && assets-path().IO.add('bootstrap/bootstrap.min.css').e).to.be-truthy;
   }
+
+  context 'materializing resources into the cache directory', {
+    let(:work, { my $dir = $*TMPDIR.add("mvc-keayl-admin-paths-spec-$*PID"); $dir.mkdir; $dir });
+
+    after-each {
+      .unlink for work.dir;
+      work.rmdir if work.e;
+    }
+
+    it 'overwrites an existing resource rather than skipping it, so an edit is not masked by a prior install', {
+      materialize-resources(work, [ 'admin.html.haml' => 'stale'.encode('utf-8') ]);
+      materialize-resources(work, [ 'admin.html.haml' => 'fresh'.encode('utf-8') ]);
+      expect(work.add('admin.html.haml').slurp).to.eq('fresh');
+    }
+  }
 }

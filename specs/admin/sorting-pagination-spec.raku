@@ -74,6 +74,14 @@ describe 'MVC::Keayl::Admin index pagination', {
     expect(page1.contains('pagination')).to.be-truthy;
   }
 
+  it 'renders the pagination control at a small size', {
+    expect(page1.contains('pagination pagination-sm')).to.be-truthy;
+  }
+
+  it 'sits the record summary to the right of the pagination buttons', {
+    expect(page1.index('class="pagination') < page1.index('Showing 1')).to.be-truthy;
+  }
+
   it 'shows a later page slice', {
     my $page3 = fetch('/admin/posts?page=3').body;
     expect($page3.contains('P5') && !$page3.contains('P1')).to.be-truthy;
