@@ -1008,11 +1008,14 @@ picker for <code>date</code>, a pair of date pickers for <code>date-range</code>
 table is never enumerated. A <code>select</code> declared with neither a <code>collection</code> nor a
 search predicate is rejected at registration time.</p>
 <h2 id="the-filter-ui">The filter UI<a class="headerlink" href="#the-filter-ui" title="Permanent link">&para;</a></h2>
-<p>A <strong>Filters</strong> button opens an offcanvas panel holding the form. Applying it
-issues an <code>hx-get</code> that swaps the index body in place, preserving the current
-sort. Active filters appear above the table as removable chips, with a
-<strong>Clear all</strong> control. The filter values live in the query string, so a filtered
-view is a shareable URL, and sort and pagination links carry the active filters.</p>
+<p>A <strong>Filters</strong> button in the index toolbar opens an offcanvas panel holding the
+form. The button rides in the swappable index body while the panel itself is
+rendered once outside it, so an <code>hx-get</code> swap never tears down an open panel.
+Applying the form issues an <code>hx-get</code> that swaps the index body in place,
+preserving the current sort. Active filters appear above the table as removable
+chips, with a <strong>Clear all</strong> control. The filter values live in the query string,
+so a filtered view is a shareable URL, and sort and pagination links carry the
+active filters.</p>
 
 
 
