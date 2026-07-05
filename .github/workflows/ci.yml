@@ -20,14 +20,14 @@ jobs:
           raku-version: 'latest'
       - name: Raku version
         run: raku --version
-      # Drop this step once MVC::Keayl, ORM::ActiveRecord, and ORM::Factory publish to zef.
+
       - name: Install from git
         run: |
-          zef install --/test https://github.com/gdonald/Template-HAML.git
-          zef install --/test https://github.com/gdonald/BDD-Behave.git
-          zef install --/test https://github.com/gdonald/MVC-Keayl.git
-          zef install --/test https://github.com/gdonald/ORM-ActiveRecord.git
-          zef install --/test https://github.com/gdonald/ORM-Factory.git
+          zef install --/test --force-install https://github.com/gdonald/Template-HAML.git
+          zef install --/test --force-install https://github.com/gdonald/BDD-Behave.git
+          zef install --/test --force-install https://github.com/gdonald/MVC-Keayl.git
+          zef install --/test --force-install https://github.com/gdonald/ORM-ActiveRecord.git
+          zef install --/test --force-install https://github.com/gdonald/ORM-Factory.git
       - name: Install Dependencies
         run: zef install --/test --test-depends --deps-only .
       - name: Install App::Prove6
