@@ -51,6 +51,10 @@ describe 'MVC::Keayl::Admin layout', {
     expect(body.contains('offcanvas') && body.contains('data-bs-target') && body.contains('#admin-sidebar')).to.be-truthy;
   }
 
+  it 'spans the sidebar the full available height', {
+    expect(body.contains('min-vh-100')).to.be-truthy;
+  }
+
   it 'exposes a hamburger toggler that hides at the large breakpoint', {
     expect(body.contains('navbar-toggler') && body.contains('d-lg-none')).to.be-truthy;
   }

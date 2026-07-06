@@ -42,6 +42,20 @@ is $ok.status, 200, 'valid credentials reach the admin';
 
 ok $ok.body.contains('Signed in as admin'), 'the current admin is exposed to the view';
 
+nok $ok.body.contains('Log out'), 'no logout link renders without a configured logout path';
+
+# a configured logout path renders a logout link in the navbar
+MVC::Keayl::Admin.reset;
+MVC::Keayl::Admin.authenticate-with(
+  MVC::Keayl::Admin::Authentication::Basic.new(name => 'admin', password => 'secret', realm => 'Admin')
+);
+MVC::Keayl::Admin.configure(logout-path => '/admin/logout');
+
+my $with-logout = fetch('/admin', authorization => encode-basic-credentials('admin', 'secret'));
+
+ok $with-logout.body.contains('>Log out</a>') && $with-logout.body.contains(q{href='/admin/logout'}),
+  'a configured logout path renders a logout link';
+
 # assets stay reachable without authentication
 ok fetch('/admin/admin-assets/htmx/htmx.min.js').status == 200,
   'assets are served without authentication';

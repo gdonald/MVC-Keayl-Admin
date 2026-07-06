@@ -53,8 +53,28 @@ describe 'MVC::Keayl::Admin with a basic-auth gate', {
     expect(fetch('/admin', authorization => encode-basic-credentials('admin', 'secret')).body.contains('Signed in as admin')).to.be-truthy;
   }
 
+  it 'renders no logout link without a configured logout path', {
+    expect(fetch('/admin', authorization => encode-basic-credentials('admin', 'secret')).body.contains('Log out')).to.be-falsy;
+  }
+
   it 'serves assets without authentication', {
     expect(fetch('/admin/admin-assets/htmx/htmx.min.js').status).to.be(200);
+  }
+
+  context 'with a configured logout path', {
+    before-each {
+      MVC::Keayl::Admin.configure(logout-path => '/admin/logout');
+    }
+
+    let(:body, { fetch('/admin', authorization => encode-basic-credentials('admin', 'secret')).body });
+
+    it 'renders a logout link', {
+      expect(body.contains('>Log out</a>')).to.be-truthy;
+    }
+
+    it 'points the logout link at the configured path', {
+      expect(body.contains(q{href='/admin/logout'})).to.be-truthy;
+    }
   }
 }
 

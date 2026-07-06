@@ -81,3 +81,23 @@ describe 'MVC::Keayl::Admin mount path', {
     }
   }
 }
+
+describe 'MVC::Keayl::Admin logout path', {
+  before-each {
+    MVC::Keayl::Admin.reset;
+  }
+
+  it 'is unset by default', {
+    expect(MVC::Keayl::Admin.config.logout-path.defined).to.be-falsy;
+  }
+
+  context 'when configured', {
+    before-each {
+      MVC::Keayl::Admin.configure(logout-path => '/admin/logout');
+    }
+
+    it 'reflects the configured path', {
+      expect(MVC::Keayl::Admin.config.logout-path).to.be('/admin/logout');
+    }
+  }
+}

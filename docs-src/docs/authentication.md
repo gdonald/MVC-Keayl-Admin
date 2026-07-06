@@ -57,5 +57,18 @@ controllers as `self.current-admin`, exposed to views as `$current_admin` (the
 layout shows a "Signed in as" indicator when present), and is the value the
 authorization layer will check.
 
+## Logging out
+
+The gate authenticates but does not own a logout route, since ending a session
+depends on the strategy. Configure a `logout-path` and the navbar renders a
+logout link next to the "Signed in as" indicator for a signed-in admin. Point it
+at a route your app handles, which clears the session and redirects:
+
+```raku
+MVC::Keayl::Admin.configure(logout-path => '/admin/logout');
+```
+
+Without a configured `logout-path` no logout link is shown.
+
 Assets are served by a controller outside the gate, so the stylesheet, script,
 and font bundle load without authentication.

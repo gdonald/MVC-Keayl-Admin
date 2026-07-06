@@ -1,9 +1,11 @@
 # Layout and chrome
 
 Admin pages render inside a Bootstrap 5 layout: a top bar with the site brand, a
-collapsible left sidebar, a main content region, a flash area, and breadcrumbs.
-On small screens the sidebar becomes an offcanvas panel toggled from the top
-bar.
+collapsible left sidebar that spans the full available height, a main content
+region, a flash area, and breadcrumbs. On small screens the sidebar becomes an
+offcanvas panel toggled from the top bar. When an admin is signed in, the top bar
+shows a "Signed in as" indicator and, if a [logout path](authentication.md) is
+configured, a logout link.
 
 ## Rendering a page
 

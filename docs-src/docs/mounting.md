@@ -25,13 +25,15 @@ available:
 | ------------- | ---------- | ---------------------------------------- |
 | `mount-path`  | `/admin`   | The path the host mounts the engine at.  |
 | `site-title`  | `Admin`    | The title shown in the admin chrome.     |
+| `logout-path` | (none)     | The path the navbar logout link targets. |
 
 Set them with `configure`:
 
 ```raku
 MVC::Keayl::Admin.configure(
-  mount-path => '/manage',
-  site-title => 'Control Panel',
+  mount-path  => '/manage',
+  site-title  => 'Control Panel',
+  logout-path => '/manage/logout',
 );
 ```
 

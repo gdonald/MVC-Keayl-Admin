@@ -81,6 +81,7 @@ class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
     self.assign('admin_breadcrumbs', MVC::Keayl::Admin::Chrome.breadcrumbs-html(@breadcrumbs));
 
     self.assign('current_admin', $!current-admin);
+    self.assign('admin_logout_path', $config.logout-path);
     self.assign('flash_notice',  self.flash<notice>);
 
     self.render($template, :layout('admin'), |%options)

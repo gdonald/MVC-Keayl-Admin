@@ -35,6 +35,8 @@ ok mounted-host.call(request('GET', '/admin')).body.contains('Admin'),
 
 is MVC::Keayl::Admin.config.mount-path, '/admin', 'the mount path defaults to /admin';
 
+nok MVC::Keayl::Admin.config.logout-path.defined, 'the logout path is unset by default';
+
 MVC::Keayl::Admin.configure(mount-path => '/manage');
 
 is MVC::Keayl::Admin.config.mount-path, '/manage', 'the mount path is configurable';
@@ -43,6 +45,10 @@ MVC::Keayl::Admin.configure(site-title => 'Control Panel');
 
 ok mounted-host.call(request('GET', '/admin')).body.contains('Control Panel'),
   'the site title is configurable';
+
+MVC::Keayl::Admin.configure(logout-path => '/admin/logout');
+
+is MVC::Keayl::Admin.config.logout-path, '/admin/logout', 'the logout path is configurable';
 
 MVC::Keayl::Admin.reset;
 

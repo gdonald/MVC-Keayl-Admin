@@ -10,7 +10,7 @@ inside a `register` block are tabulated in [Registering resources](registration.
 | ------ | ------- |
 | `endpoint()` | Returns the engine dispatcher for the host to `mount`. See [Mounting](mounting.md). |
 | `config()` | Returns the shared configuration object. |
-| `configure(:mount-path, :site-title)` | Sets the mount path and site title. See [Mounting](mounting.md). |
+| `configure(:mount-path, :site-title, :logout-path)` | Sets the mount path, site title, and navbar logout link path. See [Mounting](mounting.md). |
 | `registry()` | Returns the resource registry (`by-model`, `by-slug`, `all`). |
 
 ## Resources and pages

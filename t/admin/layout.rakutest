@@ -40,6 +40,8 @@ ok $body.contains('navbar-brand') && $body.contains('Admin'), 'the brand shows t
 ok $body.contains('offcanvas') && $body.contains('data-bs-target') && $body.contains('#admin-sidebar'),
   'the sidebar is a responsive offcanvas with a toggle target';
 
+ok $body.contains('min-vh-100'), 'the sidebar spans the full available height';
+
 ok $body.contains('navbar-toggler') && $body.contains('d-lg-none'),
   'the narrow layout exposes a hamburger toggler that hides at the large breakpoint';
 

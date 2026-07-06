@@ -28,11 +28,12 @@ method config(::?CLASS:U: --> MVC::Keayl::Admin::Config) {
   MVC::Keayl::Admin::Config.current
 }
 
-method configure(::?CLASS:U: Str :$mount-path, Str :$site-title --> MVC::Keayl::Admin::Config) {
+method configure(::?CLASS:U: Str :$mount-path, Str :$site-title, Str :$logout-path --> MVC::Keayl::Admin::Config) {
   my $config = MVC::Keayl::Admin::Config.current;
 
-  $config.mount-path = $_ with $mount-path;
-  $config.site-title = $_ with $site-title;
+  $config.mount-path  = $_ with $mount-path;
+  $config.site-title  = $_ with $site-title;
+  $config.logout-path = $_ with $logout-path;
 
   $config
 }
