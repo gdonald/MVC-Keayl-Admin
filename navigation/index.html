@@ -671,6 +671,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#resource-icons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource icons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dashboard" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -889,6 +900,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#resource-icons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource icons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dashboard" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -941,6 +963,20 @@ declaration overrides the label and Bootstrap icon, assigns a group, sets a
 <p>Resources that share a group render under a collapsible section. Items within a
 group are ordered by <code>priority</code> (lower first), then by label. The current
 resource is highlighted, and the group containing it is expanded.</p>
+<h2 id="resource-icons">Resource icons<a class="headerlink" href="#resource-icons" title="Permanent link">&para;</a></h2>
+<p>An <code>icon</code> declaration sets a resource's Bootstrap icon. The name is a
+<a href="https://icons.getbootstrap.com/">Bootstrap Icons</a> identifier without the <code>bi-</code>
+prefix. The icon appears in the sidebar entry and in the heading of the
+resource's index, show, new, and edit pages:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">register</span>(<span class="n">Post</span>, {
+  <span class="n">icon</span> <span class="s">&#39;newspaper&#39;</span>;
+});
+</code></pre></div></td></tr></table></div>
+<p>A resource without an <code>icon</code> uses <code>list-ul</code> in the sidebar and no icon in its
+headings. An <code>icon</code> passed to <code>menu</code> overrides the sidebar icon while the page
+headings keep the resource's <code>icon</code>.</p>
 <p>Group order, custom internal links, and external links are configured on the
 admin:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
