@@ -1,6 +1,7 @@
 use BDD::Behave;
 use MVC::Keayl::Admin;
 use MVC::Keayl::Admin::Attachments;
+use MVC::Keayl::Storage::Attached;
 use MVC::Keayl::Routing;
 use MVC::Keayl::Dispatcher;
 use MVC::Keayl::Request;
@@ -70,5 +71,64 @@ describe 'MVC::Keayl::Admin file uploads', {
 
     my $post = Post.where({ title => 'No cover' }).first;
     expect(MVC::Keayl::Admin::Attachments.attachment-for($post, 'cover').defined).to.be-falsy;
+  }
+
+  context 're-uploading a file through update', {
+    # attachment-for serves the first attachment, so replacing the file must
+    # remove the old one; otherwise the original keeps being shown.
+    let(:post, {
+      upload('/admin/posts', { title => 'With cover', body => 'b' },
+        file-field => 'cover', filename => 'cover.png', content => 'PNGBYTES');
+      Post.where({ title => 'With cover' }).first
+    });
+
+    let(:original-key, {
+      MVC::Keayl::Admin::Attachments.attachment-for(post, 'cover').blob.key
+    });
+
+    let(:replace, {
+      my $old = original-key;
+
+      upload("/admin/posts/{post.id}", { title => 'With cover', body => 'b' },
+        file-field => 'cover', filename => 'cover2.png', content => 'REPLACEDBYTES');
+
+      $old
+    });
+
+    it 'keeps a single attachment for the field', {
+      replace;
+      expect(storage-repository.attachments-for(post.WHAT.^name, post.id, 'cover').elems).to.eq(1);
+    }
+
+    it 'serves the newly uploaded file', {
+      replace;
+      expect(MVC::Keayl::Admin::Attachments.attachment-for(post, 'cover').blob.filename).to.eq('cover2.png');
+    }
+
+    it 'purges the replaced blob record', {
+      my $old = replace;
+      expect(storage-repository.find-blob-by-key($old).defined).to.be-falsy;
+    }
+
+    it 'deletes the replaced file from storage', {
+      my $old = replace;
+      expect(storage-service.exist($old)).to.be-falsy;
+    }
+  }
+
+  context 'updating without a new file', {
+    let(:post, {
+      upload('/admin/posts', { title => 'With cover', body => 'b' },
+        file-field => 'cover', filename => 'cover.png', content => 'PNGBYTES');
+      my $record = Post.where({ title => 'With cover' }).first;
+
+      upload("/admin/posts/{$record.id}", { title => 'Kept cover', body => 'b' });
+
+      $record
+    });
+
+    it 'keeps the existing attachment', {
+      expect(MVC::Keayl::Admin::Attachments.attachment-for(post, 'cover').blob.filename).to.eq('cover.png');
+    }
   }
 }

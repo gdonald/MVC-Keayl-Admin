@@ -3,6 +3,7 @@ use Test;
 
 use MVC::Keayl::Admin;
 use MVC::Keayl::Admin::Attachments;
+use MVC::Keayl::Storage::Attached;
 use MVC::Keayl::Routing;
 use MVC::Keayl::Dispatcher;
 use MVC::Keayl::Request;
@@ -66,6 +67,34 @@ ok $attachment.defined, 'the upload is stored as an attachment';
 is $attachment.blob.filename, 'cover.png', 'the attachment keeps the uploaded filename';
 
 is $attachment.blob.content-type, 'image/png', 'the attachment keeps the content type';
+
+my $original-key = $attachment.blob.key;
+
+# re-uploading through update replaces the attachment rather than piling on a
+# second one. attachment-for serves the first attachment, so a stale one left
+# behind would keep being shown instead of the newly uploaded file.
+my $update = upload("/admin/posts/{$post.id}", { title => 'With cover', body => 'b' },
+  file-field => 'cover', filename => 'cover2.png', content => 'REPLACEDBYTES');
+
+is $update.status, 302, 'updating with a new file upload succeeds';
+
+is storage-repository.attachments-for($post.WHAT.^name, $post.id, 'cover').elems, 1,
+  're-uploading replaces the attachment rather than keeping the old one too';
+
+is MVC::Keayl::Admin::Attachments.attachment-for($post, 'cover').blob.filename, 'cover2.png',
+  'the attachment now serves the newly uploaded file';
+
+nok storage-repository.find-blob-by-key($original-key).defined,
+  'the replaced blob record is purged';
+
+nok storage-service.exist($original-key),
+  'the replaced file is deleted from storage';
+
+# updating without a file leaves the existing attachment in place
+upload("/admin/posts/{$post.id}", { title => 'Kept cover', body => 'b' });
+
+is MVC::Keayl::Admin::Attachments.attachment-for($post, 'cover').blob.filename, 'cover2.png',
+  'updating without a file keeps the existing attachment';
 
 # creating without a file leaves no attachment
 my $plain = upload('/admin/posts', { title => 'No cover', body => 'b' });
