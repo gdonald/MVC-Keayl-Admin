@@ -53,7 +53,8 @@ MVC::Keayl::Admin.page('reports', -> $controller {
 
 The block receives the controller, so it can read params or the current admin.
 Pass `:hide` to register the route without a menu entry. Page menu entries honour
-the same `group`, `priority`, and `icon` options as resources.
+the same `group`, `priority`, and `icon` options as resources. A page's `icon`
+also appears in its heading, the same as a resource's [icon](navigation.md).
 
 ## Localization
 

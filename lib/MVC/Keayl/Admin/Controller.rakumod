@@ -60,13 +60,16 @@ class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
     $response
   }
 
-  method render-admin($template, Str :$page-title, :@breadcrumbs, *%options) {
+  method render-admin($template, Str :$page-title, Str :$icon, :@breadcrumbs, *%options) {
     my $config = MVC::Keayl::Admin::Config.current;
     my $path   = self.request.defined ?? self.request.path !! '';
 
     self.assign('site_title', $config.site-title);
     self.assign('mount_path', $config.mount-path);
-    self.assign('page_title', $page-title // $config.site-title);
+    my $title = $page-title // $config.site-title;
+
+    self.assign('page_title', $title);
+    self.assign('admin_heading', MVC::Keayl::Admin::Chrome.heading-html($title, $icon));
 
     self.assign('admin_styles',    MVC::Keayl::Admin::Assets.stylesheet-tags);
     self.assign('admin_scripts',   MVC::Keayl::Admin::Assets.script-tags);

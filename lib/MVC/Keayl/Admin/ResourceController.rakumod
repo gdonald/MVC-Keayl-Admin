@@ -366,6 +366,7 @@ method index {
   self.render-admin(
     'resource/index',
     page-title  => $resource.plural-name,
+    icon        => $resource.icon,
     breadcrumbs => self.resource-breadcrumbs($resource, $resource.plural-name => Nil),
   )
 }
@@ -578,6 +579,7 @@ method render-form($resource, $record, Str:D :$action, Str:D :$submit, Str:D :$b
   self.render-admin(
     'resource/form',
     :$page-title,
+    icon        => $resource.icon,
     breadcrumbs => self.resource-breadcrumbs($resource, $resource.plural-name => $base, $page-title => Nil),
   )
 }
@@ -613,6 +615,7 @@ method show {
   self.render-admin(
     'resource/show',
     page-title  => $title,
+    icon        => $resource.icon,
     breadcrumbs => self.resource-breadcrumbs($resource, $resource.plural-name => $base, $title => Nil),
   )
 }

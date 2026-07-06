@@ -116,6 +116,26 @@ sub register-posts(Int :$per-page, Bool :$scope-counts --> Nil) is export {
   });
 }
 
+sub register-posts-icon(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    icon 'newspaper';
+
+    column('title');
+    attribute('title');
+    field('title', :as<string>);
+    permit(<title>);
+  });
+}
+
+sub register-posts-icon-menu-override(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    icon 'newspaper';
+    menu(icon => 'file-text');
+
+    column('title');
+  });
+}
+
 sub register-posts-labeled(--> Nil) is export {
   MVC::Keayl::Admin.register(Post, {
     column('title', label => 'Custom Heading');

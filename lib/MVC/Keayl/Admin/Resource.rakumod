@@ -44,6 +44,7 @@ has MVC::Keayl::Admin::Panel        @.panels;
 has MVC::Keayl::Admin::Panel        @.tabs;
 has MVC::Keayl::Admin::ActionItem   @.action-items;
 has MVC::Keayl::Admin::MenuEntry    $.menu-entry is rw;
+has Str                             $!icon;
 has Str                             @.enabled-actions = <index show new edit destroy>;
 has Str                             $.sort-column;
 has Str                             $.sort-dir = 'asc';
@@ -342,6 +343,14 @@ method menu(Str :$group, Str :$label, Int :$priority = 0, Str :$icon, Bool :$hid
   reject-unknown(%_, 'menu');
 
   $!menu-entry = MVC::Keayl::Admin::MenuEntry.new(:$group, :$label, :$priority, :$icon, :$hide);
+
+  self
+}
+
+method icon(Str $name?) {
+  return $!icon without $name;
+
+  $!icon = $name;
 
   self
 }

@@ -1,7 +1,14 @@
 use v6.d;
 use MVC::Keayl::Admin::Config;
+use MVC::Keayl::Admin::Formatter;
 
 unit class MVC::Keayl::Admin::Chrome;
+
+method heading-html(::?CLASS:U: Str:D $title, Str $icon --> Str) {
+  my $bootstrap-icon = $icon.defined ?? qq[<i class="bi bi-{html-escape($icon)} me-2"></i>] !! '';
+
+  $bootstrap-icon ~ html-escape($title)
+}
 
 method brand-html(::?CLASS:U: --> Str) {
   my $config = MVC::Keayl::Admin::Config.current;

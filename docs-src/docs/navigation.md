@@ -20,6 +20,23 @@ Resources that share a group render under a collapsible section. Items within a
 group are ordered by `priority` (lower first), then by label. The current
 resource is highlighted, and the group containing it is expanded.
 
+## Resource icons
+
+An `icon` declaration sets a resource's Bootstrap icon. The name is a
+[Bootstrap Icons](https://icons.getbootstrap.com/) identifier without the `bi-`
+prefix. The icon appears in the sidebar entry and in the heading of the
+resource's index, show, new, and edit pages:
+
+```raku
+MVC::Keayl::Admin.register(Post, {
+  icon 'newspaper';
+});
+```
+
+A resource without an `icon` uses `list-ul` in the sidebar and no icon in its
+headings. An `icon` passed to `menu` overrides the sidebar icon while the page
+headings keep the resource's `icon`.
+
 Group order, custom internal links, and external links are configured on the
 admin:
 

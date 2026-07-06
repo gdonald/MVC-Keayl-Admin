@@ -65,7 +65,7 @@ method render(::?CLASS:U: Str:D :$mount, Str:D :$active-slug = '', :$admin --> S
     @items.push: %(
       label    => ($entry.defined && $entry.label.defined) ?? $entry.label !! $resource.plural-name,
       url      => $mount ~ '/' ~ $resource.slug,
-      icon     => ($entry.defined && $entry.icon.defined) ?? $entry.icon !! 'list-ul',
+      icon     => ($entry.defined && $entry.icon.defined) ?? $entry.icon !! ($resource.icon // 'list-ul'),
       priority => ($entry.defined ?? $entry.priority !! 0),
       group    => ($entry.defined ?? $entry.group !! Str),
       external => False,

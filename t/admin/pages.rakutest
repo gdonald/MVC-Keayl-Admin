@@ -28,6 +28,8 @@ is $response.status, 200, 'a standalone page responds at its mount path';
 ok $response.body.contains('Sales summary'), 'the page renders its block content';
 ok $response.body.contains('<title>Reports</title>'), 'the page uses its title';
 ok $response.body.contains('navbar-brand'), 'the page renders inside the admin layout';
+ok $response.body.contains(q{<h1 class='h3 mb-3'><i class="bi bi-graph-up me-2"></i>Reports}),
+  'the page heading shows its icon';
 
 # the page appears in the menu
 my $menu = MVC::Keayl::Admin::Menu.render(mount => '/admin', active-slug => 'reports');
@@ -41,6 +43,8 @@ MVC::Keayl::Admin.reset;
 MVC::Keayl::Admin.page('secret', -> $c { '<p>hush</p>' }, title => 'Secret', :hide);
 
 ok fetch('/admin/secret').body.contains('hush'), 'a hidden page is still routable';
+ok fetch('/admin/secret').body.contains(q{<h1 class='h3 mb-3'>Secret}),
+  'a page without an icon renders a plain heading';
 nok MVC::Keayl::Admin::Menu.render(mount => '/admin').contains('/admin/secret'), 'a hidden page is left out of the menu';
 
 MVC::Keayl::Admin.reset;

@@ -60,6 +60,7 @@ a declaration on the resource config:
 | `panel`              | a show-page main-column panel (`:priority`, `:if-can`)                    | [Index presentations and panels](presentations.md) |
 | `tab`                | a show-page tabbed panel (`:priority`, `:if-can`)                        | [Index presentations and panels](presentations.md) |
 | `menu`               | the sidebar entry (`:group`, `:label`, `:priority`, `:icon`, `:hide`)     | [Navigation](navigation.md) |
+| `icon`               | the resource's Bootstrap icon, shown in the sidebar and page headings     | [Navigation](navigation.md) |
 
 ## Resource options
 

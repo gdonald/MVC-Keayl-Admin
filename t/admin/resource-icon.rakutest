@@ -1,0 +1,75 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Menu;
+use MVC::Keayl::Admin::Chrome;
+use MVC::Keayl::Routing;
+use MVC::Keayl::Dispatcher;
+use MVC::Keayl::Request;
+use MVC::Keayl::Admin::TestSupport;
+
+sub fetch(Str:D $path) {
+  my $router = routes { mount MVC::Keayl::Admin.endpoint, at => '/admin'; };
+  my $host   = MVC::Keayl::Dispatcher.new(:$router, controllers => []);
+  $host.call(MVC::Keayl::Request.new(method => 'GET', target => $path))
+}
+
+sub heading-with-icon(Str:D $icon --> Str) {
+  q{<h1 class='h3 mb-3'><i class="bi bi-} ~ $icon ~ q{ me-2"></i>}
+}
+
+setup-admin-db;
+
+# a resource sets its own icon
+MVC::Keayl::Admin.reset;
+register-posts-icon;
+register-authors;
+
+seed-posts({ title => 'First post', body => 'hello' });
+my $post = Post.where({ title => 'First post' }).first;
+
+my $menu = MVC::Keayl::Admin::Menu.render(mount => '/admin', active-slug => 'posts');
+
+ok $menu.contains('bi-newspaper'), 'the sidebar uses the resource icon';
+
+ok $menu.contains('bi-list-ul'), 'a resource without an icon falls back to the default sidebar icon';
+
+ok fetch('/admin/posts').body.contains(heading-with-icon('newspaper')),
+  'the index heading shows the resource icon';
+
+ok fetch('/admin/posts/' ~ $post.id).body.contains(heading-with-icon('newspaper')),
+  'the show heading shows the resource icon';
+
+ok fetch('/admin/posts/new').body.contains(heading-with-icon('newspaper')),
+  'the new form heading shows the resource icon';
+
+ok fetch('/admin/posts/' ~ $post.id ~ '/edit').body.contains(heading-with-icon('newspaper')),
+  'the edit form heading shows the resource icon';
+
+# an explicit menu icon overrides the resource icon in the sidebar
+MVC::Keayl::Admin.reset;
+register-posts-icon-menu-override;
+
+my $override = MVC::Keayl::Admin::Menu.render(mount => '/admin', active-slug => 'posts');
+
+ok $override.contains('bi-file-text'), 'an explicit menu icon wins in the sidebar';
+
+nok $override.contains('bi-newspaper'), 'the resource icon does not also appear in the sidebar';
+
+ok fetch('/admin/posts').body.contains(heading-with-icon('newspaper')),
+  'the heading still uses the resource icon when the menu icon differs';
+
+# the heading builder
+MVC::Keayl::Admin.reset;
+
+is MVC::Keayl::Admin::Chrome.heading-html('Posts', Str), 'Posts',
+  'a heading without an icon is just the escaped title';
+
+ok MVC::Keayl::Admin::Chrome.heading-html('Posts', 'newspaper').contains('<i class="bi bi-newspaper me-2"></i>Posts'),
+  'a heading with an icon prefixes the escaped title';
+
+is MVC::Keayl::Admin::Chrome.heading-html('<b>x</b>', Str), '&lt;b&gt;x&lt;/b&gt;',
+  'a heading escapes the title';
+
+done-testing;

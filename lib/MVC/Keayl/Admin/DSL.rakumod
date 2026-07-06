@@ -62,6 +62,10 @@ sub menu(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.menu(|args)
 }
 
+sub icon(|args) is export {
+  $*KEAYL-ADMIN-RESOURCE.icon(|args)
+}
+
 sub nested(|args) is export {
   $*KEAYL-ADMIN-RESOURCE.nested(|args)
 }

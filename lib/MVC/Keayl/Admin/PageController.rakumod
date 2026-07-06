@@ -15,5 +15,6 @@ method show {
   self.render-admin(
     'page/show',
     page-title => $page.title,
+    icon       => $page.icon,
   )
 }
