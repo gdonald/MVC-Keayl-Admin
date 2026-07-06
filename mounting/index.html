@@ -958,15 +958,22 @@ available:</p>
 <td><code>Admin</code></td>
 <td>The title shown in the admin chrome.</td>
 </tr>
+<tr>
+<td><code>logout-path</code></td>
+<td>(none)</td>
+<td>The path the navbar logout link targets.</td>
+</tr>
 </tbody>
 </table>
 <p>Set them with <code>configure</code>:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span>
 <span class="normal">3</span>
-<span class="normal">4</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">configure</span>(
-  <span class="n">mount-path</span> =&gt; <span class="s">&#39;/manage&#39;</span>,
-  <span class="n">site-title</span> =&gt; <span class="s">&#39;Control Panel&#39;</span>,
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">configure</span>(
+  <span class="n">mount-path</span>  =&gt; <span class="s">&#39;/manage&#39;</span>,
+  <span class="n">site-title</span>  =&gt; <span class="s">&#39;Control Panel&#39;</span>,
+  <span class="n">logout-path</span> =&gt; <span class="s">&#39;/manage/logout&#39;</span>,
 );
 </code></pre></div></td></tr></table></div>
 <p><code>mount-path</code> is read by the host when it mounts the engine. <code>site-title</code> is

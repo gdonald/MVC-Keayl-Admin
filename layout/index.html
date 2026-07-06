@@ -921,9 +921,11 @@
 
 <h1 id="layout-and-chrome">Layout and chrome<a class="headerlink" href="#layout-and-chrome" title="Permanent link">&para;</a></h1>
 <p>Admin pages render inside a Bootstrap 5 layout: a top bar with the site brand, a
-collapsible left sidebar, a main content region, a flash area, and breadcrumbs.
-On small screens the sidebar becomes an offcanvas panel toggled from the top
-bar.</p>
+collapsible left sidebar that spans the full available height, a main content
+region, a flash area, and breadcrumbs. On small screens the sidebar becomes an
+offcanvas panel toggled from the top bar. When an admin is signed in, the top bar
+shows a "Signed in as" indicator and, if a <a href="../authentication/">logout path</a> is
+configured, a logout link.</p>
 <h2 id="rendering-a-page">Rendering a page<a class="headerlink" href="#rendering-a-page" title="Permanent link">&para;</a></h2>
 <p>Controllers derive from <code>MVC::Keayl::Admin::Controller</code> and render through
 <code>render-admin</code>, which wires the chrome (asset tags, brand, menu, breadcrumbs,

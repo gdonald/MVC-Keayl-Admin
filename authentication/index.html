@@ -817,6 +817,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#logging-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging out
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -955,6 +966,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#logging-out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging out
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1037,6 +1059,14 @@ object:</p>
 controllers as <code>self.current-admin</code>, exposed to views as <code>$current_admin</code> (the
 layout shows a "Signed in as" indicator when present), and is the value the
 authorization layer will check.</p>
+<h2 id="logging-out">Logging out<a class="headerlink" href="#logging-out" title="Permanent link">&para;</a></h2>
+<p>The gate authenticates but does not own a logout route, since ending a session
+depends on the strategy. Configure a <code>logout-path</code> and the navbar renders a
+logout link next to the "Signed in as" indicator for a signed-in admin. Point it
+at a route your app handles, which clears the session and redirects:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">configure</span>(<span class="n">logout-path</span> =&gt; <span class="s">&#39;/admin/logout&#39;</span>);
+</code></pre></div></td></tr></table></div>
+<p>Without a configured <code>logout-path</code> no logout link is shown.</p>
 <p>Assets are served by a controller outside the gate, so the stylesheet, script,
 and font bundle load without authentication.</p>
 
