@@ -102,6 +102,23 @@ my $no-cover = Post.where({ title => 'No cover' }).first;
 nok MVC::Keayl::Admin::Attachments.attachment-for($no-cover, 'cover').defined,
   'a create without a file attaches nothing';
 
+# deleting a record purges its file attachments so nothing is orphaned
+my $doomed = upload('/admin/posts', { title => 'Doomed', body => 'b' },
+  file-field => 'cover', filename => 'doomed.png', content => 'DOOMEDBYTES');
+my $doomed-post = Post.where({ title => 'Doomed' }).first;
+my $doomed-key  = MVC::Keayl::Admin::Attachments.attachment-for($doomed-post, 'cover').blob.key;
+
+my $delete = upload("/admin/posts/{$doomed-post.id}/delete", {});
+
+is $delete.status, 302, 'deleting a record succeeds';
+nok Post.where({ id => $doomed-post.id }).first.defined, 'the record is deleted';
+nok MVC::Keayl::Admin::Attachments.attachment-for($doomed-post, 'cover').defined,
+  'the record deletion leaves no attachment behind';
+nok storage-repository.find-blob-by-key($doomed-key).defined,
+  'the record deletion purges the blob record';
+nok storage-service.exist($doomed-key),
+  'the record deletion deletes the stored file';
+
 MVC::Keayl::Admin.reset;
 
 done-testing;

@@ -131,4 +131,42 @@ describe 'MVC::Keayl::Admin file uploads', {
       expect(MVC::Keayl::Admin::Attachments.attachment-for(post, 'cover').blob.filename).to.eq('cover.png');
     }
   }
+
+  context 'deleting a record with an attachment', {
+    # Destroying a record must purge its file attachments, or the blob record and
+    # stored file are orphaned.
+    let(:record, {
+      upload('/admin/posts', { title => 'Doomed', body => 'b' },
+        file-field => 'cover', filename => 'doomed.png', content => 'DOOMEDBYTES');
+      Post.where({ title => 'Doomed' }).first
+    });
+
+    let(:key, { MVC::Keayl::Admin::Attachments.attachment-for(record, 'cover').blob.key });
+
+    let(:destroy, {
+      my $blob-key = key;
+      my $response = upload("/admin/posts/{record.id}/delete", {});
+      { response => $response, key => $blob-key }
+    });
+
+    it 'deletes the record', {
+      destroy;
+      expect(Post.where({ id => record.id }).first.defined).to.be-falsy;
+    }
+
+    it 'leaves no attachment behind', {
+      destroy;
+      expect(MVC::Keayl::Admin::Attachments.attachment-for(record, 'cover').defined).to.be-falsy;
+    }
+
+    it 'purges the blob record', {
+      my %result = destroy;
+      expect(storage-repository.find-blob-by-key(%result<key>).defined).to.be-falsy;
+    }
+
+    it 'deletes the stored file', {
+      my %result = destroy;
+      expect(storage-service.exist(%result<key>)).to.be-falsy;
+    }
+  }
 }

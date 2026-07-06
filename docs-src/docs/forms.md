@@ -79,7 +79,8 @@ field('cover', :as<file>);
 
 Uploading a new file on update replaces the field's previous attachment,
 deleting the old blob record and its stored bytes. Saving without choosing a
-file leaves the existing attachment in place.
+file leaves the existing attachment in place. Deleting a record purges its file
+attachments, so no blob record or stored file is left orphaned.
 
 Configure a storage service and repository in your application's setup, the same
 as any Active Storage integration.

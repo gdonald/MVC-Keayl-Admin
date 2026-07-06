@@ -68,6 +68,14 @@ sub attach-files($resource, $record, %params) {
   }
 }
 
+# Purge every file-field attachment for a record. Called before destroying it so
+# deleting a record does not leave its blobs and stored files behind.
+sub detach-files($resource, $record) {
+  for $resource.fields.grep(*.as eq 'file') -> $field {
+    MVC::Keayl::Admin::Attachments.detach($record, $field.name);
+  }
+}
+
 sub strong-params($resource, %params) {
   my %attrs;
 
@@ -423,6 +431,7 @@ method destroy {
 
   my $index = MVC::Keayl::Admin::Config.current.mount-path ~ '/' ~ $resource.slug;
 
+  detach-files($resource, $record);
   $record.destroy;
 
   self.flash<notice> = $resource.singular-name ~ ' deleted.';
