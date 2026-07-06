@@ -1067,6 +1067,9 @@ deletion. Use the model's <code>reject-if</code> to skip a blank add-row.</p>
 type, id, and the field name (no storage role on the model required):</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">field</span>(<span class="s">&#39;cover&#39;</span>, :<span class="n">as</span><span class="s">&lt;file&gt;</span>);
 </code></pre></div></td></tr></table></div>
+<p>Uploading a new file on update replaces the field's previous attachment,
+deleting the old blob record and its stored bytes. Saving without choosing a
+file leaves the existing attachment in place.</p>
 <p>Configure a storage service and repository in your application's setup, the same
 as any Active Storage integration.</p>
 
