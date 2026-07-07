@@ -1030,10 +1030,11 @@ an input type:</p>
 <span class="n">field</span>(<span class="s">&#39;author-id&#39;</span>, :<span class="n">as</span><span class="s">&lt;select&gt;</span>, :<span class="n">collection</span>({ <span class="n">Author</span>.<span class="nb">all</span>.<span class="nb">all</span>.<span class="n">map</span>(-&gt; <span class="nv">$a</span> { <span class="nv">$a</span>.<span class="nb">id</span> =&gt; <span class="nv">$a</span>.<span class="nb">name</span> }) }));
 <span class="n">field</span>(<span class="s">&#39;tag-ids&#39;</span>,   :<span class="n">as</span><span class="s">&lt;select&gt;</span>, :<span class="n">multiple</span>, :<span class="n">collection</span>({ <span class="n">Tag</span>.<span class="nb">all</span>.<span class="nb">all</span>.<span class="n">map</span>(-&gt; <span class="nv">$t</span> { <span class="nv">$t</span>.<span class="nb">id</span> =&gt; <span class="nv">$t</span>.<span class="nb">name</span> }) }));
 </code></pre></div></td></tr></table></div>
-<p>Field labels resolve through I18n (<code>human-attribute-name</code>), and a <code>:hint</code> and
-<code>:placeholder</code> render alongside the input. A <code>select</code> renders a dropdown from its
-explicit <code>collection</code>; with <code>:multiple</code> it renders a multi-select for a
-collection association.</p>
+<p>Field labels resolve through I18n (<code>human-attribute-name</code>), or pass <code>:label</code> to
+set one explicitly for a single field. A <code>:hint</code> and <code>:placeholder</code> render
+alongside the input. A <code>select</code> renders a dropdown from its explicit
+<code>collection</code>, and with <code>:multiple</code> it renders a multi-select for a collection
+association.</p>
 <h2 id="persistence">Persistence<a class="headerlink" href="#persistence" title="Permanent link">&para;</a></h2>
 <p>Create and update assign only the attributes named in the resource's <code>permit</code>
 allowlist, so an unlisted parameter is never mass-assigned. On success the action
