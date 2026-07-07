@@ -15,6 +15,7 @@ sub column-of($field --> Str) {
 }
 
 sub label-for($model, $field --> Str) {
+  return html-escape($field.label) if $field.label.defined;
   html-escape(i18n.human-attribute-name($model, column-of($field)))
 }
 

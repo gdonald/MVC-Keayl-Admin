@@ -4,6 +4,7 @@ unit class MVC::Keayl::Admin::Field;
 
 has Str  $.name is required;
 has Str  $.as = 'string';
+has Str  $.label;
 has      &.collection;
 has Str  $.hint;
 has Str  $.placeholder;

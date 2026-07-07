@@ -237,12 +237,12 @@ method attribute(Str:D $name, :&display, Str :$format, Bool :$html = False --> :
   self
 }
 
-method field(Str:D $name, Str :$as = 'string', :&collection, Str :$hint, Str :$placeholder, Bool :$multiple = False --> ::?CLASS) {
+method field(Str:D $name, Str :$as = 'string', Str :$label, :&collection, Str :$hint, Str :$placeholder, Bool :$multiple = False --> ::?CLASS) {
   reject-unknown(%_, "field '$name'");
 
   die "unknown field type '$as' for field '$name'" unless FIELD-TYPES{$as};
 
-  @!fields.push: MVC::Keayl::Admin::Field.new(:$name, :$as, :&collection, :$hint, :$placeholder, :$multiple);
+  @!fields.push: MVC::Keayl::Admin::Field.new(:$name, :$as, :$label, :&collection, :$hint, :$placeholder, :$multiple);
 
   self
 }

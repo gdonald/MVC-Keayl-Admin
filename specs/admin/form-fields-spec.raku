@@ -12,7 +12,7 @@ describe 'MVC::Keayl::Admin form field rendering', {
 
   let(:form, {
     my $resource = MVC::Keayl::Admin.register(Post, {
-      field('title', :as<string>);
+      field('title', :as<string>, label => 'Headline');
       field('category-id', :as<select>, :collection({ (1 => 'News', 2 => 'Opinion') }));
       field('tag-ids', :as<select>, :multiple, :collection({ (1 => 'Red', 2 => 'Blue') }));
     });
@@ -31,5 +31,9 @@ describe 'MVC::Keayl::Admin form field rendering', {
 
   it 'renders the multi-select collection options', {
     expect(form.contains('Red') && form.contains('Blue')).to.be-truthy;
+  }
+
+  it 'renders a field with its custom label instead of the humanized name', {
+    expect(form.contains('>Headline</label>')).to.be-truthy;
   }
 }

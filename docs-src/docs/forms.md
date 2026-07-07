@@ -25,10 +25,11 @@ field('author-id', :as<select>, :collection({ Author.all.all.map(-> $a { $a.id =
 field('tag-ids',   :as<select>, :multiple, :collection({ Tag.all.all.map(-> $t { $t.id => $t.name }) }));
 ```
 
-Field labels resolve through I18n (`human-attribute-name`), and a `:hint` and
-`:placeholder` render alongside the input. A `select` renders a dropdown from its
-explicit `collection`; with `:multiple` it renders a multi-select for a
-collection association.
+Field labels resolve through I18n (`human-attribute-name`), or pass `:label` to
+set one explicitly for a single field. A `:hint` and `:placeholder` render
+alongside the input. A `select` renders a dropdown from its explicit
+`collection`, and with `:multiple` it renders a multi-select for a collection
+association.
 
 ## Persistence
 

@@ -48,7 +48,7 @@ a declaration on the resource config:
 | `action-item`        | a page-toolbar button (`:only`, `:except`, `:if-can`)                     | [Action availability and toolbar](actions-availability.md) |
 | `column`             | an index column (`:sortable`, `:display`, `:format`)                      | [Index pages](index-pages.md) |
 | `attribute`          | a show-page row (`:display`, `:format`)                                   | [Show pages](show-pages.md) |
-| `field`              | a form input (`:as`, `:collection`, `:hint`, `:placeholder`, `:multiple`) | [Forms](forms.md) |
+| `field`              | a form input (`:as`, `:label`, `:collection`, `:hint`, `:placeholder`, `:multiple`) | [Forms](forms.md) |
 | `filter`             | a search control (`:as`, `:predicate`, `:collection`)                     | [Filters](filters.md) |
 | `scope`              | a named scope, one markable `:default`                                    | [Scopes](scopes.md) |
 | `permit`             | the strong-params allowlist                                               | [Forms](forms.md) |

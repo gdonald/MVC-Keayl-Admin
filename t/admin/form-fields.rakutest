@@ -10,7 +10,7 @@ setup-admin-db;
 MVC::Keayl::Admin.reset;
 
 my $resource = MVC::Keayl::Admin.register(Post, {
-  field('title', :as<string>);
+  field('title', :as<string>, label => 'Headline');
   field('category-id', :as<select>, :collection({ (1 => 'News', 2 => 'Opinion') }));
   field('tag-ids', :as<select>, :multiple, :collection({ (1 => 'Red', 2 => 'Blue') }));
 });
@@ -26,6 +26,9 @@ ok $form.contains('multiple') && $form.contains('name="tag-ids[]"'),
 
 ok $form.contains('Red') && $form.contains('Blue'),
   'the multi-select renders its collection options';
+
+ok $form.contains('>Headline</label>'),
+  'a field renders its custom label instead of the humanized attribute name';
 
 MVC::Keayl::Admin.reset;
 
