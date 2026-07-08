@@ -1126,7 +1126,9 @@ also appears in its heading, the same as a resource's <a href="../navigation/">i
 <h2 id="localization">Localization<a class="headerlink" href="#localization" title="Permanent link">&para;</a></h2>
 <p>All chrome, resource names, attribute labels, scope names, and action labels go
 through an I18n backend. Without translations they fall back to the humanized
-English defaults, so localization is opt-in.</p>
+English defaults, so localization is opt-in. Humanizing title-cases each word and
+drops a trailing <code>_id</code>, <code>_at</code>, or <code>_name</code> suffix, so <code>author_id</code> becomes <code>Author</code>
+and <code>created_at</code> becomes <code>Created</code>.</p>
 <p>Load locale files and select a locale:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
 <span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">MVC::Keayl::Admin</span>.<span class="n">load-locales</span>(<span class="s">&#39;config/locales&#39;</span>);
