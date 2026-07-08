@@ -34,8 +34,8 @@ describe 'MVC::Keayl::Admin::Inflection humanize', {
     expect(humanize('created_at')).to.be('Created');
   }
 
-  it 'drops a trailing name suffix', {
-    expect(humanize('category_name')).to.be('Category');
+  it 'keeps a trailing name suffix as a word', {
+    expect(humanize('first_name')).to.be('First Name');
   }
 
   it 'keeps a bare name with no underscore prefix', {

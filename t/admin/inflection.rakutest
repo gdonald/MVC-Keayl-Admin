@@ -16,12 +16,13 @@ is humanize('blog_post'), 'Blog Post', 'humanize title-cases each word of an und
 
 is humanize('published-at'), 'Published At', 'humanize title-cases each word of a dashed name';
 
-# humanize: strips a trailing id, at, or name suffix
+# humanize: strips a trailing id or at suffix
 is humanize('author_id'), 'Author', 'humanize drops a trailing id suffix';
 
 is humanize('created_at'), 'Created', 'humanize drops a trailing at suffix';
 
-is humanize('category_name'), 'Category', 'humanize drops a trailing name suffix';
+# humanize: a trailing name suffix is kept as a word
+is humanize('first_name'), 'First Name', 'humanize keeps a trailing name suffix as a word';
 
 # humanize: a bare token that matches a suffix is left intact
 is humanize('name'), 'Name', 'humanize keeps a bare name with no underscore prefix';
