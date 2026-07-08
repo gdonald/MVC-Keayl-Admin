@@ -42,7 +42,7 @@ nok Post.where({ id => @posts[1].id }).first.read-attribute('published'), 'the m
 # collection action: a button on the index over the whole relation
 my $index = fetch('/admin/posts').body;
 ok $index.contains('action="/admin/posts/publish-all"'), 'a collection action renders a button on the index';
-ok $index.contains('>Publish all<'), 'the collection action button is labelled from its name';
+ok $index.contains('>Publish All<'), 'the collection action button is labelled from its name';
 
 my $published = send('/admin/posts/publish-all');
 is $published.status, 302, 'a collection action returns the handler response';

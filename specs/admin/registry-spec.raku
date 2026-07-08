@@ -19,11 +19,11 @@ describe 'MVC::Keayl::Admin resource names', {
   }
 
   it 'derives the singular human name', {
-    expect(posts.singular-name).to.be('Blog post');
+    expect(posts.singular-name).to.be('Blog Post');
   }
 
   it 'derives the plural human name', {
-    expect(posts.plural-name).to.be('Blog posts');
+    expect(posts.plural-name).to.be('Blog Posts');
   }
 
   it 'pluralizes a trailing y', {

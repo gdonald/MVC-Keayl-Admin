@@ -60,7 +60,9 @@ also appears in its heading, the same as a resource's [icon](navigation.md).
 
 All chrome, resource names, attribute labels, scope names, and action labels go
 through an I18n backend. Without translations they fall back to the humanized
-English defaults, so localization is opt-in.
+English defaults, so localization is opt-in. Humanizing title-cases each word and
+drops a trailing `_id`, `_at`, or `_name` suffix, so `author_id` becomes `Author`
+and `created_at` becomes `Created`.
 
 Load locale files and select a locale:
 

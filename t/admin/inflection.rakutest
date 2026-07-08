@@ -1,0 +1,31 @@
+use v6.d;
+use Test;
+
+use MVC::Keayl::Admin::Inflection;
+
+# underscore
+is underscore('BlogPost'), 'blog_post', 'underscore splits camel case and lower-cases';
+
+is underscore('Post'), 'post', 'underscore lower-cases a single word';
+
+# dasherize
+is dasherize('blog_post'), 'blog-post', 'dasherize turns underscores into hyphens';
+
+# humanize: title-cases every word
+is humanize('blog_post'), 'Blog Post', 'humanize title-cases each word of an underscored name';
+
+is humanize('published-at'), 'Published At', 'humanize title-cases each word of a dashed name';
+
+# humanize: strips a trailing id, at, or name suffix
+is humanize('author_id'), 'Author', 'humanize drops a trailing id suffix';
+
+is humanize('created_at'), 'Created', 'humanize drops a trailing at suffix';
+
+is humanize('category_name'), 'Category', 'humanize drops a trailing name suffix';
+
+# humanize: a bare token that matches a suffix is left intact
+is humanize('name'), 'Name', 'humanize keeps a bare name with no underscore prefix';
+
+is humanize('id'), 'Id', 'humanize keeps a bare id with no underscore prefix';
+
+done-testing;

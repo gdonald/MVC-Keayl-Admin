@@ -17,9 +17,9 @@ my $categories = MVC::Keayl::Admin.register(Category, { ; });
 # derived names and slug
 is $posts.slug, 'blog-posts', 'the slug is the dasherized plural of the model name';
 
-is $posts.singular-name, 'Blog post', 'the singular human name is derived from the model';
+is $posts.singular-name, 'Blog Post', 'the singular human name is derived from the model';
 
-is $posts.plural-name, 'Blog posts', 'the plural human name is derived from the model';
+is $posts.plural-name, 'Blog Posts', 'the plural human name is derived from the model';
 
 is $categories.slug, 'categories', 'pluralization handles a trailing y';
 
