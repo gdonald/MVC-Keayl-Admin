@@ -2,35 +2,14 @@
 
 All notable changes to MVC::Keayl::Admin are documented here.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Added
-
-- An `:html` flag on `column` and `attribute` so a trusted `display` value renders
-  as raw markup instead of being HTML-escaped. Honored on the table, grid, and
-  blog index presentations and on show-page attributes.
-
-### Changed
-
-- The page heading names the current page, so a page no longer repeats itself as
-  a trailing breadcrumb. Top-level pages omit the breadcrumb entirely and a
-  nested resource keeps only its ancestor trail.
-- The index toolbar now groups the batch controls on the left with the
-  collection actions, New-record button, and Filters button on the right, and a
-  footer row places the pagination and record summary opposite the export links.
-- The Filters offcanvas panel renders once outside the htmx-swapped index body,
-  so sorting, paging, or filtering never tears down an open panel.
-
-## [0.9.0] - 2026-06-25
+## [0.9.0] - 2026-07-11
 
 Initial public release. A generated administration interface for
-[MVC::Keayl](https://github.com/gdonald/MVC-Keayl) applications, in the spirit
-of Django admin and Active Admin. The admin mounts as an engine, delegates the
-model layer to [ORM::ActiveRecord](https://github.com/gdonald/ORM-ActiveRecord)
-and view rendering to [Template::HAML](https://github.com/gdonald/Template-HAML),
+[MVC::Keayl](https://github.com/gdonald/MVC-Keayl) applications. The admin
+mounts as an engine, delegates the model layer to
+[ORM::ActiveRecord](https://github.com/gdonald/ORM-ActiveRecord)
+and view rendering to
+[Template::HAML](https://github.com/gdonald/Template-HAML),
 and ships a Bootstrap 5, Bootstrap Icons, and HTMX frontend served through the
 asset pipeline.
 
@@ -45,24 +24,35 @@ asset pipeline.
 - Show pages with attribute and panel rendering, including nested `belongs_to`
   associations.
 - Forms for create and update, with fields, formatters, and validation surfacing.
+- A `:label` option on `column` and `field` to override the humanized column
+  header or form label.
+- An `:html` flag on `column` and `attribute` so a trusted `display` value renders
+  as raw markup instead of being HTML-escaped, honored on the table, grid, and
+  blog index presentations and on show-page attributes.
 - Filters and search, with association filters that require an explicit
-  `collection` so large tables are never enumerated into a dropdown.
+  `collection` so large tables are never enumerated into a dropdown, in an
+  offcanvas panel rendered outside the htmx-swapped index body so sorting,
+  paging, or filtering never tears down an open panel.
 - Scopes for predefined, named record subsets.
-- Destroy, batch, and custom actions, with per-action availability and a toolbar.
+- Destroy, batch, and custom actions, with per-action availability and a toolbar
+  that groups batch controls on the left with the collection actions, New-record
+  button, and Filters button on the right, and a footer row placing pagination
+  and the record summary opposite the export links.
 - Menu bar actions and a navigable left sidebar with a dashboard landing page.
 - Nested resources.
 - Data export.
 - Authentication, with session and HTTP basic strategies.
 - Authorization, with roles, abilities, and policies.
 - Layout and chrome: a Django-style left sidebar of grouped, ordered menu
-  entries and a right main content area.
+  entries and a right main content area, with page headings that name the current
+  page and breadcrumbs limited to a nested resource's ancestor trail.
 - Asset pipeline serving vendored Bootstrap 5, Bootstrap Icons, and HTMX, with
   progressive enhancement so every action degrades to a full-page request when
   JavaScript is disabled.
 - Internationalization support.
-- Inflection and pluralization helpers for generated labels and routes.
+- Inflection and pluralization helpers for generated labels and routes,
+  title-casing each word of a label and dropping a trailing `_id` or `_at`
+  suffix.
 - `keayl generate admin <Model>` generator that reads the schema and writes
   explicit declarations for the developer to edit.
 - Test support helpers for exercising admin resources.
-
-[0.9.0]: https://github.com/gdonald/MVC-Keayl-Admin/releases/tag/v0.9.0
