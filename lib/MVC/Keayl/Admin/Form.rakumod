@@ -36,21 +36,44 @@ sub select-html($field, Str:D $input-name, $raw --> Str) {
   qq[<select class="form-select" name="{$name}"{$multiple}>{@options.join}</select>]
 }
 
+# Format a raw attribute for a native date/time input. Those inputs require an
+# exact string (YYYY-MM-DD, HH:MM, YYYY-MM-DDTHH:MM) and silently blank a value
+# carrying a timezone offset, which is exactly how a DateTime stringifies, so
+# pull the parts out. A value that is already a string passes through unchanged.
+sub input-value($raw, Str:D $type --> Str) {
+  return '' without $raw;
+
+  if $type eq 'date' && $raw ~~ Dateish {
+    return sprintf('%04d-%02d-%02d', $raw.year, $raw.month, $raw.day);
+  }
+  if $type eq 'time' && $raw ~~ DateTime {
+    return sprintf('%02d:%02d', $raw.hour, $raw.minute);
+  }
+  if $type eq 'datetime' && $raw ~~ DateTime {
+    return sprintf('%04d-%02d-%02dT%02d:%02d', $raw.year, $raw.month, $raw.day, $raw.hour, $raw.minute);
+  }
+
+  $raw.Str
+}
+
 sub control-html($field, Str:D $input-name, $raw --> Str) {
   my $value = html-escape(($raw // '').Str);
   my $place = $field.placeholder.defined ?? qq[ placeholder="{html-escape($field.placeholder)}"] !! '';
 
   given $field.as {
-    when 'text'     { qq[<textarea class="form-control" name="{$input-name}"{$place}>{$value}</textarea>] }
+    when 'text'     {
+      my $rows = $field.rows.defined ?? qq[ rows="{$field.rows}"] !! '';
+      qq[<textarea class="form-control" name="{$input-name}"{$rows}{$place}>{$value}</textarea>]
+    }
     when 'select'   { select-html($field, $input-name, $raw) }
     when 'boolean'  {
       my $checked = $raw ?? ' checked' !! '';
       qq[<div class="form-check"><input class="form-check-input" type="checkbox" name="{$input-name}" value="1"{$checked}></div>]
     }
     when 'number'   { qq[<input class="form-control" type="number" name="{$input-name}" value="{$value}"{$place}>] }
-    when 'date'     { qq[<input class="form-control" type="date" name="{$input-name}" value="{$value}">] }
-    when 'time'     { qq[<input class="form-control" type="time" name="{$input-name}" value="{$value}">] }
-    when 'datetime' { qq[<input class="form-control" type="datetime-local" name="{$input-name}" value="{$value}">] }
+    when 'date'     { qq[<input class="form-control" type="date" name="{$input-name}" value="{html-escape(input-value($raw, 'date'))}">] }
+    when 'time'     { qq[<input class="form-control" type="time" name="{$input-name}" value="{html-escape(input-value($raw, 'time'))}">] }
+    when 'datetime' { qq[<input class="form-control" type="datetime-local" name="{$input-name}" value="{html-escape(input-value($raw, 'datetime'))}">] }
     when 'password' { qq[<input class="form-control" type="password" name="{$input-name}"{$place}>] }
     when 'hidden'   { qq[<input type="hidden" name="{$input-name}" value="{$value}">] }
     when 'file'     { qq[<input class="form-control" type="file" name="{$input-name}">] }
@@ -59,7 +82,8 @@ sub control-html($field, Str:D $input-name, $raw --> Str) {
 }
 
 sub control-for($field, $record --> Str) {
-  control-html($field, $field.name, $record.read-attribute(column-of($field)))
+  my $raw = $field.has-value ?? $field.value.($record) !! $record.read-attribute(column-of($field));
+  control-html($field, $field.name, $raw)
 }
 
 sub field-errors($record, $field --> Str) {

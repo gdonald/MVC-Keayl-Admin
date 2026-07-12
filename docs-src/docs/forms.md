@@ -29,7 +29,21 @@ Field labels resolve through I18n (`human-attribute-name`), or pass `:label` to
 set one explicitly for a single field. A `:hint` and `:placeholder` render
 alongside the input. A `select` renders a dropdown from its explicit
 `collection`, and with `:multiple` it renders a multi-select for a collection
-association.
+association. A `text` field takes `:rows` to size its textarea.
+
+By default a field reads its value from the record's matching column. Pass a
+`:value` block to compute the value instead. The block receives the record, so
+it can render a virtual attribute or a value derived through a method:
+
+```raku
+field('body',  :as<text>, :rows(8));
+field('shout', :as<string>, :value({ .title.uc }));
+```
+
+A `date`, `time`, or `datetime` field formats its value for the native input,
+dropping the timezone offset a `DateTime` would otherwise carry so the browser
+control does not blank it. A value that is already a string passes through
+unchanged.
 
 ## Persistence
 

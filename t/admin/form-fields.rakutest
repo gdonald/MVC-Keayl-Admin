@@ -30,6 +30,87 @@ ok $form.contains('Red') && $form.contains('Blue'),
 ok $form.contains('>Headline</label>'),
   'a field renders its custom label instead of the humanized attribute name';
 
+# textarea rows
+MVC::Keayl::Admin.reset;
+my $rows-resource = MVC::Keayl::Admin.register(Post, {
+  field('body', :as<text>, :rows(8));
+});
+my $rows-form = MVC::Keayl::Admin::Form.render($rows-resource, Post.build,
+  action => '/admin/posts', submit => 'Create', cancel => '/admin/posts');
+
+ok $rows-form.contains('<textarea') && $rows-form.contains('rows="8"'),
+  'a text field renders a textarea sized to the configured rows';
+
+# date value formatted for the native date input
+MVC::Keayl::Admin.reset;
+my $on = Date.new(2026, 5, 25);
+my $date-resource = MVC::Keayl::Admin.register(Post, {
+  field('due', :as<date>, :value({ $on }));
+});
+my $date-form = MVC::Keayl::Admin::Form.render($date-resource, Post.build,
+  action => '/admin/posts', submit => 'Create', cancel => '/admin/posts');
+
+ok $date-form.contains('value="2026-05-25"'),
+  'a date field formats its value for the native date input';
+
+# time value formatted for the native time input
+MVC::Keayl::Admin.reset;
+my $at = DateTime.new(:year(2026), :month(5), :day(25), :hour(9), :minute(7), :second(0));
+my $time-resource = MVC::Keayl::Admin.register(Post, {
+  field('remind-at', :as<time>, :value({ $at }));
+});
+my $time-form = MVC::Keayl::Admin::Form.render($time-resource, Post.build,
+  action => '/admin/posts', submit => 'Create', cancel => '/admin/posts');
+
+ok $time-form.contains('value="09:07"'),
+  'a time field formats its value for the native time input';
+
+# datetime value formatted for the native input (no timezone offset)
+MVC::Keayl::Admin.reset;
+my $when = DateTime.new(:year(2026), :month(5), :day(25), :hour(15), :minute(3), :second(0), :timezone(-18000));
+my $dt-resource = MVC::Keayl::Admin.register(Post, {
+  field('happened-at', :as<datetime>, :value({ $when }));
+});
+my $dt-form = MVC::Keayl::Admin::Form.render($dt-resource, Post.build,
+  action => '/admin/posts', submit => 'Create', cancel => '/admin/posts');
+
+ok $dt-form.contains('value="2026-05-25T15:03"'),
+  'a datetime field formats its value for the datetime-local input without a timezone offset';
+
+# a pre-formatted string value passes through unchanged
+MVC::Keayl::Admin.reset;
+my $string-date-resource = MVC::Keayl::Admin.register(Post, {
+  field('due', :as<date>, :value({ '1999-12-31' }));
+});
+my $string-date-form = MVC::Keayl::Admin::Form.render($string-date-resource, Post.build,
+  action => '/admin/posts', submit => 'Create', cancel => '/admin/posts');
+
+ok $string-date-form.contains('value="1999-12-31"'),
+  'a pre-formatted string date value passes through unchanged';
+
+# a date field with no value renders an empty value
+MVC::Keayl::Admin.reset;
+my $empty-date-resource = MVC::Keayl::Admin.register(Post, {
+  field('due', :as<date>, :value({ Nil }));
+});
+my $empty-date-form = MVC::Keayl::Admin::Form.render($empty-date-resource, Post.build,
+  action => '/admin/posts', submit => 'Create', cancel => '/admin/posts');
+
+ok $empty-date-form.contains('type="date" name="due" value=""'),
+  'a date field with no value renders an empty value';
+
+# a :value block computes the form value from the record, not a column
+MVC::Keayl::Admin.reset;
+my $post = Post.create({ title => 'hello' });
+my $value-resource = MVC::Keayl::Admin.register(Post, {
+  field('shout', :as<string>, :value({ .read-attribute('title').uc }));
+});
+my $value-form = MVC::Keayl::Admin::Form.render($value-resource, $post,
+  action => '/admin/posts/1', submit => 'Update', cancel => '/admin/posts');
+
+ok $value-form.contains('value="HELLO"'),
+  'a field with a :value block computes its value from the record instead of a column';
+
 MVC::Keayl::Admin.reset;
 
 done-testing;
