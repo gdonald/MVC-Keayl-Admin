@@ -39,7 +39,7 @@ sub csv-row(@cells --> Str) {
 
 sub export-records($resource, $relation --> List) {
   $relation.all.map(-> $record {
-    %( $resource.export-columns.map({ .name => export-cell($_, $record) }) )
+      %( $resource.export-columns.map({ .name => export-cell($_, $record) }) )
   }).List
 }
 
@@ -124,8 +124,8 @@ sub batch-controls($resource, $abilities --> Str) {
 # left, export links on the right). When batch actions are enabled the whole
 # thing is wrapped in the batch form so the checkboxes and Apply submit together.
 sub index-body-html($base, $resource, $abilities, Str:D :$tabs, Str:D :$chips,
-                    Bool:D :$batch, Str:D :$table, Str:D :$pager,
-                    Str:D :$toolbar-right, Str:D :$export --> Str) {
+  Bool:D :$batch, Str:D :$table, Str:D :$pager,
+  Str:D :$toolbar-right, Str:D :$export --> Str) {
   my $controls = $batch ?? batch-controls($resource, $abilities) !! '';
 
   my $toolbar = qq[<div class="d-flex flex-wrap gap-2 mb-3 align-items-center">{$controls}<div class="ms-auto d-flex flex-wrap gap-2">{$toolbar-right}</div></div>];
@@ -334,26 +334,26 @@ method index {
   my $items = self.action-items-html($resource, 'index', $abilities);
 
   my $collection-actions = $resource.collection-actions.grep({ $abilities.can(.name) }).map(-> $action {
-    my $url     = html-escape($base ~ '/' ~ $action.name);
-    my $label   = html-escape(MVC::Keayl::Admin::I18n.action-label($action.name));
-    my $confirm = $action.confirm.defined ?? qq[ onsubmit="return confirm('{html-escape($action.confirm)}')"] !! '';
+      my $url     = html-escape($base ~ '/' ~ $action.name);
+      my $label   = html-escape(MVC::Keayl::Admin::I18n.action-label($action.name));
+      my $confirm = $action.confirm.defined ?? qq[ onsubmit="return confirm('{html-escape($action.confirm)}')"] !! '';
 
-    qq[<form method="post" action="$url"{$confirm} class="d-inline"><button type="submit" class="btn btn-secondary btn-sm">{$label}</button></form>]
+      qq[<form method="post" action="$url"{$confirm} class="d-inline"><button type="submit" class="btn btn-secondary btn-sm">{$label}</button></form>]
   }).join;
 
   my $new-link = $abilities.can('create')
-    ?? qq[<a class="btn btn-primary btn-sm" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('new', 'New') ~ ' ' ~ $resource.singular-name)}</a>]
-    !! '';
+  ?? qq[<a class="btn btn-primary btn-sm" href="{html-escape($base ~ '/new')}"><i class="bi bi-plus-lg me-1"></i>{html-escape(MVC::Keayl::Admin::I18n.chrome('new', 'New') ~ ' ' ~ $resource.singular-name)}</a>]
+  !! '';
 
   my $export-links = $resource.export-formats.map(-> $format {
-    qq[<a class="btn btn-secondary btn-sm" href="{html-escape($base ~ '/export.' ~ $format)}">{html-escape(MVC::Keayl::Admin::I18n.chrome('export-' ~ $format, $format.uc))}</a>]
+      qq[<a class="btn btn-secondary btn-sm" href="{html-escape($base ~ '/export.' ~ $format)}">{html-escape(MVC::Keayl::Admin::I18n.chrome('export-' ~ $format, $format.uc))}</a>]
   }).join;
   my $export = $export-links ?? qq[<div class="btn-group btn-group-sm">{$export-links}</div>] !! '';
 
   my $toolbar-right = $items ~ $collection-actions ~ $new-link ~ self.filters-button($resource);
 
   my $body = index-body-html($base, $resource, $abilities, :$tabs, :$chips, :$batch,
-                             :$table, :$pager, :$toolbar-right, :$export);
+    :$table, :$pager, :$toolbar-right, :$export);
 
   return self.render(:html($body)) if self.request.header('HX-Request');
 
@@ -466,6 +466,8 @@ method !list-relation($resource, %params) {
     $relation = $relation.order($sort ~ ($dir eq 'desc' ?? ' DESC' !! ' ASC'));
   } elsif $resource.sort-column.defined {
     $relation = $relation.order($resource.sort-column ~ ($resource.sort-dir eq 'desc' ?? ' DESC' !! ' ASC'));
+  } else {
+    $relation = $relation.order('id DESC');
   }
 
   $relation = $relation.includes(|$resource.eager-loads) if $resource.eager-loads;
@@ -606,7 +608,7 @@ method show {
   self.assign('admin_show_sidebars', MVC::Keayl::Admin::Panels.sidebars($resource.sidebars, $record, $abilities, placement => 'show'));
 
   my @child-links = MVC::Keayl::Admin::Registry.current.children-of($resource.model).map(-> $child {
-    qq[<a class="list-group-item list-group-item-action" href="{html-escape($base ~ '/' ~ $record.id ~ '/' ~ $child.slug)}">{html-escape($child.plural-name)}</a>]
+      qq[<a class="list-group-item list-group-item-action" href="{html-escape($base ~ '/' ~ $record.id ~ '/' ~ $child.slug)}">{html-escape($child.plural-name)}</a>]
   });
   self.assign('admin_show_children', @child-links
     ?? qq[<div class="card mb-3"><div class="card-header">{html-escape(MVC::Keayl::Admin::I18n.chrome('related', 'Related'))}</div><div class="list-group list-group-flush">{@child-links.join}</div></div>]
@@ -646,7 +648,7 @@ method filters-offcanvas($resource, %params, Str:D :$base, :$sort, :$dir, :$scop
 MVC::Keayl::Admin::ResourceController.before-action('authorize-action');
 
 MVC::Keayl::Admin::ResourceController.add-renderer('admin-json', -> $controller, $data, %opts {
-  to-json($data)
+    to-json($data)
 });
 
 sub xml-escape(Str() $text --> Str) {
@@ -654,11 +656,11 @@ sub xml-escape(Str() $text --> Str) {
 }
 
 MVC::Keayl::Admin::ResourceController.add-renderer('admin-xml', -> $controller, $data, %opts {
-  my $records = $data.map(-> %record {
-    '<record>' ~ %record.sort(*.key).map(-> $pair {
-      '<' ~ $pair.key ~ '>' ~ xml-escape($pair.value.Str) ~ '</' ~ $pair.key ~ '>'
-    }).join ~ '</record>'
-  }).join;
+    my $records = $data.map(-> %record {
+        '<record>' ~ %record.sort(*.key).map(-> $pair {
+            '<' ~ $pair.key ~ '>' ~ xml-escape($pair.value.Str) ~ '</' ~ $pair.key ~ '>'
+        }).join ~ '</record>'
+    }).join;
 
-  '<?xml version="1.0" encoding="UTF-8"?>' ~ "\n" ~ '<records>' ~ $records ~ '</records>'
+    '<?xml version="1.0" encoding="UTF-8"?>' ~ "\n" ~ '<records>' ~ $records ~ '</records>'
 });

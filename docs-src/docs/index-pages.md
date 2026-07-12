@@ -73,6 +73,10 @@ shows a direction arrow, and clicking it again toggles ascending and descending.
 Only declared sortable columns are accepted, so the order clause is never built
 from arbitrary input.
 
+When no column is requested in the query string and the resource declares no
+`sort-order` default, the index falls back to ordering by `id` descending, so the
+newest records appear first.
+
 ## Pagination
 
 The index applies `LIMIT` and `OFFSET` for the current page. The page size

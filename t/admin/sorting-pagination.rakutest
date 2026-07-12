@@ -31,6 +31,11 @@ ok $asc.contains('dir=desc'), 'a column sorted ascending offers a descending tog
 
 ok $asc.contains('&uarr;'), 'the active sort column shows a direction indicator';
 
+# default order newest-first by id
+my $default = fetch('/admin/posts').body;
+ok $default.index('Cherry') < $default.index('Apple') < $default.index('Banana'),
+'the index defaults to id descending when no sort is requested';
+
 # a non-sortable column has no sort link
 ok fetch('/admin/posts').body ~~ /'<th>Headline</th>'/, 'a non-sortable column header is plain';
 
@@ -45,7 +50,7 @@ register-posts(per-page => 2);
 seed-posts({ title => 'P1' }, { title => 'P2' }, { title => 'P3' }, { title => 'P4' }, { title => 'P5' });
 
 my $page1 = fetch('/admin/posts?page=1').body;
-ok $page1.contains('P1') && $page1.contains('P2') && !$page1.contains('P3'), 'a page shows only its slice of records';
+ok $page1.contains('P5') && $page1.contains('P4') && !$page1.contains('P3'), 'a page shows only its slice of records';
 
 ok $page1.contains('Showing 1&ndash;2 of 5'), 'the page summary reports the range and total';
 
@@ -54,13 +59,13 @@ ok $page1.contains('pagination'), 'a pagination control is rendered';
 ok $page1.contains('pagination pagination-sm'), 'the pagination control renders at a small size';
 
 ok $page1.index('class="pagination') < $page1.index('Showing 1'),
-  'the record summary sits to the right of the pagination buttons';
+'the record summary sits to the right of the pagination buttons';
 
 my $page3 = fetch('/admin/posts?page=3').body;
-ok $page3.contains('P5') && !$page3.contains('P1'), 'a later page shows its own slice';
+ok $page3.contains('P1') && !$page3.contains('P5'), 'a later page shows its own slice';
 
 ok fetch('/admin/posts?page=1&sort=title&dir=desc').body.contains('sort=title'),
-  'pagination links preserve the sort state';
+'pagination links preserve the sort state';
 
 # default per-page
 is MVC::Keayl::Admin.registry.by-slug('posts').per-page, 2, 'per-page is configurable per resource';

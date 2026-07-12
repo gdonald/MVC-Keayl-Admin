@@ -60,7 +60,7 @@ describe 'MVC::Keayl::Admin JSON export', {
 
   it 'has one object per record carrying the column values', {
     my @records = from-json(fetch('/admin/posts/export.json').body).list;
-    expect(@records.elems == 2 && @records[0]<title> eq 'One').to.be-truthy;
+    expect(@records.elems == 2 && @records[0]<title> eq 'Two').to.be-truthy;
   }
 
   it 'honours the active filter', {

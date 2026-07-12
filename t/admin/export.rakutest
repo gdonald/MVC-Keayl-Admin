@@ -53,7 +53,7 @@ ok $json-response.header('Content-Type').contains('application/json'), 'the JSON
 
 my @records = from-json($json-response.body).list;
 is @records.elems, 2, 'the JSON export has one object per record';
-is @records[0]<title>, 'One', 'each JSON object carries the column values';
+is @records[0]<title>, 'Two', 'each JSON object carries the column values';
 
 # export reflects the current filter
 ok fetch('/admin/posts/export.json?title=One').&streamed-body, 'the filtered export still responds';

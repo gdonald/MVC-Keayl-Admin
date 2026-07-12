@@ -42,6 +42,11 @@ describe 'MVC::Keayl::Admin index sorting', {
     expect(asc.contains('&uarr;')).to.be-truthy;
   }
 
+  it 'defaults to id descending when no sort is requested', {
+    my $default = fetch('/admin/posts').body;
+    expect($default.index('Cherry') < $default.index('Apple') < $default.index('Banana')).to.be-truthy;
+  }
+
   it 'leaves a non-sortable column header plain', {
     expect(fetch('/admin/posts').body.contains('<th>Headline</th>')).to.be-truthy;
   }
@@ -63,7 +68,7 @@ describe 'MVC::Keayl::Admin index pagination', {
   let(:page1, { fetch('/admin/posts?page=1').body });
 
   it 'shows only the page slice', {
-    expect(page1.contains('P1') && page1.contains('P2') && !page1.contains('P3')).to.be-truthy;
+    expect(page1.contains('P5') && page1.contains('P4') && !page1.contains('P3')).to.be-truthy;
   }
 
   it 'reports the range and total in the summary', {
@@ -84,7 +89,7 @@ describe 'MVC::Keayl::Admin index pagination', {
 
   it 'shows a later page slice', {
     my $page3 = fetch('/admin/posts?page=3').body;
-    expect($page3.contains('P5') && !$page3.contains('P1')).to.be-truthy;
+    expect($page3.contains('P1') && !$page3.contains('P5')).to.be-truthy;
   }
 
   it 'preserves sort state in pagination links', {
