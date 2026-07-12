@@ -39,7 +39,9 @@ relationship rather than as a column:
   missing association renders a dash, never a broken link.
 - A **has-many** (or has-and-belongs-to-many) attribute renders as a compact
   sub-table, each row linking into the associated resource, capped with an "and
-  N more" line.
+  N more" line. A `:display` block overrides this, summarising the collection
+  however you like (for example a comma-joined string) in place of the per-record
+  links. The summary is HTML-escaped unless the attribute is declared `:html`.
 
 Association kind and target are detected through the ORM's reflection, so the
 link targets are resolved from the registry by model.

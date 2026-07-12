@@ -24,6 +24,13 @@ sub belongs-to-cell($attribute, $record, $reflection, Str:D $mount --> Str) {
 }
 
 sub has-many-cell($attribute, $record, $reflection, Str:D $mount --> Str) {
+  # A :display override wins over the default per-record links, so a collection
+  # can be summarised (e.g. a comma-joined string) instead of listed.
+  if $attribute.display.defined {
+    my $value = $attribute.display.($record);
+    return $attribute.html ?? $value.Str !! html-escape($value.Str);
+  }
+
   my @all   = $record."{$attribute.name}"().list;
   my $count = @all.elems;
 

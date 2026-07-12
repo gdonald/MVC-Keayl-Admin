@@ -60,6 +60,43 @@ describe 'MVC::Keayl::Admin show page', {
     expect(fetch('/admin/authors/' ~ $author.id).body.contains('/admin/posts/' ~ $post.id)).to.be-truthy;
   }
 
+  it 'honors a :display override on a has-many attribute, rendering a summary', {
+    MVC::Keayl::Admin.reset;
+    register-authors-posts-summary;
+    my $author = seed-authors({ name => 'Amy' })[0];
+    seed-posts({ title => 'Alpha', author_id => $author.id }, { title => 'Beta', author_id => $author.id });
+    my $body = fetch('/admin/authors/' ~ $author.id).body;
+
+    aggregate-failures {
+      expect($body.contains('Alpha')).to.be-truthy;
+      expect($body.contains('Beta')).to.be-truthy;
+      expect($body.contains('/admin/posts/')).to.be-falsy;
+    }
+  }
+
+  it 'escapes a has-many :display summary unless the attribute is html', {
+    MVC::Keayl::Admin.reset;
+    register-authors-posts-summary;
+    my $author = seed-authors({ name => 'Amy' })[0];
+    seed-posts({ title => 'A<b>B', author_id => $author.id });
+    my $body = fetch('/admin/authors/' ~ $author.id).body;
+
+    aggregate-failures {
+      expect($body.contains('A&lt;b&gt;B')).to.be-truthy;
+      expect($body.contains('A<b>B')).to.be-falsy;
+    }
+  }
+
+  it 'renders a has-many :display summary as raw markup when the attribute is html', {
+    MVC::Keayl::Admin.reset;
+    register-authors-posts-html-summary;
+    my $author = seed-authors({ name => 'Amy' })[0];
+    seed-posts({ title => 'Alpha', author_id => $author.id }, { title => 'Beta', author_id => $author.id });
+    my $body = fetch('/admin/authors/' ~ $author.id).body;
+
+    expect($body.contains('<em>Alpha, Beta</em>')).to.be-truthy;
+  }
+
   it 'returns 404 for an unknown id', {
     expect(fetch('/admin/posts/999999').status).to.be(404);
   }

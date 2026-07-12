@@ -161,6 +161,24 @@ sub register-authors(--> Nil) is export {
   });
 }
 
+sub register-authors-posts-summary(--> Nil) is export {
+  MVC::Keayl::Admin.register(Author, {
+    column('name', :sortable);
+
+    attribute('name');
+    attribute('posts', :display({ .posts.map(*.read-attribute('title')).join(', ') }));
+  });
+}
+
+sub register-authors-posts-html-summary(--> Nil) is export {
+  MVC::Keayl::Admin.register(Author, {
+    column('name', :sortable);
+
+    attribute('name');
+    attribute('posts', :html, :display({ '<em>' ~ .posts.map(*.read-attribute('title')).join(', ') ~ '</em>' }));
+  });
+}
+
 sub register-posts-grid(--> Nil) is export {
   MVC::Keayl::Admin.register(Post, {
     index(as => 'grid', -> $post { '<h5 class="card-title">' ~ $post.read-attribute('title') ~ '</h5>' });

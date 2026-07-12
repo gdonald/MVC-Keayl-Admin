@@ -53,6 +53,38 @@ my $author-body = fetch('/admin/authors/' ~ $ann.id).body;
 ok $author-body.contains('/admin/posts/' ~ $post.id),
   'a has-many attribute links each associated record into its resource';
 
+# a has-many attribute with a :display override renders the summary, not links
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-authors-posts-summary;
+my ($amy) = seed-authors({ name => 'Amy' });
+seed-posts({ title => 'Alpha', author_id => $amy.id }, { title => 'Beta', author_id => $amy.id });
+my $summary-body = fetch('/admin/authors/' ~ $amy.id).body;
+ok $summary-body.contains('Alpha') && $summary-body.contains('Beta'),
+  'a has-many attribute honors a :display override, rendering its summary';
+ok !$summary-body.contains('/admin/posts/'),
+  'the has-many :display override replaces the default per-record links';
+
+# a non-html has-many :display summary is escaped
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-authors-posts-summary;
+my ($eve) = seed-authors({ name => 'Eve' });
+seed-posts({ title => 'A<b>B', author_id => $eve.id });
+my $escaped-body = fetch('/admin/authors/' ~ $eve.id).body;
+ok $escaped-body.contains('A&lt;b&gt;B') && !$escaped-body.contains('A<b>B'),
+  'a has-many :display summary is escaped unless the attribute is html';
+
+# an html has-many :display summary renders as raw markup
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-authors-posts-html-summary;
+my ($ida) = seed-authors({ name => 'Ida' });
+seed-posts({ title => 'Alpha', author_id => $ida.id }, { title => 'Beta', author_id => $ida.id });
+my $html-body = fetch('/admin/authors/' ~ $ida.id).body;
+ok $html-body.contains('<em>Alpha, Beta</em>'),
+  'an html has-many :display summary renders as raw markup';
+
 # a missing record is a 404
 is fetch('/admin/posts/999999').status, 404, 'an unknown id is a 404';
 is fetch('/admin/posts/not-a-number').status, 404, 'a non-numeric id is a 404';
