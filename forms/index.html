@@ -1034,7 +1034,18 @@ an input type:</p>
 set one explicitly for a single field. A <code>:hint</code> and <code>:placeholder</code> render
 alongside the input. A <code>select</code> renders a dropdown from its explicit
 <code>collection</code>, and with <code>:multiple</code> it renders a multi-select for a collection
-association.</p>
+association. A <code>text</code> field takes <code>:rows</code> to size its textarea.</p>
+<p>By default a field reads its value from the record's matching column. Pass a
+<code>:value</code> block to compute the value instead. The block receives the record, so
+it can render a virtual attribute or a value derived through a method:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">field</span>(<span class="s">&#39;body&#39;</span>,  :<span class="n">as</span><span class="s">&lt;text&gt;</span>, :<span class="n">rows</span>(<span class="mi">8</span>));
+<span class="n">field</span>(<span class="s">&#39;shout&#39;</span>, :<span class="n">as</span><span class="s">&lt;string&gt;</span>, :<span class="n">value</span>({ .<span class="n">title</span>.<span class="nb">uc</span> }));
+</code></pre></div></td></tr></table></div>
+<p>A <code>date</code>, <code>time</code>, or <code>datetime</code> field formats its value for the native input,
+dropping the timezone offset a <code>DateTime</code> would otherwise carry so the browser
+control does not blank it. A value that is already a string passes through
+unchanged.</p>
 <h2 id="persistence">Persistence<a class="headerlink" href="#persistence" title="Permanent link">&para;</a></h2>
 <p>Create and update assign only the attributes named in the resource's <code>permit</code>
 allowlist, so an unlisted parameter is never mass-assigned. On success the action

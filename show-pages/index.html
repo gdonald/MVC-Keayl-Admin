@@ -952,7 +952,9 @@ relationship rather than as a column:</p>
   missing association renders a dash, never a broken link.</li>
 <li>A <strong>has-many</strong> (or has-and-belongs-to-many) attribute renders as a compact
   sub-table, each row linking into the associated resource, capped with an "and
-  N more" line.</li>
+  N more" line. A <code>:display</code> block overrides this, summarising the collection
+  however you like (for example a comma-joined string) in place of the per-record
+  links. The summary is HTML-escaped unless the attribute is declared <code>:html</code>.</li>
 </ul>
 <p>Association kind and target are detected through the ORM's reflection, so the
 link targets are resolved from the registry by model.</p>

@@ -1069,7 +1069,8 @@ flag works on the table, grid, and blog presentations, and on show-page
 attributes.</p>
 <h2 id="rows-and-actions">Rows and actions<a class="headerlink" href="#rows-and-actions" title="Permanent link">&para;</a></h2>
 <p>Every row ends in an actions column with Show, Edit, and Delete controls. Delete
-issues an HTMX destroy with a confirmation and removes the row in place; see
+issues an HTMX destroy after a Bootstrap confirmation modal and removes the row in
+place; see
 <a href="../actions/">Destroy, batch, and custom actions</a>. When a resource has no records,
 the table shows an empty state instead of rows, and the page carries a New-record
 button linking to the new form. Row controls are hidden when the authorization
@@ -1085,6 +1086,9 @@ direction travel in the query string (<code>?sort=title&amp;dir=desc</code>); th
 shows a direction arrow, and clicking it again toggles ascending and descending.
 Only declared sortable columns are accepted, so the order clause is never built
 from arbitrary input.</p>
+<p>When no column is requested in the query string and the resource declares no
+<code>sort-order</code> default, the index falls back to ordering by <code>id</code> descending, so the
+newest records appear first.</p>
 <h2 id="pagination">Pagination<a class="headerlink" href="#pagination" title="Permanent link">&para;</a></h2>
 <p>The index applies <code>LIMIT</code> and <code>OFFSET</code> for the current page. The page size
 defaults to 25 and is configurable per resource:</p>
