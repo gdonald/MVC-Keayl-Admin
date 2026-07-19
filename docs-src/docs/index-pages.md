@@ -53,7 +53,8 @@ attributes.
 ## Rows and actions
 
 Every row ends in an actions column with Show, Edit, and Delete controls. Delete
-issues an HTMX destroy with a confirmation and removes the row in place; see
+issues an HTMX destroy after a Bootstrap confirmation modal and removes the row in
+place; see
 [Destroy, batch, and custom actions](actions.md). When a resource has no records,
 the table shows an empty state instead of rows, and the page carries a New-record
 button linking to the new form. Row controls are hidden when the authorization

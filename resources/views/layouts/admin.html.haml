@@ -30,9 +30,63 @@
             .alert.alert-success(role='alert')= $flash_notice
           %h1.h3.mb-3!= $admin_heading
           != $content
+    #admin-confirm-modal.modal.fade(tabindex='-1' aria-labelledby='admin-confirm-label' aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            %h5#admin-confirm-label.modal-title= $admin_confirm_title
+            %button.btn-close(type='button' data-bs-dismiss='modal' aria-label="#{$admin_confirm_cancel}")
+          .modal-body
+            %p(data-confirm-question)
+          .modal-footer
+            %button.btn.btn-secondary(type='button' data-bs-dismiss='modal')= $admin_confirm_cancel
+            %button.btn.btn-danger(type='button' data-confirm-accept)= $admin_confirm_accept
     != $admin_importmap
     != $admin_scripts
     :javascript
+      function adminConfirm(question, onAccept) {
+        var modalElement = document.getElementById('admin-confirm-modal');
+        modalElement.querySelector('[data-confirm-question]').textContent = question;
+
+        var modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        var acceptButton = modalElement.querySelector('[data-confirm-accept]');
+
+        function cleanup() {
+          acceptButton.removeEventListener('click', accept);
+          modalElement.removeEventListener('hidden.bs.modal', cleanup);
+        }
+
+        function accept() {
+          cleanup();
+          modal.hide();
+          onAccept();
+        }
+
+        acceptButton.addEventListener('click', accept);
+        modalElement.addEventListener('hidden.bs.modal', cleanup);
+
+        modal.show();
+      }
+
+      document.addEventListener('htmx:confirm', function (event) {
+        if (!event.detail.question) return;
+        event.preventDefault();
+
+        adminConfirm(event.detail.question, function () { event.detail.issueRequest(true); });
+      });
+
+      document.addEventListener('submit', function (event) {
+        var form = event.target;
+        if (!form.matches || !form.matches('[data-confirm]')) return;
+        if (form.dataset.confirmed === 'yes') return;
+        event.preventDefault();
+
+        adminConfirm(form.getAttribute('data-confirm'), function () {
+          form.dataset.confirmed = 'yes';
+          form.submit();
+        });
+      });
+
       document.addEventListener('change', function (event) {
         var target = event.target;
         if (!target.matches) return;

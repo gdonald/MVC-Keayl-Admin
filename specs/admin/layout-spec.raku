@@ -90,6 +90,14 @@ describe 'MVC::Keayl::Admin layout', {
   it 'renders the dashboard content inside the layout', {
     expect(body.contains('Welcome to Admin')).to.be-truthy;
   }
+
+  it 'renders a Bootstrap confirmation modal shell', {
+    expect(body.contains(q{id='admin-confirm-modal'}) && body.contains('modal fade')).to.be-truthy;
+  }
+
+  it 'intercepts the htmx confirmation event to show the modal instead of a native alert', {
+    expect(body.contains('htmx:confirm') && body.contains('bootstrap.Modal')).to.be-truthy;
+  }
 }
 
 describe 'MVC::Keayl::Admin chrome', {

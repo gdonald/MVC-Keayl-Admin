@@ -66,6 +66,12 @@ nok $body.contains('col-lg-10'),
 
 ok $body.contains('Welcome to Admin'), 'the dashboard content renders inside the layout';
 
+ok $body.contains(q{id='admin-confirm-modal'}) && $body.contains('modal fade'),
+  'a Bootstrap confirmation modal shell renders';
+
+ok $body.contains('htmx:confirm') && $body.contains('bootstrap.Modal'),
+  'the htmx confirmation event is intercepted to show the modal instead of a native alert';
+
 # chrome units
 ok MVC::Keayl::Admin::Chrome.brand-html.contains('navbar-brand') && MVC::Keayl::Admin::Chrome.brand-html.contains('/admin'),
   'the brand links to the mount path';

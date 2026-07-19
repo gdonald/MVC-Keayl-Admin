@@ -2,11 +2,12 @@
 
 ## Destroy
 
-Each index row has a delete control that issues an HTMX `DELETE` with a
-confirmation and removes the row in place on success. The show page deletes
-through a plain form that redirects back to the index, so deletion works without
-JavaScript too. Dependent handling (cascading, nullifying) is delegated to the
-ORM's `destroy`.
+Each index row has a delete control that issues an HTMX `DELETE` and removes the
+row in place on success. Before the request goes out, a Bootstrap confirmation
+modal asks the operator to confirm. The show page deletes through a plain form
+that redirects back to the index, guarded by the same modal, and still submits
+directly when JavaScript is unavailable. Dependent handling (cascading,
+nullifying) is delegated to the ORM's `destroy`.
 
 ## Batch actions
 
@@ -26,7 +27,8 @@ batch-action('Publish', -> @records {
 
 `member-action` and `collection-action` declare developer-defined actions. Each
 generates a route and a button (on the show page for member actions, on the index
-for collection actions), with an optional confirmation. The handler block
+for collection actions), with an optional confirmation shown in the same Bootstrap
+modal. The handler block
 receives the controller and either the record (member) or the relation
 (collection), and returns a response — a redirect or a rendered partial.
 

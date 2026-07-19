@@ -40,6 +40,12 @@ describe 'MVC::Keayl::Admin show page', {
     expect(fetch('/admin/posts/' ~ $post.id).body.contains('action="/admin/posts/' ~ $post.id ~ '/delete"')).to.be-truthy;
   }
 
+  it 'confirms the destroy through a data attribute rather than a native alert', {
+    seed-posts({ title => 'P', body => 'b' });
+    my $body = fetch('/admin/posts/' ~ Post.where({ title => 'P' }).first.id).body;
+    expect($body.contains('data-confirm=') && !$body.contains('onsubmit=')).to.be-truthy;
+  }
+
   it 'links a belongs-to attribute to the associated record', {
     my $author = ann;
     seed-posts({ title => 'P', body => 'b', author_id => $author.id });

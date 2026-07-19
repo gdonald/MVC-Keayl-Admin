@@ -4,6 +4,7 @@ use MVC::Keayl::Admin::Config;
 use MVC::Keayl::Admin::Assets;
 use MVC::Keayl::Admin::Chrome;
 use MVC::Keayl::Admin::Menu;
+use MVC::Keayl::Admin::I18n;
 use MVC::Keayl::Admin::Authentication;
 
 class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
@@ -83,6 +84,10 @@ class MVC::Keayl::Admin::Controller is MVC::Keayl::Controller {
     self.assign('current_admin', $!current-admin);
     self.assign('admin_logout_path', $config.logout-path);
     self.assign('flash_notice',  self.flash<notice>);
+
+    self.assign('admin_confirm_title',  MVC::Keayl::Admin::I18n.chrome('confirm-title', 'Please confirm'));
+    self.assign('admin_confirm_accept', MVC::Keayl::Admin::I18n.chrome('confirm-accept', 'Confirm'));
+    self.assign('admin_confirm_cancel', MVC::Keayl::Admin::I18n.chrome('confirm-cancel', 'Cancel'));
 
     self.render($template, :layout('admin'), |%options)
   }
