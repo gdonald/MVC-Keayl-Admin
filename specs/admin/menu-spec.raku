@@ -66,7 +66,7 @@ describe 'MVC::Keayl::Admin menu links and ordering', {
 
   let(:html, { MVC::Keayl::Admin::Menu.render(mount => '/admin') });
 
-  it 'honours the explicit group order', {
+  it 'honors the explicit group order', {
     expect(html.index('menu-group-system') < html.index('menu-group-content')).to.be-truthy;
   }
 

@@ -63,7 +63,7 @@ describe 'MVC::Keayl::Admin JSON export', {
     expect(@records.elems == 2 && @records[0]<title> eq 'Two').to.be-truthy;
   }
 
-  it 'honours the active filter', {
+  it 'honors the active filter', {
     expect(from-json(fetch('/admin/posts/export.json?title=One').body).list.elems).to.be(1);
   }
 }

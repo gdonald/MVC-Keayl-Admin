@@ -45,7 +45,7 @@ describe 'MVC::Keayl::Admin content panels', {
     expect(show.contains('nav-tabs') && show.contains('tab-overview') && show.contains('tab-history')).to.be-truthy;
   }
 
-  it 'honours sidebar placement', {
+  it 'honors sidebar placement', {
     expect(show.contains('Need help?') && !show.contains('index tip')).to.be-truthy;
   }
 

@@ -39,6 +39,23 @@ describe 'MVC::Keayl::Admin status tags', {
     my $body = fetch('/admin/posts/' ~ $id).body;
     expect($body.contains('badge text-bg-success') && $body.contains('>Yes</span>')).to.be-truthy;
   }
+
+  context 'when the status value is a canceled state', {
+    before-each {
+      MVC::Keayl::Admin.reset;
+      register-posts-canceled-status;
+    }
+
+    it 'renders a danger badge for the American spelling', {
+      seed-posts({ title => 'Done', published => True });
+      expect(fetch('/admin/posts').body.contains('text-bg-danger">Canceled</span>')).to.be-truthy;
+    }
+
+    it 'renders a danger badge for the British spelling', {
+      seed-posts({ title => 'Draft', published => False });
+      expect(fetch('/admin/posts').body.contains('text-bg-danger">Cancelled</span>')).to.be-truthy;
+    }
+  }
 }
 
 describe 'MVC::Keayl::Admin export columns', {

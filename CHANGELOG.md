@@ -2,6 +2,27 @@
 
 All notable changes to MVC::Keayl::Admin are documented here.
 
+## [0.9.1] - 2026-07-24
+
+### Added
+
+- A default index ordering, so an index with no `sort` in the query string and no
+  declared `sort-order` falls back to `id` descending and lists the newest
+  records first.
+- A `:display` block on a has-many or has-and-belongs-to-many show attribute,
+  rendering the collection as a summary string in place of the per-record link
+  sub-table, HTML-escaped unless the attribute is declared `:html`.
+
+### Changed
+
+- Delete and custom-action confirmations now use a Bootstrap modal in the admin
+  layout instead of the browser's native `confirm` dialog, for both HTMX deletes
+  and plain form submissions.
+
+### Fixed
+
+- Edit-form fields pre-filling from the record's current values.
+
 ## [0.9.0] - 2026-07-11
 
 Initial public release. A generated administration interface for

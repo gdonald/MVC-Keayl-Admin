@@ -214,6 +214,12 @@ sub register-posts-status(--> Nil) is export {
   });
 }
 
+sub register-posts-canceled-status(--> Nil) is export {
+  MVC::Keayl::Admin.register(Post, {
+    column('state', :format<status-tag>, :display({ .read-attribute('published') ?? 'canceled' !! 'cancelled' }));
+  });
+}
+
 sub register-posts-csv(--> Nil) is export {
   MVC::Keayl::Admin.register(Post, {
     column('title');

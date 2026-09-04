@@ -12,7 +12,8 @@ my %status-variants =
   enabled => 'success', yes => 'success', true => 'success', live => 'success',
   pending => 'warning', warning => 'warning', review => 'warning',
   inactive => 'secondary', draft => 'secondary', disabled => 'secondary', archived => 'secondary',
-  rejected => 'danger', failed => 'danger', error => 'danger', cancelled => 'danger',
+  rejected => 'danger', failed => 'danger', error => 'danger',
+  canceled => 'danger', cancelled => 'danger',
   'no' => 'danger', false => 'danger';
 
 sub status-tag-html($value --> Str) is export {

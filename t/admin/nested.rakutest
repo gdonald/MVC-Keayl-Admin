@@ -34,7 +34,7 @@ register-authors-nested;
 # the new form renders a nested fieldset for the association
 my $new = fetch('/admin/authors/new').body;
 ok $new.contains('posts-attributes[][title]'), 'the form renders a nested array input for a has-many association';
-ok $new.contains('Posts'), 'the nested fieldset is labelled';
+ok $new.contains('Posts'), 'the nested fieldset is labeled';
 
 # creating with nested attributes builds the associated records
 my $created = submit('/admin/authors',

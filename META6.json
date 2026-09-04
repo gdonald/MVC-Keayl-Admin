@@ -2,7 +2,7 @@
   "api": "1",
   "auth": "zef:gdonald",
   "authors": ["Greg Donald"],
-  "version": "0.9.0",
+  "version": "0.9.1",
   "build-depends": [],
   "depends": [
     "MVC::Keayl:auth<zef:gdonald>",

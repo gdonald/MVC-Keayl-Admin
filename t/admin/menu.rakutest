@@ -8,7 +8,7 @@ use MVC::Keayl::Admin::TestSupport;
 
 setup-admin-db;
 
-# grouped, ordered, labelled, icon, and active highlighting
+# grouped, ordered, labeled, icon, and active highlighting
 MVC::Keayl::Admin.reset;
 MVC::Keayl::Admin.register(Post,   { column('title'); menu(group => 'Content', label => 'Articles', icon => 'file-text', priority => 2); });
 MVC::Keayl::Admin.register(Author, { column('name');  menu(group => 'Content', priority => 1); });

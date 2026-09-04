@@ -45,7 +45,7 @@ ok $show.contains('nav-tabs'), 'tabs render as a tabbed card';
 ok $show.contains('Overview') && $show.contains('tab-overview'), 'the first tab renders';
 ok $show.contains('History') && $show.contains('tab-history'), 'a second tab renders';
 
-# show page sidebars honour placement
+# show page sidebars honor placement
 ok $show.contains('Need help?'), 'a both-placement sidebar renders on the show page';
 nok $show.contains('index tip'), 'an index-only sidebar does not render on the show page';
 

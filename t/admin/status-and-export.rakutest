@@ -37,6 +37,15 @@ ok $index.contains('>Active</span>'), 'the status-tag label is humanized from th
 my $show = fetch('/admin/posts/' ~ $sid).body;
 ok $show.contains('badge text-bg-success') && $show.contains('>Yes</span>'), 'a boolean status-tag renders on the show page';
 
+# a canceled status renders a danger badge for either spelling
+MVC::Keayl::Admin.reset;
+register-posts-canceled-status;
+seed-posts({ title => 'Done', published => True }, { title => 'Draft', published => False });
+
+my $canceled = fetch('/admin/posts').body;
+ok $canceled.contains('text-bg-danger">Canceled</span>'), 'the American spelling of a canceled status renders a danger badge';
+ok $canceled.contains('text-bg-danger">Cancelled</span>'), 'the British spelling of a cancelled status renders a danger badge';
+
 # a csv block overrides the export columns
 MVC::Keayl::Admin.reset;
 setup-admin-db;

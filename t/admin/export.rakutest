@@ -57,7 +57,7 @@ is @records[0]<title>, 'Two', 'each JSON object carries the column values';
 
 # export reflects the current filter
 ok fetch('/admin/posts/export.json?title=One').&streamed-body, 'the filtered export still responds';
-is from-json(fetch('/admin/posts/export.json?title=One').body).list.elems, 1, 'the export honours the active filter';
+is from-json(fetch('/admin/posts/export.json?title=One').body).list.elems, 1, 'the export honors the active filter';
 
 MVC::Keayl::Admin.reset;
 
