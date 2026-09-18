@@ -2,7 +2,7 @@
 
 All notable changes to MVC::Keayl::Admin are documented here.
 
-## [0.9.1] - 2026-07-24
+## [0.9.1] - 2026-09-18
 
 ### Added
 
@@ -12,6 +12,8 @@ All notable changes to MVC::Keayl::Admin are documented here.
 - A `:display` block on a has-many or has-and-belongs-to-many show attribute,
   rendering the collection as a summary string in place of the per-record link
   sub-table, HTML-escaped unless the attribute is declared `:html`.
+- The American spelling `canceled` as a `status-tag` value, rendering the danger
+  variant alongside the existing `cancelled`.
 
 ### Changed
 
