@@ -9,3 +9,7 @@ method allows(Str:D $action, :$admin, :$resource, :$record --> Bool) {
 method scope($relation, :$admin, :$resource) {
   $relation
 }
+
+method defaults(:$admin, :$resource --> Hash) {
+  %()
+}

@@ -42,6 +42,18 @@ class HidePosts is MVC::Keayl::Admin::Authorization::Policy {
   }
 }
 
+class PublishByDefault is MVC::Keayl::Admin::Authorization::Policy {
+  method defaults(:$admin, :$resource --> Hash) {
+    %( published => True )
+  }
+}
+
+class AliceOnly is MVC::Keayl::Admin::Authorization::Policy {
+  method scope($relation, :$admin, :$resource) {
+    $resource.slug eq 'authors' ?? $relation.where({ name => 'Alice' }) !! $relation
+  }
+}
+
 class FakeAdmin { has $.role }
 
 sub host {
@@ -53,6 +65,19 @@ sub call(Str:D $method, Str:D $path) {
   host.call(MVC::Keayl::Request.new(:$method, target => $path))
 }
 
+sub post-form(Str:D $path, Str:D $body) {
+  host.call(MVC::Keayl::Request.new(
+    method  => 'POST',
+    target  => $path,
+    headers => { 'Content-Type' => 'application/x-www-form-urlencoded' },
+    :$body,
+  ))
+}
+
+sub batch(Str:D $action, *@ids) {
+  post-form('/admin/posts/batch', (@ids.map({ 'ids[]=' ~ $_ }).Slip, 'batch-action=' ~ $action).join('&'))
+}
+
 sub fresh {
   MVC::Keayl::Admin.reset;
   setup-admin-db;
@@ -62,6 +87,7 @@ sub fresh {
 # default policy allows everything
 fresh;
 ok MVC::Keayl::Admin::Authorization.allows('destroy'), 'the default policy allows every action';
+is MVC::Keayl::Admin::Authorization.defaults.elems, 0, 'the default policy supplies no create defaults';
 
 # a forbidden action renders a 403 page
 fresh;
@@ -101,6 +127,66 @@ nok $index.contains('Private'), 'a record outside the policy scope is hidden';
 
 my $private = Post.where({ title => 'Private' }).first;
 is call('GET', '/admin/posts/' ~ $private.id).status, 404, 'a record outside the scope cannot be reached';
+
+# batch and collection actions stay inside the policy scope
+batch('Destroy', $private.id);
+ok Post.where({ id => $private.id }).first.defined, 'batch destroy skips a record outside the policy scope';
+
+batch('Publish', $private.id);
+nok Post.where({ id => $private.id }).first.read-attribute('published'), 'a custom batch action skips a record outside the policy scope';
+
+call('POST', '/admin/posts/publish-all');
+nok Post.where({ id => $private.id }).first.read-attribute('published'), 'a collection action receives only the records inside the policy scope';
+
+# batch actions check each selected record against the policy
+fresh;
+seed-posts({ title => 'One' }, { title => 'Two' });
+MVC::Keayl::Admin.authorize-with(OddRecordsOnly.new);
+
+my @batch-posts = Post.all.all;
+my $batch-odd  = @batch-posts.first({ .id !%% 2 });
+my $batch-even = @batch-posts.first({ .id %% 2 });
+
+batch('Destroy', $batch-even.id);
+ok Post.where({ id => $batch-even.id }).first.defined, 'batch destroy skips a selected record the policy forbids';
+
+batch('Destroy', $batch-odd.id);
+nok Post.where({ id => $batch-odd.id }).first.defined, 'batch destroy removes a selected record the policy allows';
+
+# a custom batch action is authorized by its own name
+fresh;
+seed-posts({ title => 'Draft', published => False });
+MVC::Keayl::Admin.authorize-with(DenyDestroy.new);
+
+my $draft = Post.where({ title => 'Draft' }).first;
+
+batch('Publish', $draft.id);
+ok Post.where({ id => $draft.id }).first.read-attribute('published'), 'a custom batch action runs when the policy forbids destroy';
+
+is batch('Destroy', $draft.id).status, 403, 'batch destroy is forbidden when the policy forbids destroy';
+
+# policy defaults are set on create over the posted values
+fresh;
+MVC::Keayl::Admin.authorize-with(PublishByDefault.new);
+
+post-form('/admin/posts', 'title=Fresh&published=0');
+ok Post.where({ title => 'Fresh' }).first.read-attribute('published'), 'policy defaults override the posted values on create';
+
+# a nested parent outside the policy scope is a 404
+MVC::Keayl::Admin.reset;
+setup-admin-db;
+register-authors;
+register-posts-nested;
+seed-authors({ name => 'Alice' }, { name => 'Bob' });
+MVC::Keayl::Admin.authorize-with(AliceOnly.new);
+
+my $bob-base   = '/admin/authors/' ~ Author.where({ name => 'Bob' }).first.id ~ '/posts';
+my $alice-base = '/admin/authors/' ~ Author.where({ name => 'Alice' }).first.id ~ '/posts';
+
+is call('GET', $bob-base).status, 404, 'a nested index under a hidden parent is a 404';
+is post-form($bob-base, 'title=Hidden Parent').status, 404, 'a nested create under a hidden parent is a 404';
+nok Post.where({ title => 'Hidden Parent' }).first.defined, 'a nested create under a hidden parent creates nothing';
+is call('GET', $alice-base).status, 200, 'a nested index under a visible parent is served';
 
 # buttons hidden when the policy forbids them
 fresh;

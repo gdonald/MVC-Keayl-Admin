@@ -2,6 +2,29 @@
 
 All notable changes to MVC::Keayl::Admin are documented here.
 
+## [0.9.2] - 2026-10-28
+
+### Added
+
+- A policy `defaults` method returning column values set on every created
+  record, merged over the posted attributes.
+- `MVC::Keayl::Admin.endpoint` accepts `controller-options`, passed to the admin
+  controllers.
+
+### Changed
+
+- A custom batch action is authorized with its own name instead of `destroy`.
+- Requires MVC::Keayl 0.9.3 or later, whose mounted dispatcher takes the host's
+  `secret`.
+
+### Fixed
+
+- Batch actions load the selected records through the policy scope and check
+  each one against the policy.
+- Collection actions receive the policy-scoped relation.
+- A nested resource loads its parent through the parent resource's policy scope
+  and answers 404 when the parent is outside it.
+
 ## [0.9.1] - 2026-09-18
 
 ### Added

@@ -7,6 +7,31 @@ use MVC::Keayl::Routing;
 use MVC::Keayl::Dispatcher;
 use MVC::Keayl::Request;
 use MVC::Keayl::HttpAuthentication;
+use MVC::Keayl::Controller;
+use MVC::Keayl::TestSupport;
+
+class AdminLoginController is MVC::Keayl::Controller {
+  method create {
+    self.session<admin_id> = 7;
+    self.head(204)
+  }
+}
+
+sub signed-in-session($admin-endpoint --> IntegrationSession) {
+  my $router = routes {
+    post '/login', to => 'admin_login#create';
+    mount $admin-endpoint, at => '/admin';
+  };
+
+  my $session = IntegrationSession.new(app => MVC::Keayl::Dispatcher.new(
+    :$router,
+    controllers        => [AdminLoginController],
+    controller-options => %( secret => 'host-secret' ),
+  ));
+
+  $session.post('/login');
+  $session
+}
 
 sub fetch($path, :$authorization) {
   my %headers = $authorization.defined ?? (Authorization => $authorization) !! ();
@@ -124,5 +149,24 @@ describe 'MVC::Keayl::Admin session authentication strategy', {
     it 'maps the stored id to an admin', {
       expect(resolving.authenticate(controller)).to.be('admin-5');
     }
+  }
+}
+
+describe 'MVC::Keayl::Admin session authentication inside a host app', {
+  before-each {
+    MVC::Keayl::Admin.reset;
+    MVC::Keayl::Admin.authenticate-with(MVC::Keayl::Admin::Authentication::Session.new(key => 'admin_id'));
+  }
+
+  it 'admits an admin the host signed in when mounted without controller options', {
+    expect(signed-in-session(MVC::Keayl::Admin.endpoint).get('/admin').status).to.be(200);
+  }
+
+  it 'admits an admin the host signed in when mounted with the host secret', {
+    expect(signed-in-session(MVC::Keayl::Admin.endpoint(controller-options => %( secret => 'host-secret' ))).get('/admin').status).to.be(200);
+  }
+
+  it 'redirects to the login path when mounted with a different secret', {
+    expect(signed-in-session(MVC::Keayl::Admin.endpoint(controller-options => %( secret => 'other-secret' ))).get('/admin').status).to.be(302);
   }
 }

@@ -196,8 +196,11 @@ method view-path(::?CLASS:U: Str:D $path --> Nil) {
   MVC::Keayl::Admin::Config.current.add-view-override($path);
 }
 
-method endpoint(::?CLASS:U:) {
-  self.engine.endpoint(view-path-overrides => MVC::Keayl::Admin::Config.current.view-overrides)
+method endpoint(::?CLASS:U: :%controller-options) {
+  self.engine.endpoint(
+    view-path-overrides => MVC::Keayl::Admin::Config.current.view-overrides,
+    :%controller-options,
+  )
 }
 
 method reset(::?CLASS:U: --> Nil) {

@@ -2,10 +2,10 @@
   "api": "1",
   "auth": "zef:gdonald",
   "authors": ["Greg Donald"],
-  "version": "0.9.1",
+  "version": "0.9.2",
   "build-depends": [],
   "depends": [
-    "MVC::Keayl:auth<zef:gdonald>",
+    "MVC::Keayl:ver<0.9.3+>:auth<zef:gdonald>",
     "ORM::ActiveRecord:auth<zef:gdonald>",
     "Template::HAML:auth<zef:gdonald>"
   ],

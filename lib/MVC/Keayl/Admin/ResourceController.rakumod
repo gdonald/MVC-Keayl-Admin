@@ -137,6 +137,10 @@ sub index-body-html($base, $resource, $abilities, Str:D :$tabs, Str:D :$chips,
   $tabs ~ $chips ~ $core
 }
 
+sub batch-ability(Str:D $name --> Str) {
+  $name eq 'Destroy' ?? 'destroy' !! $name
+}
+
 sub resolve-scope($resource, %params) {
   my $name = (%params<scope> // '').Str;
 
@@ -203,7 +207,9 @@ method nested-parent($resource) {
   return Nil without $parent-id;
 
   with $resource.parent-reflection -> $reflection {
-    return $reflection.klass.where({ id => $parent-id.Int }).first;
+    my $visible = self.policy-scope(self.parent-resource($resource), $reflection.klass.all);
+
+    return $visible.where({ id => $parent-id.Int }).first;
   }
 
   Nil
@@ -258,7 +264,8 @@ method action-ability {
     when 'show'                                      { 'show' }
     when 'new-record' | 'create'                     { 'create' }
     when 'edit' | 'update'                           { 'update' }
-    when 'destroy' | 'apply-batch'                   { 'destroy' }
+    when 'destroy'                                   { 'destroy' }
+    when 'apply-batch'                               { batch-ability((self.params<batch-action> // '').Str) }
     when 'run-member-action' | 'run-collection-action' {
       self.request.path.split('/').grep(*.chars).tail
     }
@@ -270,6 +277,7 @@ method authorize-action {
   my $resource = self.current-resource;
 
   return without $resource;
+  return self.head(404) if self.params<parent_id>.defined && !self.nested-parent($resource).defined;
 
   return if MVC::Keayl::Admin::Authorization.allows(self.action-ability, admin => self.current-admin, :$resource);
 
@@ -378,7 +386,12 @@ method apply-batch {
   my @ids  = (self.params<ids> // ()).list.map(*.Int);
   my $name = (self.params<batch-action> // '').Str;
 
-  my @records = @ids ?? $resource.model.where({ id => @ids }).all !! ();
+  my $ability = batch-ability($name);
+
+  my @records = @ids
+    ?? self.policy-scope($resource, $resource.model.all).where({ id => @ids }).all
+         .grep({ self!authorize-record($ability, $resource, $_) })
+    !! ();
 
   if @records {
     if $name eq 'Destroy' {
@@ -417,7 +430,7 @@ method run-collection-action {
   my $name     = self.request.path.split('/').grep(*.chars).tail;
 
   with $resource.collection-actions.first({ .name eq $name }) -> $action {
-    return $action.block.(self, $resource.model.all);
+    return $action.block.(self, self.policy-scope($resource, $resource.model.all));
   }
 
   self.head(404)
@@ -526,6 +539,8 @@ method create {
   with self.nested-parent($resource) -> $parent {
     %attrs{self.parent-fk($resource)} = $parent.id;
   }
+
+  %attrs = %attrs, MVC::Keayl::Admin::Authorization.defaults(admin => self.current-admin, :$resource);
 
   my $record = $resource.model.create(%attrs);
 

@@ -24,3 +24,7 @@ method allows(::?CLASS:U: |args --> Bool) {
 method scope(::?CLASS:U: |args) {
   self.policy.scope(|args)
 }
+
+method defaults(::?CLASS:U: |args --> Hash) {
+  self.policy.defaults(|args)
+}
