@@ -8,3 +8,4 @@ ROADMAP.md
 coverage
 build.sh
 mkdocs.yml
+Jenkinsfile
