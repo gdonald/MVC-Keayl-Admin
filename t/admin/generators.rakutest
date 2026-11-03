@@ -1,6 +1,8 @@
 use v6.d;
 use Test;
 
+use MVC::Keayl::Admin;
+use MVC::Keayl::Admin::Config;
 use MVC::Keayl::Admin::Generators;
 use MVC::Keayl::Admin::TestSupport;
 
@@ -28,43 +30,27 @@ sub base-routes(IO() $root) {
   RAKU
 }
 
-setup-admin-db;
+sub base-application(IO() $root) {
+  $root.add('config').mkdir;
+  $root.add('config/application.raku').spurt(q:to/RAKU/);
+  use MVC::Keayl::Application;
 
-# generate admin <Model> introspects the schema into an explicit registration
-{
-  my $root = scratch('admin');
-  my $out  = StringSink.new;
+  my $app = MVC::Keayl::Application.new;
 
-  is generate-admin('Post', model => Post, root => $root, out => $out, err => StringSink.new), 0,
-    'the admin generator succeeds';
-
-  my $file = $root.add('app/admin/post.raku');
-  ok $file.e, 'the registration file is created';
-
-  my $source = $file.slurp;
-  like $source, /'MVC::Keayl::Admin.register(Post'/, 'the registration registers the model';
-  like $source, /'use MVC::Keayl::Admin::DSL'/,     'the registration imports the DSL used by its block';
-  like $source, /"column('title')"/,                'a column is emitted from the schema';
-  like $source, /"field('title'"/,                   'a field is emitted from the schema';
-  like $source, /"filter('"/,                        'a filter is emitted from the schema';
-  like $source, /'permit('/,                         'permitted attributes are emitted';
-  unlike $source, /"field('id')"/,                   'the primary key is not an editable field';
-
-  ok $root.add('t/admin/post.rakutest').e,     'a parallel t/ test is generated';
-  ok $root.add('specs/admin/post-spec.raku').e, 'a parallel spec is generated';
-
-  my $test-source = $root.add('t/admin/post.rakutest').slurp;
-  like $test-source, /"use lib 'app/models'"/,          'the generated test puts the models directory on the search path';
-  like $test-source, /"use lib 'app/models/concerns'"/, 'the generated test puts the model concerns directory on the search path';
-
-  my $spec-source = $root.add('specs/admin/post-spec.raku').slurp;
-  like $spec-source, /"use lib 'app/models'"/,          'the generated spec puts the models directory on the search path';
-  like $spec-source, /"use lib 'app/models/concerns'"/, 'the generated spec puts the model concerns directory on the search path';
+  $app;
+  RAKU
 }
 
-# without an explicit model the generator loads it from the conventional app/models directory
-{
-  my $root = scratch('load-model');
+sub installed(Str:D $label --> IO::Path) {
+  my $root = scratch($label);
+  base-routes($root);
+  base-application($root);
+
+  generate-admin-install(root => $root, out => StringSink.new, err => StringSink.new);
+  $root
+}
+
+sub widget-model(IO() $root) {
   $root.add('app/models').mkdir;
   $root.add('app/models/Widget.rakumod').spurt(q:to/RAKU/);
   unit class Widget;
@@ -77,29 +63,100 @@ setup-admin-db;
     )
   }
   RAKU
+}
 
-  my $err = StringSink.new;
+sub uncommented-authentication(Str:D $module --> Str) {
+  my @lines = $module.lines;
+  my $from  = @lines.first(:k, *.contains('# MVC::Keayl::Admin.authenticate-with('));
+  my $to    = @lines.first(:k, *.contains('# );'));
 
-  is generate-admin('Widget', root => $root, out => StringSink.new, err => $err), 0,
+  @lines[$from .. $to].map(*.subst(/^ \s* '# '/, '')).join("\n")
+}
+
+setup-admin-db;
+
+# generate admin <Model> adds an explicit registration to the admin registrations module
+{
+  my $root = installed('admin');
+  my $out  = StringSink.new;
+
+  is generate-admin('Post', model => Post, root => $root, out => $out, err => StringSink.new), 0,
+    'the admin generator succeeds';
+
+  my $source = $root.add('app/admin/AdminRegistrations.rakumod').slurp;
+  like $source, /^^ 'use Post;' $$/,                    'the registrations module loads the model';
+  like $source, /'MVC::Keayl::Admin.register(Post'/,   'the registration registers the model';
+  like $source, /"column('title')"/,                   'a column is emitted from the schema';
+  like $source, /"field('title'"/,                     'a field is emitted from the schema';
+  like $source, /"filter('"/,                          'a filter is emitted from the schema';
+  like $source, /'permit('/,                           'permitted attributes are emitted';
+  unlike $source, /"field('id')"/,                     'the primary key is not an editable field';
+  like $source, /'register(Post' .* '}' \s* $/,        'the registration is inside register-admin';
+  like $out.text, /'update'/,                          'the module update is reported';
+
+  ok $root.add('t/admin/post.rakutest').e,     'a parallel t/ test is generated';
+  ok $root.add('specs/admin/post-spec.raku').e, 'a parallel spec is generated';
+
+  my $test-source = $root.add('t/admin/post.rakutest').slurp;
+  like $test-source, /"use lib 'app/models'"/,          'the generated test puts the models directory on the search path';
+  like $test-source, /"use lib 'app/models/concerns'"/, 'the generated test puts the model concerns directory on the search path';
+  like $test-source, /'register-admin;'/,               'the generated test runs the registrations';
+
+  my $spec-source = $root.add('specs/admin/post-spec.raku').slurp;
+  like $spec-source, /"use lib 'app/models'"/,          'the generated spec puts the models directory on the search path';
+  like $spec-source, /"use lib 'app/models/concerns'"/, 'the generated spec puts the model concerns directory on the search path';
+  like $spec-source, /'register-admin;'/,               'the generated spec runs the registrations';
+}
+
+# generating the same model twice adds one registration
+{
+  my $root = installed('twice');
+  my $out  = StringSink.new;
+
+  generate-admin('Post', model => Post, root => $root, out => StringSink.new, err => StringSink.new);
+  generate-admin('Post', model => Post, root => $root, out => $out, err => StringSink.new);
+
+  is $root.add('app/admin/AdminRegistrations.rakumod').slurp.comb('register(Post').elems, 1,
+    'a repeated generate does not duplicate the registration';
+  like $out.text, /'exists'/, 'the existing registration is reported';
+}
+
+# without an explicit model the generator loads it from app/models, and the application registers it
+{
+  my $root = installed('load-model');
+  widget-model($root);
+
+  is generate-admin('Widget', root => $root, out => StringSink.new, err => StringSink.new), 0,
     'the generator loads a model from app/models and succeeds';
 
-  my $source = $root.add('app/admin/widget.raku').slurp;
-  like $source, /"column('name')"/,        'a column is emitted from the disk-loaded schema';
+  my $source = $root.add('app/admin/AdminRegistrations.rakumod').slurp;
+  like $source, /"column('name')"/,            'a column is emitted from the disk-loaded schema';
   like $source, /"field('notes', :as<text>)"/, 'a text column from the disk-loaded schema becomes a text field';
+
+  MVC::Keayl::Admin.reset;
+  my $app = indir $root, { EVALFILE 'config/application.raku' };
+
+  ok $app.defined, 'the application loads';
+  ok MVC::Keayl::Admin.registry.all.first(*.model-name eq 'Widget').defined,
+    'loading the application registers the generated resource';
+  is MVC::Keayl::Admin::Config.current.site-title, 'Admin',
+    'loading the application applies the generated configuration';
+
+  MVC::Keayl::Admin.reset;
 }
 
 # the field type follows the column type
 {
-  my $root = scratch('types');
+  my $root = installed('types');
   generate-admin('Post', model => Post, root => $root, out => StringSink.new, err => StringSink.new);
 
-  my $source = $root.add('app/admin/post.raku').slurp;
+  my $source = $root.add('app/admin/AdminRegistrations.rakumod').slurp;
   like $source, /"field('body', :as<text>)"/, 'a text column becomes a text field';
 }
 
 # a model that cannot be loaded reports a clean error rather than crashing
 {
-  my $root = scratch('unloadable');
+  my $root = installed('unloadable');
   my $err  = StringSink.new;
 
   is generate-admin('NoSuchModel12345', root => $root, out => StringSink.new, err => $err), 1,
@@ -107,34 +164,92 @@ setup-admin-db;
   like $err.text, /'cannot load model'/, 'the unloadable model is reported on the error stream';
 }
 
-# generate admin:install mounts the engine and writes the scaffolding
+# generating a model before install reports that install is needed
+{
+  my $root = scratch('uninstalled');
+  my $err  = StringSink.new;
+
+  is generate-admin('Post', model => Post, root => $root, out => StringSink.new, err => $err), 1,
+    'the generator returns non-zero without the registrations module';
+  like $err.text, /'generate admin:install first'/, 'the missing install is reported on the error stream';
+  nok $root.add('t/admin/post.rakutest').e, 'no test is generated without the registrations module';
+}
+
+# generate admin:install mounts the engine, writes the registrations module, and loads it from the application
 {
   my $root = scratch('install');
   base-routes($root);
-  my $out = StringSink.new;
+  base-application($root);
 
-  is generate-admin-install(root => $root, out => $out, err => StringSink.new), 0,
+  is generate-admin-install(root => $root, out => StringSink.new, err => StringSink.new), 0,
     'the install generator succeeds';
 
   like $root.add('config/routes.raku').slurp, /'mount MVC::Keayl::Admin.endpoint'/, 'the engine is mounted in the routes';
-  ok $root.add('config/initializers/admin.raku').e,                 'a config initializer is written';
-  like $root.add('config/initializers/admin.raku').slurp, /'configure'/, 'the initializer configures the admin';
-  ok $root.add('app/admin/dashboard.raku').e,                       'a dashboard stub is written';
-  ok $root.add('config/initializers/admin_authentication.raku').e,  'an auth stub is written';
-  ok $root.add('t/admin/install.rakutest').e,                       'a parallel t/ test is generated for install';
-  ok $root.add('specs/admin/install-spec.raku').e,                  'a parallel spec is generated for install';
+
+  my $module = $root.add('app/admin/AdminRegistrations.rakumod').slurp;
+  like $module, /'sub register-admin is export'/, 'the registrations module exports register-admin';
+  like $module, /'configure'/,                    'register-admin configures the admin';
+  like $module, /'dashboard-block'/,              'register-admin adds a dashboard block';
+  like $module, /'authenticate-with'/,            'the module has an authentication stub';
+
+  my $application = $root.add('config/application.raku').slurp;
+  like $application, /'use AdminRegistrations;' \s+ 'register-admin;' \s+ 'my $app'/,
+    'the application runs register-admin before building the app';
+  like $application, /"use lib 'app/admin'"/, 'the application puts app/admin on the search path';
+
+  nok $root.add('config/initializers').e, 'no initializer files are written';
+
+  ok $root.add('t/admin/install.rakutest').e,      'a parallel t/ test is generated for install';
+  ok $root.add('specs/admin/install-spec.raku').e, 'a parallel spec is generated for install';
 }
 
-# install does not duplicate the mount on a second run
+# the authentication stub constructs a Basic strategy once uncommented
+{
+  my $root   = installed('authentication');
+  my $module = $root.add('app/admin/AdminRegistrations.rakumod').slurp;
+
+  MVC::Keayl::Admin.reset;
+  EVAL 'use MVC::Keayl::Admin; use MVC::Keayl::Admin::Authentication::Basic; ' ~ uncommented-authentication($module);
+
+  is MVC::Keayl::Admin::Authentication.strategy.name, 'admin', 'the uncommented stub installs a Basic strategy';
+
+  MVC::Keayl::Admin.reset;
+}
+
+# install without an application file reports it
+{
+  my $root = scratch('no-application');
+  base-routes($root);
+  my $err = StringSink.new;
+
+  generate-admin-install(root => $root, out => StringSink.new, err => $err);
+  like $err.text, /'no ' .* 'config/application.raku'/, 'the missing application file is reported';
+}
+
+# install into an application without a my $app line reports it
+{
+  my $root = scratch('no-app-line');
+  base-routes($root);
+  $root.add('config/application.raku').spurt("use MVC::Keayl::Application;\n");
+  my $err = StringSink.new;
+
+  generate-admin-install(root => $root, out => StringSink.new, err => $err);
+  like $err.text, /'no \'my $app\' line'/, 'the missing app line is reported';
+}
+
+# install does not duplicate the mount or the application wiring on a second run
 {
   my $root = scratch('idempotent');
   base-routes($root);
+  base-application($root);
 
   generate-admin-install(root => $root, out => StringSink.new, err => StringSink.new);
   generate-admin-install(root => $root, out => StringSink.new, err => StringSink.new);
 
   is $root.add('config/routes.raku').slurp.comb(/'mount MVC::Keayl::Admin.endpoint'/).elems, 1,
     'a repeated install does not duplicate the mount';
+  is $root.add('config/application.raku').slurp.comb('register-admin;').elems, 1,
+    'a repeated install does not duplicate the application wiring';
 }
 
 done-testing;

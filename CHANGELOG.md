@@ -2,6 +2,25 @@
 
 All notable changes to MVC::Keayl::Admin are documented here.
 
+## [Unreleased]
+
+### Changed
+
+- `keayl-admin generate admin:install` writes
+  `app/admin/AdminRegistrations.rakumod`, exporting a `register-admin` sub with
+  the configuration, dashboard block, and authentication stub, and adds
+  `use AdminRegistrations;` and `register-admin;` to `config/application.raku`.
+  It no longer writes `config/initializers/admin.raku`,
+  `config/initializers/admin_authentication.raku`, or `app/admin/dashboard.raku`.
+- `keayl-admin generate admin <Model>` adds its registration to
+  `register-admin` instead of writing `app/admin/<model>.raku`, and exits
+  non-zero when `admin:install` has not run.
+
+### Fixed
+
+- The generated authentication stub passes `name` to
+  `MVC::Keayl::Admin::Authentication::Basic`.
+
 ## [0.9.2] - 2026-10-28
 
 ### Added
